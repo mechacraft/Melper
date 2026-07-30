@@ -1,0 +1,83 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  # Never interrupt an in-flight deployment.
+  cancel-in-progress: false
+
+env:
+  # Project pages are served from https://<user>.github.io/<repo>/ - trailing slash required.
+  BASE_PATH: /Melper/
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Test
+        run: dotnet test Melper.Tests/Melper.Tests.csproj -c Release
+
+      - name: Publish
+        run: dotnet publish Melper.Web/Melper.Web.csproj -c Release -o publish
+
+      - name: Rewrite base path for project pages
+        working-directory: publish/wwwroot
+        run: |
+          set -euo pipefail
+
+          # The repo keeps <base href="/"> so `dotnet run` works locally; only the
+          # published copy is rewritten.
+          sed -i "s|<base href=\"/\" />|<base href=\"$BASE_PATH\" />|" index.html
+          sed -i "s|^const base = \"/\";$|const base = \"$BASE_PATH\";|" service-worker.js
+
+          # index.html is listed in the service worker manifest with an SRI hash;
+          # rewriting it invalidates that hash and breaks service worker install.
+          OLD_HASH=$(grep -B1 '"url": "index.html"' service-worker-assets.js | grep -o 'sha256-[^"]*')
+          NEW_HASH="sha256-$(openssl dgst -sha256 -binary index.html | openssl base64)"
+          sed -i "s|$OLD_HASH|$NEW_HASH|" service-worker-assets.js
+
+          # A silent sed miss would produce a green build and a dead site.
+          grep -q "<base href=\"$BASE_PATH\" />" index.html \
+            || { echo "::error::base href rewrite failed in index.html"; exit 1; }
+          grep -q "^const base = \"$BASE_PATH\";$" service-worker.js \
+            || { echo "::error::base rewrite failed in service-worker.js"; exit 1; }
+          grep -q "$NEW_HASH" service-worker-assets.js \
+            || { echo "::error::index.html hash update failed in service-worker-assets.js"; exit 1; }
+
+      - name: Add SPA fallback
+        working-directory: publish/wwwroot
+        run: |
+          set -euo pipefail
+          # GitHub Pages has no SPA rewrite; without this, deep links 404.
+          # Must run after the base href rewrite so the fallback inherits it.
+          cp index.html 404.html
+          touch .nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: publish/wwwroot
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

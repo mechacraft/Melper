@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Melper.Core/Melper.Core.csproj" />
+  <Project Path="Melper.Tests/Melper.Tests.csproj" />
+  <Project Path="Melper.Web/Melper.Web.csproj" />
+</Solution>

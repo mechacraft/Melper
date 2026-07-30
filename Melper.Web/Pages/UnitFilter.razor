@@ -1,0 +1,240 @@
+@page "/filter"
+@using Melper.Core.Services
+@using Melper.Data
+@inject IJSRuntime JS
+
+<PageTitle>Unit filter</PageTitle>
+
+<div class="row mb-3 align-items-end g-3">
+    <div class="col-auto">
+        <label class="form-label">Applies to</label>
+        <div class="btn-group d-block">
+            @foreach (var target in Targets)
+            {
+                <button type="button"
+                        class="btn @(target.Key == _target ? "btn-primary" : "btn-outline-primary")"
+                        @onclick="() => SwitchTarget(target.Key)">
+                    @target.Label
+                </button>
+            }
+        </div>
+    </div>
+    <div class="col">
+        <label class="form-label">
+            Filter
+            <span class="text-body-secondary small">(@_selected.Count of @AllUnits.Count units)</span>
+        </label>
+        <input class="form-control font-monospace" readonly value="@_pattern"
+               placeholder="empty - no filter, every unit passes"/>
+    </div>
+</div>
+
+<div class="btn-group mb-3" role="group">
+    <button type="button" class="btn btn-outline-secondary" @onclick="SelectAll">All</button>
+    @foreach (var pick in QuickPicks)
+    {
+        <button type="button" title="@pick.Title"
+                class="btn @(IsExactly(pick.Units) ? "btn-secondary" : "btn-outline-secondary")"
+                @onclick="() => SelectOnly(pick.Units)">
+            @pick.Label
+        </button>
+    }
+</div>
+
+<div class="row row-cols-auto g-3">
+    @foreach (var group in Groups)
+    {
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header">
+                    <label role="button" class="mb-0">
+                        <input type="checkbox" class="form-check-input me-1"
+                               checked="@AllChecked(group.Units)"
+                               @onchange="() => ToggleGroup(group)"/>
+                        <span class="fw-semibold">@group.Label</span>
+                        <span class="text-body-secondary small">(@CheckedCount(group)/@group.Units.Count)</span>
+                    </label>
+                </div>
+                <div class="card-body py-2">
+                    @foreach (var unit in group.Units)
+                    {
+                        <label role="button" class="d-block">
+                            <input type="checkbox" class="form-check-input me-1"
+                                   checked="@_selected.Contains(unit.Name)"
+                                   @onchange="() => ToggleUnit(unit)"/>
+                            @unit.Name
+                        </label>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private sealed record Target(string Key, string Label);
+
+    private sealed record Group(string Label, List<Unit> Units);
+
+    /// <summary>A roster-wide selection that does not follow the cost grouping.</summary>
+    private sealed record QuickPick(string Label, string Title, List<Unit> Units);
+
+    private static readonly List<Unit> AllUnits = UnitsCollection.Units;
+
+    /// <summary>The localStorage keys the name inputs on the other pages read.</summary>
+    private static readonly Target[] Targets =
+    [
+        new("mainNameFilter", "Name"),
+        new("vsNameFilter", "VsName"),
+    ];
+
+    /// <summary>
+    /// Cost brackets to group by. The trailing bracket is open-ended so a future
+    /// roster addition cannot fall off the page.
+    /// </summary>
+    private static readonly (string Label, int Min, int Max)[] CostBrackets =
+    [
+        ("100", 100, 100),
+        ("200", 200, 200),
+        ("300", 300, 300),
+        ("400-500", 400, 500),
+        ("800", 800, int.MaxValue),
+    ];
+
+    private static readonly List<Group> Groups = BuildGroups();
+
+    private static readonly QuickPick[] QuickPicks =
+    [
+        new("Air", "Flying units", AllUnits.Where(x => x.IsAir).ToList()),
+        new("Ground", "Everything that does not fly", AllUnits.Where(x => x.IsAir == false).ToList()),
+        new("Anti-air", "Can hit air, innately or once the technology is bought",
+            AllUnits.Where(x => x.CanEverAttackAir).ToList()),
+    ];
+
+    private readonly HashSet<string> _selected = new(StringComparer.OrdinalIgnoreCase);
+    private string _target = Targets[0].Key;
+    private string _pattern = "";
+
+    private static List<Group> BuildGroups()
+    {
+        var groups = CostBrackets
+            .Select(bracket => new Group(
+                bracket.Label,
+                AllUnits.Where(x => x.Cost >= bracket.Min && x.Cost <= bracket.Max).ToList()))
+            .Where(x => x.Units.Count > 0)
+            .ToList();
+
+        var bracketed = groups.SelectMany(x => x.Units).Select(x => x.Name).ToHashSet();
+        var rest = AllUnits.Where(x => bracketed.Contains(x.Name) == false).ToList();
+        if (rest.Count > 0)
+        {
+            groups.Add(new Group("Other", rest));
+        }
+
+        return groups;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadTarget();
+        }
+    }
+
+    /// <summary>
+    /// The stored pattern is the state: a hand-written one round-trips into
+    /// checkboxes and is left alone until something is actually clicked.
+    /// </summary>
+    private async Task LoadTarget()
+    {
+        _pattern = await JS.InvokeAsync<string>("localStorage.getItem", _target) ?? "";
+
+        _selected.Clear();
+        foreach (var unit in UnitFilterBuilder.SelectMatching(_pattern, AllUnits))
+        {
+            _selected.Add(unit.Name);
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task SwitchTarget(string key)
+    {
+        if (_target == key)
+        {
+            return;
+        }
+
+        _target = key;
+        await LoadTarget();
+    }
+
+    private Task ToggleUnit(Unit unit)
+    {
+        if (_selected.Remove(unit.Name) == false)
+        {
+            _selected.Add(unit.Name);
+        }
+
+        return Save();
+    }
+
+    /// <summary>
+    /// Checking wins: a partly checked bracket fills up first, only a full one clears.
+    /// </summary>
+    private Task ToggleGroup(Group group)
+    {
+        var clear = AllChecked(group.Units);
+        foreach (var unit in group.Units)
+        {
+            if (clear)
+            {
+                _selected.Remove(unit.Name);
+            }
+            else
+            {
+                _selected.Add(unit.Name);
+            }
+        }
+
+        return Save();
+    }
+
+    /// <summary>
+    /// A quick pick replaces the selection outright, so pressing it twice is a
+    /// no-op rather than something that empties or fills the page.
+    /// </summary>
+    private Task SelectOnly(List<Unit> units)
+    {
+        _selected.Clear();
+        foreach (var unit in units)
+        {
+            _selected.Add(unit.Name);
+        }
+
+        return Save();
+    }
+
+    private Task SelectAll()
+    {
+        foreach (var unit in AllUnits)
+        {
+            _selected.Add(unit.Name);
+        }
+
+        return Save();
+    }
+
+    private bool AllChecked(List<Unit> units) => units.All(x => _selected.Contains(x.Name));
+
+    private bool IsExactly(List<Unit> units) => _selected.Count == units.Count && AllChecked(units);
+
+    private int CheckedCount(Group group) => group.Units.Count(x => _selected.Contains(x.Name));
+
+    private async Task Save()
+    {
+        _pattern = UnitFilterBuilder.Build(AllUnits.Where(x => _selected.Contains(x.Name)), AllUnits);
+        await JS.InvokeVoidAsync("localStorage.setItem", _target, _pattern);
+    }
+}

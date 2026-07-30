@@ -1,0 +1,172 @@
+﻿@page "/damage"
+@using Melper.Core
+@using Melper.Data
+@using Melper.Services
+@inject IJSRuntime JS
+
+<PageTitle>Damage calculations</PageTitle>
+
+<div class="row mb-3">
+    <div class="col-4">
+        <label class="form-label">Main filter</label>
+        <input class="form-control" @bind="mainNameFilter" @bind:after="OnMainNameFilterChanged"/>
+        <label class="form-label">Vs filter</label>
+        <input class="form-control" @bind="vsNameFilter" @bind:after="OnVsNameFilterChanged"/>
+    </div>
+</div>
+
+<div class="rounded">
+    <table class="table table-hover table-striped table-bordered align-middle">
+        <thead class="table-dark text-center sticky-top">
+        <tr>
+            <th>Name</th>
+            <th>vsName</th>
+            <th>Mode</th>
+            <th>UnitDamage</th>
+            <th>SalvoDamage</th>
+            <th>Reload</th>
+            <th>Health</th>
+            <th @onclick="() => SortBy(nameof(BattleCalcResults.TimeToDestroy))" style="cursor:pointer">DestroyTime</th>
+            <th @onclick="() => SortBy(nameof(BattleCalcResults.TimeToDestroyWithReload))" style="cursor:pointer">TotalTime</th>
+            <th @onclick="() => SortBy(nameof(BattleCalcResults.TotalSalvos))" style="cursor:pointer">TotalSalvos</th>
+            <th @onclick="() => SortBy(nameof(BattleCalcResults.TotalShots))" style="cursor:pointer">TotalShots</th>
+            <th @onclick="() => SortBy(nameof(BattleCalcResults.Overkill))" style="cursor:pointer">Overkill</th>
+            <th @onclick="() => SortBy(nameof(BattleCalcResults.OverkillPercentage))" style="cursor:pointer">Overkill %</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var row in GetSortedResults())
+        {
+            <tr>
+                <td>@row.Main.Name</td>
+                <td>@row.Vs.Name</td>
+                <td>@row.Mode</td>
+                <td>
+                    @(row.Main.Damage * (row.Main.ProjectilesPerShotOverride ?? 1))
+                    @if (row.Main.ProjectilesPerShotOverride.HasValue)
+                    {
+                        <span> (@row.Main.Damage*@row.Main.ProjectilesPerShotOverride)</span>
+                    }
+                </td>
+                <td>@(row.Main.Damage * (row.Main.ProjectilesPerShotOverride ?? 1) * row.Main.CountInPack)</td>
+                <td>@row.Main.ReloadTime.TotalSeconds</td>
+                <td>
+                    @if (row.Vs.CountInPack > 1)
+                    {
+                        <span>@(row.Vs.CountInPack * row.Vs.Health) (@row.Vs.Health*@row.Vs.CountInPack)</span>
+                    }
+                    else
+                    {
+                        <span>@row.Vs.Health</span>
+                    }
+                </td>
+                <td>@row.Result.TimeToDestroy.ToString("0.##")</td>
+                <td>@row.Result.TimeToDestroyWithReload.ToString("0.##")</td>
+                <td>@row.Result.TotalSalvos.ToString("0.##")</td>
+                <td>
+                    @row.Result.TotalShots
+                    @if (row.Main.ProjectilesPerShotOverride.HasValue)
+                    {
+                        <span> (@(row.Result.TotalShots / row.Main.ProjectilesPerShotOverride)*@row.Main.ProjectilesPerShotOverride)</span>
+                    }
+                </td>
+                <td>
+                    @row.Result.Overkill
+                    @if (row.Vs.CountInPack > 1)
+                    {
+                        <span> (@row.Result.OverkillPerUnit * @row.Vs.CountInPack)</span>
+                    }
+                </td>
+                <td>@row.Result.OverkillPercentage.ToString("0.##")%</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    string mainNameFilter = "";
+    string vsNameFilter = "";
+
+    string? sortColumn;
+    bool sortAscending = true;
+
+    record RowData(Unit Main, Unit Vs, BattleCalcMode Mode, BattleCalcResults Result);
+
+    private void SortBy(string column)
+    {
+        if (sortColumn == column)
+            sortAscending = !sortAscending;
+        else
+        {
+            sortColumn = column;
+            sortAscending = true;
+        }
+    }
+
+    private IEnumerable<RowData> GetSortedResults()
+    {
+        var results = new List<RowData>();
+
+        foreach (var main in UnitsCollection.Units.Where(x => string.IsNullOrEmpty(mainNameFilter) || x.Name.RegMatch(mainNameFilter)))
+        {
+            foreach (var vs in UnitsCollection.Units.Where(x => string.IsNullOrEmpty(vsNameFilter) || x.Name.RegMatch(vsNameFilter)))
+            {
+                if (main.CanAttackAir == false && vs.IsAir)
+                {
+                    continue;
+                }
+
+                // vs a single unit salvo mode gives the same numbers as ideal
+                var modes = main.CalculateSalvoMode && main.CountInPack > 1 && vs.CountInPack > 1
+                    ? new[] { BattleCalcMode.Ideal, BattleCalcMode.Salvo }
+                    : new[] { BattleCalcMode.Ideal };
+
+                foreach (var mode in modes)
+                {
+                    var res = BattleCalculator.Calculate(main, vs, mode);
+                    if (!res.Fails)
+                        results.Add(new RowData(main, vs, mode, res));
+                }
+            }
+        }
+
+        return sortColumn switch
+        {
+            nameof(BattleCalcResults.TimeToDestroy) =>
+                sortAscending ? results.OrderBy(r => r.Result.TimeToDestroy) : results.OrderByDescending(r => r.Result.TimeToDestroy),
+            nameof(BattleCalcResults.TimeToDestroyWithReload) =>
+                sortAscending ? results.OrderBy(r => r.Result.TimeToDestroyWithReload) : results.OrderByDescending(r => r.Result.TimeToDestroyWithReload),
+            nameof(BattleCalcResults.TotalSalvos) =>
+                sortAscending ? results.OrderBy(r => r.Result.TotalSalvos) : results.OrderByDescending(r => r.Result.TotalSalvos),
+            nameof(BattleCalcResults.TotalShots) =>
+                sortAscending ? results.OrderBy(r => r.Result.TotalShots) : results.OrderByDescending(r => r.Result.TotalShots),
+            nameof(BattleCalcResults.Overkill) =>
+                sortAscending ? results.OrderBy(r => r.Result.Overkill) : results.OrderByDescending(r => r.Result.Overkill),
+            nameof(BattleCalcResults.OverkillPercentage) =>
+                sortAscending ? results.OrderBy(r => r.Result.OverkillPercentage) : results.OrderByDescending(r => r.Result.OverkillPercentage),
+            _ => results
+        };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            mainNameFilter = await JS.InvokeAsync<string>("localStorage.getItem", "mainNameFilter") ?? "";
+            vsNameFilter = await JS.InvokeAsync<string>("localStorage.getItem", "vsNameFilter") ?? "";
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnMainNameFilterChanged()
+    {
+        await JS.InvokeVoidAsync("localStorage.setItem", "mainNameFilter", mainNameFilter ?? "");
+    }
+
+    private async Task OnVsNameFilterChanged()
+    {
+        await JS.InvokeVoidAsync("localStorage.setItem", "vsNameFilter", vsNameFilter ?? "");
+    }
+
+}

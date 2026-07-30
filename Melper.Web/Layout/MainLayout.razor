@@ -1,0 +1,24 @@
+@inherits LayoutComponentBase
+
+<div class="page">
+    <main>
+        @* Outside .top-row: that row is a sticky stacking context, which would
+           cap the toggle below the sticky table headers. *@
+        <div class="theme-toggle">
+            <ThemeToggle/>
+        </div>
+
+        <div class="top-row px-4">
+            @* Empty href, not "/": an absolute path would leave the base path when
+               the app is hosted under a subfolder (GitHub Pages). *@
+            <NavLink href="" Match="NavLinkMatch.All">Units</NavLink>
+            <NavLink href="damage">Damage</NavLink>
+            <NavLink href="breakpoints">Breakpoints</NavLink>
+            <NavLink href="filter">Filter</NavLink>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>

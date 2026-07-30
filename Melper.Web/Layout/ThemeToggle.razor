@@ -1,0 +1,29 @@
+@inject IJSRuntime JS
+
+<button type="button" class="btn btn-sm btn-outline-secondary"
+        title="@(_isDark ? "Switch to light theme" : "Switch to dark theme")"
+        @onclick="ToggleTheme">
+    @(_isDark ? "☀" : "🌙")
+</button>
+
+@code {
+    private bool _isDark = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var theme = await JS.InvokeAsync<string?>("localStorage.getItem", "theme");
+            _isDark = theme != "light";
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleTheme()
+    {
+        _isDark = !_isDark;
+        var theme = _isDark ? "dark" : "light";
+        await JS.InvokeVoidAsync("document.documentElement.setAttribute", "data-bs-theme", theme);
+        await JS.InvokeVoidAsync("localStorage.setItem", "theme", theme);
+    }
+}

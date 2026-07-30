@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "melper-web",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "Melper.Web", "--urls", "http://localhost:5137"],
+      "port": 5137
+    }
+  ]
+}

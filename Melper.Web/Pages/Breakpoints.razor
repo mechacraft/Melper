@@ -1,0 +1,506 @@
+@page "/breakpoints"
+@using System.Text.Json
+@using Melper.Core
+@using Melper.Core.Buffs
+@using Melper.Core.Extensions
+@using Melper.Core.Services
+@using Melper.Data
+@using Melper.ViewModel
+@inject IJSRuntime JS
+
+<PageTitle>Breakpoints calculations</PageTitle>
+
+<div class="row">
+    <div class="col-3">
+        <p>main</p>
+        <EditForm Model="@left">
+            <label>
+                <InputCheckbox @bind-Value="left.Attack1" @bind-Value:after="OnConfigChanged"/>
+                Attack1
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="left.Attack2" @bind-Value:after="OnConfigChanged"/>
+                Attack2
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="left.Hp1" @bind-Value:after="OnConfigChanged"/>
+                Hp1
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="left.Hp2" @bind-Value:after="OnConfigChanged"/>
+                Hp2
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="left.HasteModule" @bind-Value:after="OnConfigChanged"/>
+                HasteModule
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="left.HeavyArmor" @bind-Value:after="OnConfigChanged"/>
+                HeavyArmor
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="left.CostControl" @bind-Value:after="OnConfigChanged"/>
+                CostControl
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="left.Fortified" @bind-Value:after="OnConfigChanged"/>
+                Fortified
+            </label><br/>
+            <label>
+                Lvls <input type="number" class="form-control" @bind="left.Lvls" @bind:after="OnConfigChanged"/>
+            </label>
+        </EditForm>
+    </div>
+    <div class="col-3">
+        <p>vs</p>
+        <EditForm Model="@right">
+            <label>
+                <InputCheckbox @bind-Value="right.Attack1" @bind-Value:after="OnConfigChanged"/>
+                Attack1
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="right.Attack2" @bind-Value:after="OnConfigChanged"/>
+                Attack2
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="right.Hp1" @bind-Value:after="OnConfigChanged"/>
+                Hp1
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="right.Hp2" @bind-Value:after="OnConfigChanged"/>
+                Hp2
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="left.HasteModule" @bind-Value:after="OnConfigChanged"/>
+                HasteModule
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="right.HeavyArmor" @bind-Value:after="OnConfigChanged"/>
+                HeavyArmor
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="right.CostControl" @bind-Value:after="OnConfigChanged"/>
+                CostControl
+            </label><br/>
+            <label>
+                <InputCheckbox @bind-Value="right.Fortified" @bind-Value:after="OnConfigChanged"/>
+                Fortified
+            </label><br/>
+            <label>
+                Lvls <input type="number" class="form-control" @bind="right.Lvls" @bind:after="OnConfigChanged"/>
+            </label>
+        </EditForm>
+    </div>
+    <div class="col-3">
+        <label class="form-label">Main filter</label>
+        <input class="form-control" @bind="mainNameFilter" @bind:after="OnMainNameFilterChanged"/>
+        <label class="form-label">Vs filter</label>
+        <input class="form-control" @bind="vsNameFilter" @bind:after="OnVsNameFilterChanged"/>
+        <p class="mt-2 text-muted small">@rows.Count rows</p>
+    </div>
+</div>
+
+@* <table class="table table-bordered table-sm"> *@
+@*     <thead> *@
+@*     <tr> *@
+@*         <th></th> *@
+@*         <th>Damage Inc %</th> *@
+@*         <th>HP Inc %</th> *@
+@*         <th>Damage Mul</th> *@
+@*         <th>HP Mul</th> *@
+@*     </tr> *@
+@*     </thead> *@
+@*     <tbody> *@
+@*     <tr> *@
+@*         <td>Main</td> *@
+@*         <td>@mainBuffs.Sum(x => x.DamageIncrease)%</td> *@
+@*         <td>@mainBuffs.Sum(x => x.HpIncrease)%</td> *@
+@*         <td>@mainBuffs.DamageMul()</td> *@
+@*         <td>@mainBuffs.HpMul()</td> *@
+@*     </tr> *@
+@*     <tr> *@
+@*         <td>Vs</td> *@
+@*         <td>@vsBuffs.Sum(x => x.DamageIncrease)%</td> *@
+@*         <td>@vsBuffs.Sum(x => x.HpIncrease)%</td> *@
+@*         <td>@vsBuffs.DamageMul()</td> *@
+@*         <td>@vsBuffs.HpMul()</td> *@
+@*     </tr> *@
+@*     </tbody> *@
+@* </table> *@
+
+@* Virtualize needs a real scrolling ancestor to measure against. *@
+<div class="breakpoints-scroll">
+<table class="table table-hover table-striped table-bordered align-middle">
+    <thead class="table-dark text-center sticky-top">
+    <tr>
+        <th>Unit</th>
+        <th>Vs unit</th>
+        @for (var i = 0; i < buffsToShow.Count; i++)
+        {
+            var buff = buffsToShow[i];
+            var key = BuffKey(buff);
+            if (buff.DamageIncrease > 0)
+            {
+                <th>
+                    <button type="button"
+                            class="btn btn-sm btn-link text-white"
+                            @onclick="@(() => SetSort(key, true))"
+                            title="Sort by ShotsToKillWinPercents">
+                        @buff.Name @(" ShotsToKill")
+                    </button>
+                </th>
+            }
+
+            if (buff.HpIncrease > 0)
+            {
+                <th>
+                    <button type="button"
+                            class="btn btn-sm btn-link text-white"
+                            @onclick="@(() => SetSort(key, false))"
+                            title="Sort by ShotsToLiveWinPercents">
+                        @buff.Name @(" ShotsToLive")
+                    </button>
+                </th>
+            }
+        }
+    </tr>
+    </thead>
+    <tbody>
+    <Virtualize Items="@rows" Context="row" ItemSize="76" SpacerElement="tr" OverscanCount="8">
+        <tr>
+            <td>
+                @row.Main.Name
+                @if (row.Main.Level > 1)
+                {
+                    <text>l</text>
+                    @row.Main.Level
+                }
+            </td>
+            <td>
+                @row.Vs.Name
+                @if (row.Vs.Level > 1)
+                {
+                    <text>l</text>
+                    @row.Vs.Level
+                }
+            </td>
+
+            @for (var i = 0; i < buffsToShow.Count; i++)
+            {
+                var buff = buffsToShow[i];
+                var calc = row.ByBuff[i];
+
+                if (buff.DamageIncrease > 0)
+                {
+                    <td>
+                        @if (HasKillValue(calc))
+                        {
+                            @calc.ShotsToKill
+                            <text>=></text>
+                            @calc.ShotsToKillNew
+                            <text> -</text>
+                            @(calc.ShotsToKillWinPercents.ToString("0.##"))
+                            <text>%</text>
+                            <br/>
+                            @("dmg:")
+                            @calc.MainDamage
+                            @("=>")
+                            @calc.MainDamageNew
+                            <br/>
+                            @("vshp:")
+                            @calc.VsHealth
+                        }
+                    </td>
+                }
+
+                if (buff.HpIncrease > 0)
+                {
+                    <td>
+                        @if (HasLiveValue(row, calc))
+                        {
+                            @calc.ShotsToLive
+                            <text>=></text>
+                            @calc.ShotsToLiveNew
+                            <text> +</text>
+                            @(calc.ShotsToLiveWinPercents.ToString("0.##"))
+                            <text>%</text>
+                            <br/>
+                            @("hp:")
+                            @calc.MainHealth
+                            @("=>")
+                            @calc.MainHealthNew
+                            <br/>
+                            @("vsdmg:")
+                            @calc.VsDamage
+                        }
+                    </td>
+                }
+            }
+        </tr>
+    </Virtualize>
+    </tbody>
+</table>
+</div>
+
+@code {
+
+    private sealed class RowItem
+    {
+        public required Unit Main { get; init; }
+        public required Unit Vs { get; init; }
+
+        /// <summary>
+        /// False when the main unit flies and the vs unit has no anti-air at all —
+        /// the vs unit never lands a shot, so ShotsToLive means nothing.
+        /// </summary>
+        public required bool VsCanHitMain { get; init; }
+
+        /// <summary>Results positionally aligned with <see cref="buffsToShow"/>.</summary>
+        public required BreakPointsResults[] ByBuff { get; init; }
+    }
+
+    private const string LeftConfigKey = "BreakPointSideConfig:left";
+    private const string RightConfigKey = "BreakPointSideConfig:right";
+
+    BreakPointSideConfig left = new();
+    BreakPointSideConfig right = new();
+    string mainNameFilter = "";
+    string vsNameFilter = "";
+
+    // Sorting state
+    string sortBuffKey = "";
+    bool sortByKillPerc = true; // true => ShotsToKillWinPercents, false => ShotsToLiveWinPercents
+    bool sortDesc = true;
+
+    // Everything below is rebuilt only by Recalculate(), never during a render pass.
+    List<IBuff> buffsToShow = [];
+    List<RowItem> rows = [];
+
+    IBuff[] buffsList =
+    [
+        new Attack1Buff(),
+        new Attack2Buff(),
+        new Hp1Buff(),
+        new Hp2Buff(),
+        new SmallAmpCoreBuff(),
+        new ImpFireControlBuff(),
+        new HasteModuleBuff(),
+        new HeavyArmorBuff(),
+        new AmpCoreBuff(),
+    ];
+
+    protected override void OnInitialized() => Recalculate();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        mainNameFilter = await LoadString("mainNameFilter") ?? "";
+        vsNameFilter = await LoadString("vsNameFilter") ?? "";
+        left = await LoadConfig(LeftConfigKey) ?? left;
+        right = await LoadConfig(RightConfigKey) ?? right;
+
+        Recalculate();
+        StateHasChanged();
+    }
+
+    private static List<IBuff> BuildBuffs(BreakPointSideConfig side)
+    {
+        var buffs = new List<IBuff>();
+
+        if (side.Attack1) buffs.Add(new Attack1Buff());
+        if (side.Attack2)
+        {
+            if (buffs.All(x => x is not Attack1Buff))
+                buffs.Add(new Attack1Buff());
+            buffs.Add(new Attack2Buff());
+        }
+
+        if (side.Hp1) buffs.Add(new Hp1Buff());
+        if (side.Hp2)
+        {
+            if (buffs.All(x => x is not Hp1Buff))
+                buffs.Add(new Hp1Buff());
+            buffs.Add(new Hp2Buff());
+        }
+
+        if (side.HeavyArmor) buffs.Add(new HeavyArmorBuff());
+        if (side.CostControl) buffs.Add(new CostControlBuff());
+        if (side.Fortified) buffs.Add(new FortifiedBuff());
+
+        return buffs;
+    }
+
+    /// <summary>
+    /// What taking <paramref name="buff"/> costs the side in one step. A tier-2 buff can't
+    /// be taken without its tier-1 prerequisite, so when that prerequisite isn't owned yet
+    /// its increase is part of the step too — same rule <see cref="BuildBuffs"/> applies.
+    /// </summary>
+    private static (int Damage, int Hp) CandidateIncrease(IBuff buff, BreakPointSideConfig side) => buff switch
+    {
+        Attack2Buff when side.Attack1 == false => (new Attack1Buff().DamageIncrease + buff.DamageIncrease, buff.HpIncrease),
+        Hp2Buff when side.Hp1 == false => (buff.DamageIncrease, new Hp1Buff().HpIncrease + buff.HpIncrease),
+        _ => (buff.DamageIncrease, buff.HpIncrease)
+    };
+
+    /// <summary>
+    /// Builds the whole grid. Called on config/filter changes only — never from the
+    /// render body, so sorting and re-renders no longer rebuild hundreds of thousands
+    /// of cells.
+    /// </summary>
+    private void Recalculate()
+    {
+        buffsToShow = buffsList
+            .Where(x => left.HeavyArmor == false || x.GetType() != typeof(HeavyArmorBuff))
+            .Where(x => left.HasteModule == false || x.GetType() != typeof(HasteModuleBuff))
+            .Where(x => left.Attack1 == false || x.GetType() != typeof(Attack1Buff))
+            .Where(x => left.Attack2 == false || (x.GetType() != typeof(Attack2Buff) && x.GetType() != typeof(Attack1Buff)))
+            .Where(x => left.Hp1 == false || x.GetType() != typeof(Hp1Buff))
+            .Where(x => left.Hp2 == false || (x.GetType() != typeof(Hp2Buff) && x.GetType() != typeof(Hp1Buff)))
+            .ToList();
+
+        // Fold each side's buffs down once, instead of re-running the LINQ per cell.
+        var mainAggregates = BuffAggregates.From(BuildBuffs(left));
+        var vsAggregates = BuffAggregates.From(BuildBuffs(right));
+
+        // What each column's buff actually adds on top of what main already owns —
+        // folded once here, since it depends on the config and not on the unit pair.
+        var candidateIncreases = buffsToShow.Select(x => CandidateIncrease(x, left)).ToArray();
+
+        var mains = ExpandLevels(mainNameFilter, left.Lvls);
+        var opponents = ExpandLevels(vsNameFilter, right.Lvls);
+
+        var built = new List<RowItem>(mains.Count * opponents.Count);
+        foreach (var main in mains)
+        {
+            foreach (var vs in opponents)
+            {
+                if (main.CanAttackAir == false && vs.IsAir) continue;
+
+                var byBuff = new BreakPointsResults[buffsToShow.Count];
+                for (var i = 0; i < buffsToShow.Count; i++)
+                {
+                    var (damageIncrease, hpIncrease) = candidateIncreases[i];
+                    byBuff[i] = BreakPointsCalculator.Calculate(
+                        main, vs, mainAggregates, vsAggregates, damageIncrease, hpIncrease);
+                }
+
+                built.Add(new RowItem
+                {
+                    Main = main,
+                    Vs = vs,
+                    VsCanHitMain = main.IsAir == false || vs.CanEverAttackAir,
+                    ByBuff = byBuff
+                });
+            }
+        }
+
+        rows = built;
+        ApplySort();
+    }
+
+    private static List<Unit> ExpandLevels(string nameFilter, int lvls) =>
+        UnitsCollection.Units
+            .Where(x => string.IsNullOrEmpty(nameFilter) || x.Name.RegMatch(nameFilter))
+            .SelectMany(x => Enumerable.Range(1, Math.Max(lvls, 1)).Select(lvl => x with { Level = lvl }))
+            .ToList();
+
+    /// <summary>Whether a ShotsToKill cell shows anything — the buff has to move the count.</summary>
+    private static bool HasKillValue(BreakPointsResults calc) => calc.ShotsToKill != calc.ShotsToKillNew;
+
+    /// <summary>
+    /// Whether a ShotsToLive cell shows anything. The numbers are computed for every row,
+    /// but they are meaningless when the vs unit can never reach an air main — such a row
+    /// renders blank, so sorting must treat it as having no value rather than as a big win.
+    /// </summary>
+    private static bool HasLiveValue(RowItem row, BreakPointsResults calc) =>
+        row.VsCanHitMain && calc.ShotsToLive != calc.ShotsToLiveNew;
+
+    /// <summary>Reorders the already-computed rows in place; never recalculates.</summary>
+    private void ApplySort()
+    {
+        if (string.IsNullOrEmpty(sortBuffKey)) return;
+
+        var index = buffsToShow.FindIndex(b => BuffKey(b) == sortBuffKey);
+        if (index < 0)
+        {
+            // The column disappeared with the last config change.
+            sortBuffKey = "";
+            return;
+        }
+
+        Func<RowItem, double> selector = sortByKillPerc
+            ? r => r.ByBuff[index].ShotsToKillWinPercents
+            : r => r.ByBuff[index].ShotsToLiveWinPercents;
+
+        // Blank cells sort to the bottom whichever way the column is pointing, so they
+        // never break up the run of real numbers the sort was asked for.
+        Func<RowItem, bool> hasValue = sortByKillPerc
+            ? r => HasKillValue(r.ByBuff[index])
+            : r => HasLiveValue(r, r.ByBuff[index]);
+
+        var ordered = rows.OrderByDescending(hasValue);
+        rows = (sortDesc ? ordered.ThenByDescending(selector) : ordered.ThenBy(selector)).ToList();
+    }
+
+    private async Task OnConfigChanged()
+    {
+        await SaveConfig(LeftConfigKey, left);
+        await SaveConfig(RightConfigKey, right);
+        Recalculate();
+    }
+
+    private async Task OnMainNameFilterChanged()
+    {
+        await JS.InvokeVoidAsync("localStorage.setItem", "mainNameFilter", mainNameFilter ?? "");
+        Recalculate();
+    }
+
+    private async Task OnVsNameFilterChanged()
+    {
+        await JS.InvokeVoidAsync("localStorage.setItem", "vsNameFilter", vsNameFilter ?? "");
+        Recalculate();
+    }
+
+    private async Task<string?> LoadString(string key) =>
+        await JS.InvokeAsync<string?>("localStorage.getItem", key);
+
+    private async Task SaveConfig(string key, BreakPointSideConfig config) =>
+        await JS.InvokeVoidAsync("localStorage.setItem", key, JsonSerializer.Serialize(config));
+
+    private async Task<BreakPointSideConfig?> LoadConfig(string key)
+    {
+        var json = await LoadString(key);
+        if (string.IsNullOrEmpty(json)) return null;
+
+        try
+        {
+            return JsonSerializer.Deserialize<BreakPointSideConfig>(json);
+        }
+        catch (JsonException)
+        {
+            // Older builds stored "[object Object]" here.
+            return null;
+        }
+    }
+
+    private static string BuffKey(IBuff buff) => buff.GetType().FullName ?? buff.GetType().Name;
+
+    private void SetSort(string key, bool byKill)
+    {
+        if (sortBuffKey == key && sortByKillPerc == byKill)
+        {
+            // toggle direction
+            sortDesc = !sortDesc;
+        }
+        else
+        {
+            sortBuffKey = key;
+            sortByKillPerc = byKill;
+            sortDesc = true; // default to desc on new column
+        }
+
+        ApplySort();
+    }
+
+}

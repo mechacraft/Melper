@@ -1,0 +1,6 @@
+/* Virtualize measures against the nearest scrolling ancestor, so the table needs its
+   own scroll box rather than riding on the page scroll. */
+.breakpoints-scroll {
+    height: 75vh;
+    overflow-y: auto;
+}

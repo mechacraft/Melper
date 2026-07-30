@@ -1,0 +1,203 @@
+﻿@page "/"
+@using Melper.Core
+@using Melper.Data
+@using Melper.ViewModel
+@inject IJSRuntime JS
+
+<PageTitle>Units</PageTitle>
+
+<div class="row mb-3">
+    <div class="col-4">
+        <label class="form-label">Filter</label>
+        <input class="form-control" @bind="mainNameFilter" @bind:after="OnMainNameFilterChanged"/>
+    </div>
+</div>
+
+<div class="rounded">
+    <table class="table table-hover table-striped table-bordered align-middle">
+        <thead class="table-dark text-center">
+        <tr>
+            <th role="button" @onclick="() => SortBy(nameof(Unit.Name))">
+                Name @SortGlyph(nameof(Unit.Name))
+            </th>
+            <th role="button" @onclick="() => SortBy(nameof(Unit.Cost))">
+                Cost @SortGlyph(nameof(Unit.Cost))
+            </th>
+            <th role="button" @onclick="() => SortBy(nameof(Unit.CountInPack))">
+                Count @SortGlyph(nameof(Unit.CountInPack))
+            </th>
+            <th role="button" @onclick="() => SortBy(nameof(Unit.Health))">
+                Health @SortGlyph(nameof(Unit.Health))
+            </th>
+            <th role="button" @onclick='() => SortBy(nameof(UnitViewModel.TotalHealth))'>
+                Total Health @SortGlyph(nameof(UnitViewModel.TotalHealth))
+            </th>
+            <th role="button" @onclick="() => SortBy(nameof(Unit.Damage))">
+                Damage @SortGlyph(nameof(Unit.Damage))
+            </th>
+            <th role="button" @onclick='() => SortBy(nameof(UnitViewModel.ReloadTime))'>
+                Reload @SortGlyph(nameof(UnitViewModel.ReloadTime))
+            </th>
+            <th role="button" @onclick="() => SortBy(nameof(Unit.Range))">
+                Range @SortGlyph(nameof(Unit.Range))
+            </th>
+            <th role="button" @onclick="() => SortBy(nameof(Unit.Splash))">
+                Splash @SortGlyph(nameof(Unit.Splash))
+            </th>
+            <th role="button" @onclick='() => SortBy(nameof(UnitViewModel.DpsPerUnit))'>
+                DPS per unit @SortGlyph(nameof(UnitViewModel.DpsPerUnit))
+            </th>
+            <th role="button" @onclick='() => SortBy(nameof(UnitViewModel.TotalDps))'>
+                Total DPS @SortGlyph(nameof(UnitViewModel.TotalDps))
+            </th>
+            <th role="button" @onclick='() => SortBy(nameof(UnitViewModel.DpsPerCost))'>
+                DpsEff @SortGlyph(nameof(UnitViewModel.DpsPerCost))
+            </th>
+            <th role="button" @onclick='() => SortBy(nameof(UnitViewModel.HealthPerCost))'>
+                HealthEff @SortGlyph(nameof(UnitViewModel.HealthPerCost))
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var unit in SortedUnits())
+        {
+            <tr>
+                <td class="fw-semibold">@unit.Name</td>
+                <td class="text-end">@unit.Cost</td>
+                <td class="text-end">@unit.CountInPack</td>
+                <td class="text-end">@unit.Health</td>
+                <td class="text-end">@unit.TotalHealth.ToString("0.##")</td>
+                <td class="text-end">@unit.Damage@(unit.ProjectilesPerShotOverride.HasValue ? $" * {unit.ProjectilesPerShotOverride}" : "")</td>
+                <td class="text-end">@unit.ReloadTime.TotalSeconds</td>
+                <td class="text-end">@(unit.Range == 0 ? "melee" : unit.Range)</td>
+                <td class="text-end">@unit.Splash.ToString("0.##")</td>
+                <td class="text-end">@unit.DpsPerUnit.ToString("0.##")</td>
+                <td class="text-end">@unit.TotalDps.ToString("0.##")</td>
+                <td class="text-end">@unit.DpsPerCost.ToString("0.##")</td>
+                <td class="text-end">@unit.HealthPerCost.ToString("0.##")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<UnitViewModel> Units = UnitsCollection.Units.Select(x => new UnitViewModel(x)).ToList();
+    string mainNameFilter = "";
+
+    private string? _sortColumn;
+    private bool _sortAsc = true;
+
+    private void SortBy(string column)
+    {
+        if (_sortColumn == column)
+        {
+            if (_sortAsc == false)
+            {
+                _sortColumn = null;
+            }
+
+            _sortAsc = !_sortAsc;
+        }
+        else
+        {
+            _sortColumn = column;
+            _sortAsc = true;
+        }
+    }
+
+    private IEnumerable<UnitViewModel> SortedUnits()
+    {
+        IEnumerable<UnitViewModel> sorted = _sortColumn switch
+        {
+            nameof(Unit.Name) => _sortAsc
+                ? Units.OrderBy(u => u.Name)
+                : Units.OrderByDescending(u => u.Name),
+
+            nameof(Unit.Cost) => _sortAsc
+                ? Units.OrderBy(u => u.Cost)
+                : Units.OrderByDescending(u => u.Cost),
+
+            nameof(Unit.CountInPack) => _sortAsc
+                ? Units.OrderBy(u => u.CountInPack)
+                : Units.OrderByDescending(u => u.CountInPack),
+
+            nameof(Unit.Splash) => _sortAsc
+                ? Units.OrderBy(u => u.Splash)
+                : Units.OrderByDescending(u => u.Splash),
+
+            nameof(Unit.Range) => _sortAsc
+                ? Units.OrderBy(u => u.Range)
+                : Units.OrderByDescending(u => u.Range),
+
+            nameof(Unit.Health) => _sortAsc
+                ? Units.OrderBy(u => u.Health)
+                : Units.OrderByDescending(u => u.Health),
+
+            nameof(Unit.Damage) => _sortAsc
+                ? Units.OrderBy(u => u.Damage)
+                : Units.OrderByDescending(u => u.Damage),
+
+            nameof(UnitViewModel.ReloadTime) => _sortAsc
+                ? Units.OrderBy(u => u.ReloadTime)
+                : Units.OrderByDescending(u => u.ReloadTime),
+
+            nameof(UnitViewModel.TotalHealth) => _sortAsc
+                ? Units.OrderBy(u => u.TotalHealth)
+                : Units.OrderByDescending(u => u.TotalHealth),
+
+            nameof(UnitViewModel.HealthPerCost) => _sortAsc
+                ? Units.OrderBy(u => u.HealthPerCost)
+                : Units.OrderByDescending(u => u.HealthPerCost),
+
+            nameof(UnitViewModel.DpsPerUnit) => _sortAsc
+                ? Units.OrderBy(u => u.DpsPerUnit)
+                : Units.OrderByDescending(u => u.DpsPerUnit),
+
+            nameof(UnitViewModel.TotalDps) => _sortAsc
+                ? Units.OrderBy(u => u.TotalDps)
+                : Units.OrderByDescending(u => u.TotalDps),
+
+            nameof(UnitViewModel.DpsPerCost) => _sortAsc
+                ? Units.OrderBy(u => u.DpsPerCost)
+                : Units.OrderByDescending(u => u.DpsPerCost),
+
+            _ => Units,
+        };
+
+        return sorted.Where(x => string.IsNullOrEmpty(mainNameFilter) || x.Name.RegMatch(mainNameFilter));
+    }
+
+
+    private RenderFragment SortGlyph(string column)
+    {
+        return builder =>
+        {
+            if (_sortColumn != column)
+            {
+                return;
+            }
+
+            var glyph = _sortAsc ? "▲" : "▼";
+            builder.OpenElement(0, "span");
+            builder.AddAttribute(1, "class", "ms-1 small");
+            builder.AddContent(2, glyph);
+            builder.CloseElement();
+        };
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            mainNameFilter = await JS.InvokeAsync<string>("localStorage.getItem", "mainNameFilter") ?? "";
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnMainNameFilterChanged()
+    {
+        await JS.InvokeVoidAsync("localStorage.setItem", "mainNameFilter", mainNameFilter ?? "");
+    }
+}
