@@ -18,7 +18,8 @@ ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 MELPER = os.path.join(ROOT, "Melper.Core", "Data", "units.json")
 
 # roster field  ->  column in the extracted units.json
-FIELDS = [("Cost", "cost"), ("Health", "life"), ("Damage", "damage"),
+FIELDS = [("Cost", "cost"), ("UnlockCost", "unlockCost"),
+          ("Health", "life"), ("Damage", "damage"),
           ("ReloadTime", "attackInterval"), ("Range", "attackRange"),
           ("Speed", "moveSpeed"), ("Splash", "splashRange"),
           ("CountInPack", "countInPack"), ("IsAir", "isFly"),
@@ -81,6 +82,7 @@ if missing:
             "Id": g["id"],
             "Name": g["name_cn"],
             "Cost": g["cost"],
+            "UnlockCost": g["unlockCost"],
             "CountInPack": g["countInPack"],
             "Damage": g["damage"],
             "ReloadTime": g["attackInterval"],

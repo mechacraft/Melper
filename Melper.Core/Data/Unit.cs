@@ -23,6 +23,13 @@ public record Unit
 
     public int Cost { get; init; }
 
+    /// <summary>
+    /// What it costs to add the unit to the shop for the rest of the match
+    /// (<c>CardData.unlockPrice</c>). Zero for the starters — the units that are on
+    /// offer from the first round without paying anything for the privilege.
+    /// </summary>
+    public int UnlockCost { get; init; }
+
     [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public required int CountInPack { get; init; }
 

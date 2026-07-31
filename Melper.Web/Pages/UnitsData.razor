@@ -50,6 +50,7 @@
         <tr>
             <th>Name</th>
             <th>Cost</th>
+            <th title="What it costs to put the unit in the shop; 0 for the starters">Unlock</th>
             <th>Count</th>
             <th>Health</th>
             <th>Damage</th>
@@ -77,6 +78,10 @@
                 <td>
                     <input type="number" min="0" class="form-control form-control-sm text-end" style="min-width: 5.5rem"
                            @bind="row.Cost" @bind:after="MarkDirty"/>
+                </td>
+                <td>
+                    <input type="number" min="0" class="form-control form-control-sm text-end" style="min-width: 5.5rem"
+                           @bind="row.UnlockCost" @bind:after="MarkDirty"/>
                 </td>
                 <td>
                     <input type="number" class="form-control form-control-sm text-end" style="min-width: 5rem"
@@ -145,6 +150,7 @@
     {
         public string Name { get; set; } = unit.Name;
         public int Cost { get; set; } = unit.Cost;
+        public int UnlockCost { get; set; } = unit.UnlockCost;
         public int CountInPack { get; set; } = unit.CountInPack;
         public int Health { get; set; } = unit.Health;
         public int Damage { get; set; } = unit.Damage;
@@ -167,6 +173,7 @@
         {
             Name = Name,
             Cost = Cost,
+            UnlockCost = UnlockCost,
             CountInPack = CountInPack,
             Health = Health,
             Damage = Damage,

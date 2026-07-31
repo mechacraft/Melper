@@ -108,8 +108,15 @@
     // snapshot taken at type load would keep showing the grouping the app started with.
     private readonly List<Group> Groups = BuildGroups();
 
+    /// <summary>How many units a pack has to hold before it counts as chaff.</summary>
+    private const int ChaffPackSize = 12;
+
     private readonly QuickPick[] QuickPicks =
     [
+        new("Starters", "On offer from the first round - nothing to pay to unlock them",
+            AllUnits.Where(x => x.UnlockCost == 0).ToList()),
+        new("Chaff", $"Comes {ChaffPackSize} or more to a pack",
+            AllUnits.Where(x => x.CountInPack >= ChaffPackSize).ToList()),
         new("Air", "Flying units", AllUnits.Where(x => x.IsAir).ToList()),
         new("Ground", "Everything that does not fly", AllUnits.Where(x => x.IsAir == false).ToList()),
         new("Anti-air", "Can hit air, innately or once the technology is bought",

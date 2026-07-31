@@ -62,6 +62,7 @@ for m in sorted(cfg["mechDatas"], key=lambda x: x["id"]):
         "roster": SPECIAL.get(card.get("specialUnit"), card.get("specialUnit")),
         "tier": card.get("group"),
         "cost": card.get("baseMoney"),
+        "unlockCost": card.get("unlockPrice"),
         "countInPack": card.get("mechCount"),
         "prefab": m.get("prefabName"),
         "size": UNIT_TYPE.get(m.get("mechType"), m.get("mechType")),

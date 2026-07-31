@@ -48,7 +48,7 @@ uv venv --python 3.11 .venv && uv pip install --python .venv\Scripts\python.exe 
 | файл | что внутри |
 |---|---|
 | `data/config_raw.json` | полный дамп всех 6 контейнеров (~8 МБ) |
-| `data/units.csv` / `units.json` | 63 юнита: HP, урон, дальность, интервал, сплэш, ПВО, цена |
+| `data/units.csv` / `units.json` | 63 юнита: HP, урон, дальность, интервал, сплэш, ПВО, цена, цена открытия |
 
 ---
 
@@ -251,9 +251,21 @@ Il2CppDumper.exe "<game>\GameAssembly.dll" "<game>\Mechabellum_Data\il2cpp_data\
 | 3 | Fortress, Vulcan, Melting Point, Overlord, Sandworm, Raiden |
 | 4 | War Factory, Abyss, Mountain |
 
-Оттуда же берутся ещё два поля, которые прямо ложатся в `Unit`:
-`baseMoney` → `Cost` и `mechCount` → `CountInPack` (сверено: Fang 100/18,
-Crawler 100/24 — совпадает с текущим C#).
+Оттуда же берутся ещё три поля, которые прямо ложатся в `Unit`:
+`baseMoney` → `Cost`, `mechCount` → `CountInPack` (сверено: Fang 100/18,
+Crawler 100/24 — совпадает с текущим C#) и `unlockPrice` → `UnlockCost`.
+
+`unlockPrice` — цена открытия юнита в магазине на матч, и она ровно повторяет `tier`:
+
+| tier | unlockPrice |
+|---:|---:|
+| 1 | 0 (стартовые) |
+| 2 | 50, у Hacker — 100 |
+| 3 | 200 |
+| 4 | 350 |
+
+Нулевая цена — это признак стартового юнита, по нему на странице фильтра стоит
+быстрый выбор «Starters».
 
 ### Играбельный ростер = id 1–31 плюс 2002 (Mountain)
 
