@@ -1,4 +1,6 @@
-﻿namespace Melper.Data;
+﻿using System.Text.Json.Serialization;
+
+namespace Melper.Data;
 
 public record Unit
 {
@@ -9,9 +11,19 @@ public record Unit
     /// </summary>
     public int Id { get; init; }
 
+    /// <summary>
+    /// Never serialized: the JSON roster holds base (level 1) stats, and <see cref="Damage"/>
+    /// already folds the level into its getter — round-tripping it would square the multiplier.
+    /// </summary>
+    [JsonIgnore]
     public int Level { get; init; } = 1;
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public required string Name { get; init; }
+
     public int Cost { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public required int CountInPack { get; init; }
 
     private readonly int _damage;
@@ -31,6 +43,7 @@ public record Unit
     /// Wraith, Overlord and friends) fire their whole volley per reload, so
     /// <see cref="Damage"/> alone understates an attack by the projectile count.
     /// </summary>
+    [JsonIgnore]
     public int DamagePerAttack => Damage * (ProjectilesPerShotOverride ?? 1);
 
     /// <summary>
@@ -39,8 +52,10 @@ public record Unit
     /// area, so a single target eats one projectile rather than the whole salvo —
     /// counting the full volley would overstate what it takes to kill that target.
     /// </summary>
+    [JsonIgnore]
     public int DamageForBreakpoints => CountBreakpointsForSingleProjectile ? Damage : DamagePerAttack;
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public required TimeSpan ReloadTime { get; init; }
 
     private readonly int _health;
@@ -67,11 +82,14 @@ public record Unit
     /// <summary>
     /// True when the unit can hit air at all, innately or once upgraded.
     /// </summary>
+    [JsonIgnore]
     public bool CanEverAttackAir => CanAttackAir || CanAttackAirWithTech;
 
     public bool IsAir { get; init; }
     public bool IsGiant { get; init; }
     public bool IsTitan { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public required int Speed { get; set; }
     public decimal Splash { get; set; }
     public bool CalculateSalvoMode { get; init; }

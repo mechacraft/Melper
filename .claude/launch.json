@@ -6,6 +6,12 @@
       "runtimeExecutable": "dotnet",
       "runtimeArgs": ["run", "--project", "Melper.Web", "--urls", "http://localhost:5137"],
       "port": 5137
+    },
+    {
+      "name": "melper-web-verify",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "Melper.Web", "--urls", "http://localhost:5138"],
+      "port": 5138
     }
   ]
 }

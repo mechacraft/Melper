@@ -53,7 +53,11 @@ public class UnitViewModel
 
     private static double GetDpsPerUnit(Unit unit)
     {
-        return unit.Damage * (unit.ProjectilesPerShotOverride ?? 1) / unit.ReloadTime.TotalSeconds;
+        // The Data page can put a zero in either divisor, and an Infinity would poison
+        // every derived column and sort the row straight to the top.
+        return unit.ReloadTime.TotalSeconds > 0
+            ? unit.Damage * (unit.ProjectilesPerShotOverride ?? 1) / unit.ReloadTime.TotalSeconds
+            : 0;
     }
 
     private static double GetTotalDps(Unit unit)
@@ -63,7 +67,7 @@ public class UnitViewModel
 
     private static double GetDpsRel1KPer100Cost(Unit unit)
     {
-        return GetTotalDps(unit) / 1000d / unit.Cost * 100d;
+        return unit.Cost > 0 ? GetTotalDps(unit) / 1000d / unit.Cost * 100d : 0;
     }
 
     private static double GetTotalHealth(Unit unit)

@@ -1,0 +1,245 @@
+@page "/data"
+@using Melper.Core
+@using Melper.Data
+@using Melper.Web
+@inject IJSRuntime JS
+
+<PageTitle>Data</PageTitle>
+
+<div class="row mb-3 align-items-end">
+    <div class="col-4">
+        <label class="form-label">Filter</label>
+        <input class="form-control" @bind="nameFilter" @bind:event="oninput"/>
+    </div>
+    <div class="col-8 d-flex gap-2 justify-content-end">
+        <button class="btn btn-primary" disabled="@(dirty == false)" @onclick="Apply">Apply</button>
+        <button class="btn btn-outline-secondary" disabled="@(dirty == false)" @onclick="Revert">Revert</button>
+        <button class="btn btn-outline-danger" disabled="@(edited == false)" @onclick="Reset">Reset to repo</button>
+    </div>
+</div>
+
+<div class="alert @(Stale ? "alert-warning" : "alert-secondary") py-2">
+    <div>
+        The values in the repository were last checked against the game on
+        <strong>@UnitsCollection.AsOf.ToString("d MMMM yyyy")</strong> (@Age).
+        @if (Stale)
+        {
+            <text>
+                The game has almost certainly been patched since — check the stats against it
+                and correct them here.
+            </text>
+        }
+    </div>
+    <div>
+        Edits apply to every page in <strong>this browser tab</strong> only — a new tab always
+        starts from the values in the repository.
+        @if (dirty)
+        {
+            <strong class="ms-1">Unapplied changes.</strong>
+        }
+        else if (edited)
+        {
+            <span class="ms-1">This tab is running an edited roster.</span>
+        }
+    </div>
+</div>
+
+<div class="rounded">
+    <table class="table table-hover table-striped table-bordered align-middle">
+        <thead class="table-dark text-center">
+        <tr>
+            <th>Name</th>
+            <th>Cost</th>
+            <th>Count</th>
+            <th>Health</th>
+            <th>Damage</th>
+            <th title="Projectiles per shot">Proj</th>
+            <th title="Hits per attack">Hits</th>
+            <th>Reload</th>
+            <th>Range</th>
+            <th>Splash</th>
+            <th>Speed</th>
+            <th title="Can hit air with no upgrades">AA</th>
+            <th title="Can hit air once the technology is bought">AA tech</th>
+            <th>Air</th>
+            <th title="Breakpoints count a single projectile, not the whole volley">1proj</th>
+            <th title="Damage lands as a salvo">Salvo</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var row in Visible())
+        {
+            <tr @key="row">
+                <td>
+                    <input class="form-control form-control-sm fw-semibold" style="min-width: 9rem"
+                           @bind="row.Name" @bind:after="MarkDirty"/>
+                </td>
+                <td>
+                    <input type="number" min="0" class="form-control form-control-sm text-end" style="min-width: 5.5rem"
+                           @bind="row.Cost" @bind:after="MarkDirty"/>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm text-end" style="min-width: 5rem"
+                           @bind="row.CountInPack" @bind:after="MarkDirty"/>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm text-end" style="min-width: 7rem"
+                           @bind="row.Health" @bind:after="MarkDirty"/>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm text-end" style="min-width: 7rem"
+                           @bind="row.Damage" @bind:after="MarkDirty"/>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm text-end" style="min-width: 4.5rem"
+                           @bind="row.ProjectilesPerShotOverride" @bind:after="MarkDirty"/>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm text-end" style="min-width: 4.5rem"
+                           @bind="row.HitsPerAttackOverride" @bind:after="MarkDirty"/>
+                </td>
+                <td>
+                    <input type="number" step="0.1" min="0" class="form-control form-control-sm text-end" style="min-width: 5rem"
+                           @bind="row.ReloadSeconds" @bind:after="MarkDirty"/>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm text-end" style="min-width: 5rem"
+                           @bind="row.Range" @bind:after="MarkDirty"/>
+                </td>
+                <td>
+                    <input type="number" step="0.5" min="0" class="form-control form-control-sm text-end" style="min-width: 5rem"
+                           @bind="row.Splash" @bind:after="MarkDirty"/>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm text-end" style="min-width: 4.5rem"
+                           @bind="row.Speed" @bind:after="MarkDirty"/>
+                </td>
+                <td class="text-center">
+                    <input type="checkbox" class="form-check-input" @bind="row.CanAttackAir" @bind:after="MarkDirty"/>
+                </td>
+                <td class="text-center">
+                    <input type="checkbox" class="form-check-input" @bind="row.CanAttackAirWithTech" @bind:after="MarkDirty"/>
+                </td>
+                <td class="text-center">
+                    <input type="checkbox" class="form-check-input" @bind="row.IsAir" @bind:after="MarkDirty"/>
+                </td>
+                <td class="text-center">
+                    <input type="checkbox" class="form-check-input" @bind="row.CountBreakpointsForSingleProjectile" @bind:after="MarkDirty"/>
+                </td>
+                <td class="text-center">
+                    <input type="checkbox" class="form-check-input" @bind="row.CalculateSalvoMode" @bind:after="MarkDirty"/>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+
+    /// <summary>
+    /// A mutable stand-in for the immutable <see cref="Unit"/> record so the inputs can
+    /// two-way bind; turned back into records only when the edits are applied.
+    /// </summary>
+    private sealed class Row(Unit unit)
+    {
+        public string Name { get; set; } = unit.Name;
+        public int Cost { get; set; } = unit.Cost;
+        public int CountInPack { get; set; } = unit.CountInPack;
+        public int Health { get; set; } = unit.Health;
+        public int Damage { get; set; } = unit.Damage;
+        public int? ProjectilesPerShotOverride { get; set; } = unit.ProjectilesPerShotOverride;
+        public int? HitsPerAttackOverride { get; set; } = unit.HitsPerAttackOverride;
+        public double ReloadSeconds { get; set; } = unit.ReloadTime.TotalSeconds;
+        public int Range { get; set; } = unit.Range;
+        public decimal Splash { get; set; } = unit.Splash;
+        public int Speed { get; set; } = unit.Speed;
+        public bool CanAttackAir { get; set; } = unit.CanAttackAir;
+        public bool CanAttackAirWithTech { get; set; } = unit.CanAttackAirWithTech;
+        public bool IsAir { get; set; } = unit.IsAir;
+        public bool CountBreakpointsForSingleProjectile { get; set; } = unit.CountBreakpointsForSingleProjectile;
+        public bool CalculateSalvoMode { get; set; } = unit.CalculateSalvoMode;
+
+        /// <summary>Fields the editor does not expose, carried through untouched.</summary>
+        private readonly Unit _source = unit;
+
+        public Unit ToUnit() => _source with
+        {
+            Name = Name,
+            Cost = Cost,
+            CountInPack = CountInPack,
+            Health = Health,
+            Damage = Damage,
+            ProjectilesPerShotOverride = ProjectilesPerShotOverride,
+            HitsPerAttackOverride = HitsPerAttackOverride,
+            ReloadTime = TimeSpan.FromSeconds(ReloadSeconds),
+            Range = Range,
+            Splash = Splash,
+            Speed = Speed,
+            CanAttackAir = CanAttackAir,
+            CanAttackAirWithTech = CanAttackAirWithTech,
+            IsAir = IsAir,
+            CountBreakpointsForSingleProjectile = CountBreakpointsForSingleProjectile,
+            CalculateSalvoMode = CalculateSalvoMode,
+        };
+    }
+
+    private List<Row> rows = [];
+    private string nameFilter = "";
+    private bool dirty;
+
+    private static int DaysOld => Math.Max(
+        DateOnly.FromDateTime(DateTime.Now).DayNumber - UnitsCollection.AsOf.DayNumber, 0);
+
+    /// <summary>
+    /// Balance patches land far more often than every six months, so past that the shipped
+    /// numbers are worth distrusting on sight rather than being taken at face value.
+    /// </summary>
+    private static bool Stale => DaysOld > 180;
+
+    private static string Age => DaysOld switch
+    {
+        0 => "today",
+        1 => "yesterday",
+        < 60 => $"{DaysOld} days ago",
+        < 730 => $"{DaysOld / 30} months ago",
+        _ => $"{DaysOld / 365} years ago",
+    };
+
+    /// <summary>Whether the roster in effect differs from the one in the repository.</summary>
+    private bool edited;
+
+    protected override void OnInitialized() => LoadRows();
+
+    private void LoadRows()
+    {
+        rows = UnitsCollection.Units.Select(u => new Row(u)).ToList();
+        edited = UnitsCollection.Units.SequenceEqual(UnitsCollection.Defaults()) == false;
+    }
+
+    private IEnumerable<Row> Visible() =>
+        rows.Where(r => string.IsNullOrEmpty(nameFilter) || r.Name.RegMatch(nameFilter));
+
+    private void MarkDirty() => dirty = true;
+
+    private async Task Apply()
+    {
+        await UnitsStorage.SaveAsync(JS, rows.Select(r => r.ToUnit()));
+        LoadRows();
+        dirty = false;
+    }
+
+    private void Revert()
+    {
+        LoadRows();
+        dirty = false;
+    }
+
+    private async Task Reset()
+    {
+        await UnitsStorage.ResetAsync(JS);
+        LoadRows();
+        dirty = false;
+    }
+
+}

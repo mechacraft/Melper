@@ -6,7 +6,7 @@ Python (stdlib), никакого venv.
 
 Не путать с [`../mechabellum-extract`](../mechabellum-extract): тот достаёт
 таблицы баланса из клиента, этот читает записи конкретных партий. Общего кода
-у них нет, ростер имён берётся напрямую из `Melper.Core/Data/UnitsCollection.cs`.
+у них нет, ростер имён берётся напрямую из `Melper.Core/Data/units.json`.
 
 ---
 
@@ -29,7 +29,7 @@ python replay_search.py --player MakTpaxep --unit Fortress --min 4 --last 15
 | ключ | что делает |
 |---|---|
 | `--player` | чью сторону смотреть (обязательный) |
-| `--unit` | имя из `UnitsCollection.cs` или числовой id: `Fortress` = `1` |
+| `--unit` | имя из `Melper.Core/Data/units.json` или числовой id: `Fortress` = `1` |
 | `--min` | порог, по умолчанию 1 |
 | `--last N` | только N самых свежих матчей (по дате) |
 | `--round last\|any` | считать в последнем раунде (по умолчанию) или в любом |

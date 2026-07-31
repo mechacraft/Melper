@@ -11,17 +11,17 @@ import argparse
 import collections
 import datetime
 import glob
+import json
 import os
-import re
 import struct
 import sys
 import xml.etree.ElementTree as ET
 
 GAME = r"D:\SteamLibrary\steamapps\common\Mechabellum"
 REPLAY_DIR = os.path.join(GAME, "ProjectDatas", "Replay")
-UNITS_CS = os.path.join(
+UNITS_JSON = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    "..", "..", "Melper.Core", "Data", "UnitsCollection.cs",
+    "..", "..", "Melper.Core", "Data", "units.json",
 )
 
 XSI_TYPE = "{http://www.w3.org/2001/XMLSchema-instance}type"
@@ -121,10 +121,9 @@ def fought_with(rounds, i):
 # --- unit names -------------------------------------------------------------
 
 def unit_names():
-    """{id: English name} from UnitsCollection.cs -- the project's own roster."""
-    source = open(UNITS_CS, encoding="utf-8").read()
-    pairs = re.findall(r'Id = (\d+),\s*\n\s*Name = "([^"]+)"', source)
-    return {int(uid): name for uid, name in pairs}
+    """{id: English name} from units.json -- the project's own roster."""
+    with open(UNITS_JSON, encoding="utf-8") as fh:
+        return {u["Id"]: u["Name"] for u in json.load(fh)["Units"] if u.get("Id")}
 
 
 def resolve_unit(query, names):

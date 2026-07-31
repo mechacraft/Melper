@@ -1,6 +1,6 @@
 # One-shot extraction: creates the venv if missing, then runs the whole chain.
 #   .\run.ps1            extract + build tables
-#   .\run.ps1 -Compare   also diff against Melper.Core/Data/UnitsCollection.cs
+#   .\run.ps1 -Compare   also diff against Melper.Core/Data/units.json
 param([switch]$Compare)
 
 $ErrorActionPreference = "Stop"

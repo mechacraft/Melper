@@ -19,7 +19,7 @@
                 Attack1
             </label><br/>
             <label>
-                <InputCheckbox @bind-Value="left.Attack2" @bind-Value:after="OnConfigChanged"/>
+                <InputCheckbox @bind-Value="left.Attack2" @bind-Value:after="@(async () => await OnAttack2Changed(left))"/>
                 Attack2
             </label><br/>
             <label>
@@ -27,7 +27,7 @@
                 Hp1
             </label><br/>
             <label>
-                <InputCheckbox @bind-Value="left.Hp2" @bind-Value:after="OnConfigChanged"/>
+                <InputCheckbox @bind-Value="left.Hp2" @bind-Value:after="@(async () => await OnHp2Changed(left))"/>
                 Hp2
             </label><br/>
             <label>
@@ -59,7 +59,7 @@
                 Attack1
             </label><br/>
             <label>
-                <InputCheckbox @bind-Value="right.Attack2" @bind-Value:after="OnConfigChanged"/>
+                <InputCheckbox @bind-Value="right.Attack2" @bind-Value:after="@(async () => await OnAttack2Changed(right))"/>
                 Attack2
             </label><br/>
             <label>
@@ -67,7 +67,7 @@
                 Hp1
             </label><br/>
             <label>
-                <InputCheckbox @bind-Value="right.Hp2" @bind-Value:after="OnConfigChanged"/>
+                <InputCheckbox @bind-Value="right.Hp2" @bind-Value:after="@(async () => await OnHp2Changed(right))"/>
                 Hp2
             </label><br/>
             <label>
@@ -440,6 +440,24 @@
 
         var ordered = rows.OrderByDescending(hasValue);
         rows = (sortDesc ? ordered.ThenByDescending(selector) : ordered.ThenBy(selector)).ToList();
+    }
+
+    /// <summary>
+    /// A tier-2 buff can't be taken without its tier-1 prerequisite, so ticking Attack2
+    /// ticks Attack1 too when it isn't owned yet. Unticking Attack1 is left alone —
+    /// <see cref="BuildBuffs"/> still adds the prerequisite to the calculation.
+    /// </summary>
+    private async Task OnAttack2Changed(BreakPointSideConfig side)
+    {
+        if (side.Attack2) side.Attack1 = true;
+        await OnConfigChanged();
+    }
+
+    /// <inheritdoc cref="OnAttack2Changed"/>
+    private async Task OnHp2Changed(BreakPointSideConfig side)
+    {
+        if (side.Hp2) side.Hp1 = true;
+        await OnConfigChanged();
     }
 
     private async Task OnConfigChanged()

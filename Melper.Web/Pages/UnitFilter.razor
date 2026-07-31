@@ -5,67 +5,66 @@
 
 <PageTitle>Unit filter</PageTitle>
 
-<div class="row mb-3 align-items-end g-3">
-    <div class="col-auto">
-        <label class="form-label">Applies to</label>
-        <div class="btn-group d-block">
-            @foreach (var target in Targets)
-            {
-                <button type="button"
-                        class="btn @(target.Key == _target ? "btn-primary" : "btn-outline-primary")"
-                        @onclick="() => SwitchTarget(target.Key)">
-                    @target.Label
+@* One half per target: a column owns its pattern, its quick picks and its own
+   copy of the roster, so nothing about the two selections shares a control. *@
+<div class="row g-4">
+    @foreach (var target in Targets)
+    {
+        <div class="col-12 col-lg-6">
+            <label class="form-label fw-semibold">
+                @target.Label
+                <span class="text-body-secondary small fw-normal">
+                    (@_selected[target.Key].Count of @AllUnits.Count units)
+                </span>
+            </label>
+            <input class="form-control font-monospace mb-3" readonly value="@_pattern[target.Key]"
+                   placeholder="empty - no filter, every unit passes"/>
+
+            <div class="btn-group mb-3" role="group">
+                <button type="button" class="btn btn-outline-secondary"
+                        @onclick="() => SelectAll(target.Key)">
+                    All
                 </button>
-            }
-        </div>
-    </div>
-    <div class="col">
-        <label class="form-label">
-            Filter
-            <span class="text-body-secondary small">(@_selected.Count of @AllUnits.Count units)</span>
-        </label>
-        <input class="form-control font-monospace" readonly value="@_pattern"
-               placeholder="empty - no filter, every unit passes"/>
-    </div>
-</div>
+                @foreach (var pick in QuickPicks)
+                {
+                    <button type="button" title="@pick.Title"
+                            class="btn @(IsExactly(target.Key, pick.Units) ? "btn-secondary" : "btn-outline-secondary")"
+                            @onclick="() => SelectOnly(target.Key, pick.Units)">
+                        @pick.Label
+                    </button>
+                }
+            </div>
 
-<div class="btn-group mb-3" role="group">
-    <button type="button" class="btn btn-outline-secondary" @onclick="SelectAll">All</button>
-    @foreach (var pick in QuickPicks)
-    {
-        <button type="button" title="@pick.Title"
-                class="btn @(IsExactly(pick.Units) ? "btn-secondary" : "btn-outline-secondary")"
-                @onclick="() => SelectOnly(pick.Units)">
-            @pick.Label
-        </button>
-    }
-</div>
-
-<div class="row row-cols-auto g-3">
-    @foreach (var group in Groups)
-    {
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-header">
-                    <label role="button" class="mb-0">
-                        <input type="checkbox" class="form-check-input me-1"
-                               checked="@AllChecked(group.Units)"
-                               @onchange="() => ToggleGroup(group)"/>
-                        <span class="fw-semibold">@group.Label</span>
-                        <span class="text-body-secondary small">(@CheckedCount(group)/@group.Units.Count)</span>
-                    </label>
-                </div>
-                <div class="card-body py-2">
-                    @foreach (var unit in group.Units)
-                    {
-                        <label role="button" class="d-block">
-                            <input type="checkbox" class="form-check-input me-1"
-                                   checked="@_selected.Contains(unit.Name)"
-                                   @onchange="() => ToggleUnit(unit)"/>
-                            @unit.Name
-                        </label>
-                    }
-                </div>
+            <div class="row row-cols-auto g-3">
+                @foreach (var group in Groups)
+                {
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <label role="button" class="mb-0">
+                                    <input type="checkbox" class="form-check-input me-1"
+                                           checked="@AllChecked(target.Key, group.Units)"
+                                           @onchange="() => ToggleGroup(target.Key, group)"/>
+                                    <span class="fw-semibold">@group.Label</span>
+                                    <span class="text-body-secondary small">
+                                        (@CheckedCount(target.Key, group)/@group.Units.Count)
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="card-body py-2">
+                                @foreach (var unit in group.Units)
+                                {
+                                    <label role="button" class="d-block">
+                                        <input type="checkbox" class="form-check-input me-1"
+                                               checked="@_selected[target.Key].Contains(unit.Name)"
+                                               @onchange="() => ToggleUnit(target.Key, unit)"/>
+                                        @unit.Name
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     }
@@ -81,11 +80,15 @@
 
     private static readonly List<Unit> AllUnits = UnitsCollection.Units;
 
-    /// <summary>The localStorage keys the name inputs on the other pages read.</summary>
+    /// <summary>
+    /// The localStorage keys the name inputs on the other pages read, in the
+    /// order the halves are laid out: the unit being calculated on the left, the
+    /// one it is measured against on the right.
+    /// </summary>
     private static readonly Target[] Targets =
     [
-        new("mainNameFilter", "Name"),
-        new("vsNameFilter", "VsName"),
+        new("mainNameFilter", "Unit"),
+        new("vsNameFilter", "Vs unit"),
     ];
 
     /// <summary>
@@ -101,9 +104,11 @@
         ("800", 800, int.MaxValue),
     ];
 
-    private static readonly List<Group> Groups = BuildGroups();
+    // Per instance, not static: the Data page can change cost and the air flags, and a
+    // snapshot taken at type load would keep showing the grouping the app started with.
+    private readonly List<Group> Groups = BuildGroups();
 
-    private static readonly QuickPick[] QuickPicks =
+    private readonly QuickPick[] QuickPicks =
     [
         new("Air", "Flying units", AllUnits.Where(x => x.IsAir).ToList()),
         new("Ground", "Everything that does not fly", AllUnits.Where(x => x.IsAir == false).ToList()),
@@ -111,9 +116,15 @@
             AllUnits.Where(x => x.CanEverAttackAir).ToList()),
     ];
 
-    private readonly HashSet<string> _selected = new(StringComparer.OrdinalIgnoreCase);
-    private string _target = Targets[0].Key;
-    private string _pattern = "";
+    /// <summary>
+    /// Both targets are edited side by side, so every piece of state is per
+    /// target. Filled up front: the markup reads it on the first render, before
+    /// the stored patterns can be loaded.
+    /// </summary>
+    private readonly Dictionary<string, HashSet<string>> _selected =
+        Targets.ToDictionary(x => x.Key, _ => new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+
+    private readonly Dictionary<string, string> _pattern = Targets.ToDictionary(x => x.Key, _ => "");
 
     private static List<Group> BuildGroups()
     {
@@ -138,7 +149,12 @@
     {
         if (firstRender)
         {
-            await LoadTarget();
+            foreach (var target in Targets)
+            {
+                await LoadTarget(target.Key);
+            }
+
+            StateHasChanged();
         }
     }
 
@@ -146,95 +162,86 @@
     /// The stored pattern is the state: a hand-written one round-trips into
     /// checkboxes and is left alone until something is actually clicked.
     /// </summary>
-    private async Task LoadTarget()
+    private async Task LoadTarget(string key)
     {
-        _pattern = await JS.InvokeAsync<string>("localStorage.getItem", _target) ?? "";
+        var pattern = await JS.InvokeAsync<string>("localStorage.getItem", key) ?? "";
+        _pattern[key] = pattern;
 
-        _selected.Clear();
-        foreach (var unit in UnitFilterBuilder.SelectMatching(_pattern, AllUnits))
+        var selected = _selected[key];
+        selected.Clear();
+        foreach (var unit in UnitFilterBuilder.SelectMatching(pattern, AllUnits))
         {
-            _selected.Add(unit.Name);
+            selected.Add(unit.Name);
         }
-
-        StateHasChanged();
     }
 
-    private async Task SwitchTarget(string key)
+    private Task ToggleUnit(string key, Unit unit)
     {
-        if (_target == key)
+        if (_selected[key].Remove(unit.Name) == false)
         {
-            return;
+            _selected[key].Add(unit.Name);
         }
 
-        _target = key;
-        await LoadTarget();
-    }
-
-    private Task ToggleUnit(Unit unit)
-    {
-        if (_selected.Remove(unit.Name) == false)
-        {
-            _selected.Add(unit.Name);
-        }
-
-        return Save();
+        return Save(key);
     }
 
     /// <summary>
     /// Checking wins: a partly checked bracket fills up first, only a full one clears.
     /// </summary>
-    private Task ToggleGroup(Group group)
+    private Task ToggleGroup(string key, Group group)
     {
-        var clear = AllChecked(group.Units);
+        var clear = AllChecked(key, group.Units);
         foreach (var unit in group.Units)
         {
             if (clear)
             {
-                _selected.Remove(unit.Name);
+                _selected[key].Remove(unit.Name);
             }
             else
             {
-                _selected.Add(unit.Name);
+                _selected[key].Add(unit.Name);
             }
         }
 
-        return Save();
+        return Save(key);
     }
 
     /// <summary>
     /// A quick pick replaces the selection outright, so pressing it twice is a
     /// no-op rather than something that empties or fills the page.
     /// </summary>
-    private Task SelectOnly(List<Unit> units)
+    private Task SelectOnly(string key, List<Unit> units)
     {
-        _selected.Clear();
+        _selected[key].Clear();
         foreach (var unit in units)
         {
-            _selected.Add(unit.Name);
+            _selected[key].Add(unit.Name);
         }
 
-        return Save();
+        return Save(key);
     }
 
-    private Task SelectAll()
+    private Task SelectAll(string key)
     {
         foreach (var unit in AllUnits)
         {
-            _selected.Add(unit.Name);
+            _selected[key].Add(unit.Name);
         }
 
-        return Save();
+        return Save(key);
     }
 
-    private bool AllChecked(List<Unit> units) => units.All(x => _selected.Contains(x.Name));
+    private bool AllChecked(string key, List<Unit> units) => units.All(x => _selected[key].Contains(x.Name));
 
-    private bool IsExactly(List<Unit> units) => _selected.Count == units.Count && AllChecked(units);
+    private bool IsExactly(string key, List<Unit> units) =>
+        _selected[key].Count == units.Count && AllChecked(key, units);
 
-    private int CheckedCount(Group group) => group.Units.Count(x => _selected.Contains(x.Name));
+    private int CheckedCount(string key, Group group) => group.Units.Count(x => _selected[key].Contains(x.Name));
 
-    private async Task Save()
+    private async Task Save(string key)
     {
-        _pattern = UnitFilterBuilder.Build(AllUnits.Where(x => _selected.Contains(x.Name)), AllUnits);
-        await JS.InvokeVoidAsync("localStorage.setItem", _target, _pattern);
+        var pattern = UnitFilterBuilder.Build(AllUnits.Where(x => _selected[key].Contains(x.Name)), AllUnits);
+        _pattern[key] = pattern;
+        await JS.InvokeVoidAsync("localStorage.setItem", key, pattern);
     }
 }
