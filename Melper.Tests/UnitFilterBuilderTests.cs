@@ -48,9 +48,9 @@ public class UnitFilterBuilderTests
         for (var i = 0; i < 500; i++)
         {
             var selected = All.Where(_ => random.Next(2) == 0).ToList();
-            if (selected.Count == 0 || selected.Count == All.Count)
+            if (selected.Count == All.Count)
             {
-                continue; // Those two are the "no pattern" cases, covered below.
+                continue; // "Everything" is the no-pattern case, covered below.
             }
 
             AssertRoundTrip(selected);
@@ -58,10 +58,22 @@ public class UnitFilterBuilderTests
     }
 
     [Fact]
-    public void AllAndNothingSelected_BothMeanNoPattern()
+    public void EverythingSelected_MeansNoPattern()
     {
         Assert.Equal("", UnitFilterBuilder.Build(All, All));
-        Assert.Equal("", UnitFilterBuilder.Build([], All));
+    }
+
+    [Fact]
+    public void NothingSelected_MeansAPatternNoUnitMatches()
+    {
+        var pattern = UnitFilterBuilder.Build([], All);
+
+        Assert.Equal(UnitFilterBuilder.MatchNothing, pattern);
+        Assert.Empty(UnitFilterBuilder.SelectMatching(pattern, All));
+
+        // Round-trips like any other selection: it comes back out of storage as itself
+        // rather than turning into "no filter".
+        AssertRoundTrip([]);
     }
 
     [Fact]

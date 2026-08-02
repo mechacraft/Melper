@@ -17,17 +17,29 @@ public static class UnitFilterBuilder
     private const int MinTokenLength = 3;
 
     /// <summary>
+    /// The pattern for a selection that is deliberately empty. Every unit has a name, so
+    /// nothing matches "the name is empty" - and unlike the empty pattern, which the pages
+    /// read as no filter at all, it survives the round trip through storage as itself.
+    /// </summary>
+    public const string MatchNothing = "^$";
+
+    /// <summary>
     /// Builds the shortest pattern that matches exactly <paramref name="selected"/>
-    /// out of <paramref name="all"/>. Both extremes - nothing picked and
-    /// everything picked - mean "do not narrow anything down", which is the empty
-    /// pattern the pages treat as no filter.
+    /// out of <paramref name="all"/>. Everything picked means "do not narrow anything
+    /// down", which is the empty pattern the pages treat as no filter; nothing picked is
+    /// the opposite instruction and gets <see cref="MatchNothing"/>.
     /// </summary>
     public static string Build(IEnumerable<Unit> selected, IReadOnlyCollection<Unit> all)
     {
         var allNames = all.Select(x => x.Name).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         var picked = selected.Select(x => x.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        if (picked.Count == 0 || picked.Count >= allNames.Count)
+        if (picked.Count == 0)
+        {
+            return MatchNothing;
+        }
+
+        if (picked.Count >= allNames.Count)
         {
             return "";
         }

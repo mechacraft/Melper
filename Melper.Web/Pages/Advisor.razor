@@ -1,0 +1,332 @@
+@page "/advisor"
+@using System.Text.Json
+@using Melper.Core.Buffs
+@using Melper.Core.Services
+@using Melper.Data
+@using Melper.ViewModel
+@inject IJSRuntime JS
+
+<PageTitle>Advisor</PageTitle>
+
+<UnitPicker OnChanged="OnSelectionChanged"/>
+
+<hr class="my-4"/>
+
+@* Only the four attack and hp technologies: they are the ones the advice is about, so
+   the rest of the Breakpoints page's toggles are deliberately not repeated here. *@
+<div class="row g-4">
+    @foreach (var side in Sides)
+    {
+        <div class="col-6 col-md-3">
+            <label class="form-label fw-semibold">@side.Label</label>
+            <div class="card">
+                <div class="card-body py-2">
+                    <label role="button" class="d-block">
+                        <input type="checkbox" class="form-check-input me-1"
+                               checked="@side.Config.Attack1"
+                               @onchange="e => SetAttack1(side.Config, e)"/>
+                        Attack1
+                    </label>
+                    <label role="button" class="d-block">
+                        <input type="checkbox" class="form-check-input me-1"
+                               checked="@side.Config.Attack2"
+                               @onchange="e => SetAttack2(side.Config, e)"/>
+                        Attack2
+                    </label>
+                    <label role="button" class="d-block">
+                        <input type="checkbox" class="form-check-input me-1"
+                               checked="@side.Config.Hp1"
+                               @onchange="e => SetHp1(side.Config, e)"/>
+                        Hp1
+                    </label>
+                    <label role="button" class="d-block">
+                        <input type="checkbox" class="form-check-input me-1"
+                               checked="@side.Config.Hp2"
+                               @onchange="e => SetHp2(side.Config, e)"/>
+                        Hp2
+                    </label>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="col-12 col-md-6">
+        <label class="form-label fw-semibold">Show</label>
+        <select class="form-select w-auto" @bind="_limit" @bind:after="Rebuild">
+            @foreach (var option in LimitOptions)
+            {
+                <option value="@option">top @option</option>
+            }
+            <option value="@int.MaxValue">everything</option>
+        </select>
+        <p class="mt-2 mb-0 text-body-secondary small">
+            @if (_candidates.Count == 0)
+            {
+                @* Only the main side's ticks decide this: the vs ticks say what the opponent
+                   already has, not what there is left to buy. *@
+                <text>The unit owns every attack and hp technology - nothing left to advise on.</text>
+            }
+            else
+            {
+                <text>
+                    Showing @_shown of @_total breakpoints, at most @PerUnitLimit per unit.
+                    The number on the right is how much of the crossing the technology's own
+                    percentage did not already pay for - 3 attacks into 2 off a 12% buy scores
+                    1.34, while 265 attacks into 385 off a 45% one scores 1.00 and sinks. That
+                    is the order. Level 1 stats; only the technologies ticked above are counted.
+                </text>
+            }
+        </p>
+    </div>
+</div>
+
+<hr class="my-4"/>
+
+@if (_groups.Count == 0 && _candidates.Count > 0)
+{
+    <p class="text-body-secondary">
+        No breakpoint moves for this selection - every pairing needs the same number of
+        attacks with the upgrade as without it.
+    </p>
+}
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-xxl-3 g-3">
+    @foreach (var group in _groups)
+    {
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold">@group.Main.Name</span>
+                    <span class="text-body-secondary small">best @Multiplier(group.BestScore)</span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var item in group.Items)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center gap-2"
+                            title="@Explain(item)">
+                            <span>
+                                vs <span class="fw-semibold">@item.Vs.Name</span>:
+                                <span class="badge @Badge(item)">@item.Upgrade.Name</span>
+                                @item.Before &rarr; @item.After @Wording(item)
+                            </span>
+                            <span class="text-body-secondary small text-nowrap">@Multiplier(item.Score)</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private sealed record Side(string Label, BreakPointSideConfig Config);
+
+    private sealed record MainGroup(Unit Main, double BestScore, List<BreakpointSuggestion> Items);
+
+    /// <summary>Shared with the Breakpoints page, so what a side owns is stated once.</summary>
+    private const string LeftConfigKey = "BreakPointSideConfig:left";
+
+    private const string RightConfigKey = "BreakPointSideConfig:right";
+
+    /// <summary>
+    /// How many pairings one main unit contributes. A ranked list is only useful while it
+    /// stays short, and a strong unit would otherwise fill it with its whole match-up chart.
+    /// </summary>
+    private const int PerUnitLimit = 6;
+
+    private static readonly int[] LimitOptions = [25, 50, 100, 250];
+
+    private BreakPointSideConfig _left = new();
+    private BreakPointSideConfig _right = new();
+
+    // Recreated on every config load so the markup binds to the live objects.
+    private Side[] Sides => [new("Unit owns", _left), new("Vs owns", _right)];
+
+    private UnitSelection _selection = UnitSelection.Everything;
+    private int _limit = LimitOptions[1];
+
+    private IReadOnlyList<UpgradeCandidate> _candidates = [];
+    private List<MainGroup> _groups = [];
+    private int _total;
+    private int _shown;
+
+    // Nothing stored has been read yet, so this only makes the first paint agree with
+    // itself - the list it puts up is the whole roster's, which is what an empty pattern
+    // means anyway.
+    protected override void OnInitialized() => Rebuild();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender == false) return;
+
+        _left = await LoadConfig(LeftConfigKey) ?? _left;
+        _right = await LoadConfig(RightConfigKey) ?? _right;
+
+        Rebuild();
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Also raised once the picker has read the stored patterns, which happens after this
+    /// page's own first render - so this, not OnAfterRenderAsync, is what fills the list.
+    /// </summary>
+    private void OnSelectionChanged(UnitSelection selection)
+    {
+        _selection = selection;
+        Rebuild();
+        StateHasChanged();
+    }
+
+    private void Rebuild()
+    {
+        var roster = UnitsCollection.Units;
+
+        _candidates = BreakpointAdvisor.AttackAndHpCandidates(
+            _left.Attack1, _left.Attack2, _left.Hp1, _left.Hp2);
+
+        var suggestions = BreakpointAdvisor.Suggest(
+            _selection.Mains(roster),
+            _selection.Opponents(roster),
+            Aggregates(_left),
+            Aggregates(_right),
+            _candidates);
+
+        _total = suggestions.Count;
+
+        // Capped per unit first, then overall: a list of ten units' best advice beats one
+        // unit's best ten, and the ordering inside a group is the ranking it came in with.
+        var perUnit = suggestions
+            .GroupBy(x => x.Main.Name, StringComparer.OrdinalIgnoreCase)
+            .Select(x => new MainGroup(x.First().Main, x.Max(s => s.Score), x.Take(PerUnitLimit).ToList()))
+            .ToList();
+
+        perUnit.Sort(ByEffect);
+
+        _groups = [];
+        _shown = 0;
+        foreach (var group in perUnit)
+        {
+            if (_shown >= _limit) break;
+
+            // A group is never split: taking half a unit's advice would read as if the rest
+            // of its pairings had no breakpoint at all.
+            _groups.Add(group);
+            _shown += group.Items.Count;
+        }
+    }
+
+    /// <summary>
+    /// Ranks two units by their whole run of advice rather than by their best line alone:
+    /// a great many units peak at the same doubling, and comparing further down the run
+    /// puts the unit that gets more out of the upgrade first instead of falling back to
+    /// alphabetical order the moment the peaks tie.
+    /// </summary>
+    private static int ByEffect(MainGroup a, MainGroup b)
+    {
+        for (var i = 0; i < Math.Min(a.Items.Count, b.Items.Count); i++)
+        {
+            var byScore = b.Items[i].Score.CompareTo(a.Items[i].Score);
+            if (byScore != 0) return byScore;
+        }
+
+        var byCount = b.Items.Count.CompareTo(a.Items.Count);
+        return byCount != 0
+            ? byCount
+            : string.Compare(a.Main.Name, b.Main.Name, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Only the four technologies this page shows. The shared config may also hold
+    /// Heavy armor and friends from the Breakpoints page; folding those in here would
+    /// move the numbers with nothing on screen to explain why.
+    /// </summary>
+    private static BuffAggregates Aggregates(BreakPointSideConfig side)
+    {
+        var buffs = new List<IBuff>();
+
+        if (side.Attack1 || side.Attack2) buffs.Add(new Attack1Buff());
+        if (side.Attack2) buffs.Add(new Attack2Buff());
+        if (side.Hp1 || side.Hp2) buffs.Add(new Hp1Buff());
+        if (side.Hp2) buffs.Add(new Hp2Buff());
+
+        return BuffAggregates.From(buffs);
+    }
+
+    private static bool Checked(ChangeEventArgs e) => e.Value is true;
+
+    private Task SetAttack1(BreakPointSideConfig side, ChangeEventArgs e)
+    {
+        side.Attack1 = Checked(e);
+
+        // A tier-2 technology cannot be held without its tier-1 prerequisite, so dropping
+        // the prerequisite drops the tier above it too.
+        if (side.Attack1 == false) side.Attack2 = false;
+
+        return OnConfigChanged();
+    }
+
+    private Task SetAttack2(BreakPointSideConfig side, ChangeEventArgs e)
+    {
+        side.Attack2 = Checked(e);
+        if (side.Attack2) side.Attack1 = true;
+
+        return OnConfigChanged();
+    }
+
+    /// <inheritdoc cref="SetAttack1"/>
+    private Task SetHp1(BreakPointSideConfig side, ChangeEventArgs e)
+    {
+        side.Hp1 = Checked(e);
+        if (side.Hp1 == false) side.Hp2 = false;
+
+        return OnConfigChanged();
+    }
+
+    /// <inheritdoc cref="SetAttack2"/>
+    private Task SetHp2(BreakPointSideConfig side, ChangeEventArgs e)
+    {
+        side.Hp2 = Checked(e);
+        if (side.Hp2) side.Hp1 = true;
+
+        return OnConfigChanged();
+    }
+
+    private async Task OnConfigChanged()
+    {
+        await SaveConfig(LeftConfigKey, _left);
+        await SaveConfig(RightConfigKey, _right);
+        Rebuild();
+    }
+
+    private static string Wording(BreakpointSuggestion item) =>
+        item.Upgrade.Kind == UpgradeKind.Attack ? "attacks to kill" : "attacks survived";
+
+    private static string Badge(BreakpointSuggestion item) =>
+        item.Upgrade.Kind == UpgradeKind.Attack ? "text-bg-danger" : "text-bg-primary";
+
+    private static string Multiplier(double ratio) => ratio.ToString("0.##");
+
+    /// <summary>The long form of the number on the right, which is what the list is sorted by.</summary>
+    private static string Explain(BreakpointSuggestion item) =>
+        $"×{Multiplier(item.Ratio)} better for a buy worth ×{Multiplier(item.Flat)}"
+        + $" - the crossing is {Multiplier(item.Score)} times what the stats alone paid for";
+
+    private async Task SaveConfig(string key, BreakPointSideConfig config) =>
+        await JS.InvokeVoidAsync("localStorage.setItem", key, JsonSerializer.Serialize(config));
+
+    private async Task<BreakPointSideConfig?> LoadConfig(string key)
+    {
+        var json = await JS.InvokeAsync<string?>("localStorage.getItem", key);
+        if (string.IsNullOrEmpty(json)) return null;
+
+        try
+        {
+            return JsonSerializer.Deserialize<BreakPointSideConfig>(json);
+        }
+        catch (JsonException)
+        {
+            // Older builds stored "[object Object]" here.
+            return null;
+        }
+    }
+}
