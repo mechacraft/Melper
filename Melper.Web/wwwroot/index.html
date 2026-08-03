@@ -5,7 +5,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark light" />
-    <title>Melper.Web</title>
+    <meta name="description" content="Mechabellum unit tables, damage math, breakpoints and buy advice." />
+    <!-- Installed windows take their frame colour from the manifest; this covers mobile browser UI. -->
+    <meta name="theme-color" content="#212529" />
+    <title>Melper</title>
     <base href="/" />
     <script>
         // Applied before any stylesheet renders so there is no flash of the wrong theme.
@@ -44,8 +47,63 @@
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
+
+    <div id="pwa-update-ui" class="alert alert-primary m-0 rounded-0 shadow" hidden>
+        <span class="flex-grow-1">A new version of Melper is available.</span>
+        <button type="button" class="btn btn-sm btn-primary reload">Reload</button>
+        <button type="button" class="btn-close dismiss" aria-label="Dismiss"></button>
+    </div>
+
     <script src="_framework/blazor.webassembly.js"></script>
-    <script>navigator.serviceWorker.register('service-worker.js');</script>
+    <script>
+        // Offline support and the install prompt both hang off the service worker;
+        // skip it where there is none (file://, plain-http origins other than localhost).
+        if ('serviceWorker' in navigator) {
+            // Installed as an app, the window can stay open for days without a
+            // navigation, so nothing would otherwise check for a new deployment.
+            const updateCheckIntervalMs = 60 * 60 * 1000;
+
+            navigator.serviceWorker.register('service-worker.js').then(registration => {
+                const bar = document.getElementById('pwa-update-ui');
+
+                // A cache-first worker keeps serving the old assets until it is
+                // replaced, and it only steps aside once every client is gone -
+                // which in a standalone window may be never. Hence the prompt.
+                const promptForUpdate = worker => {
+                    bar.querySelector('.reload').onclick = () => worker.postMessage({ type: 'SKIP_WAITING' });
+                    bar.querySelector('.dismiss').onclick = () => bar.hidden = true;
+                    bar.hidden = false;
+                };
+
+                if (registration.waiting) {
+                    promptForUpdate(registration.waiting);
+                }
+
+                registration.addEventListener('updatefound', () => {
+                    const installing = registration.installing;
+                    installing.addEventListener('statechange', () => {
+                        // No controller means this is the first install, not an update.
+                        if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+                            promptForUpdate(installing);
+                        }
+                    });
+                });
+
+                setInterval(() => registration.update(), updateCheckIntervalMs);
+            }).catch(error => console.warn('Service worker registration failed', error));
+
+            // The new worker takes over the page once it stops waiting; reloading
+            // then is what swaps in the new assets. Blazor pulls assemblies in
+            // lazily, so reloading is also what keeps them all on one version.
+            let reloading = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!reloading) {
+                    reloading = true;
+                    location.reload();
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

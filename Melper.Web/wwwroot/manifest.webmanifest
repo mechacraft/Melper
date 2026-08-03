@@ -1,11 +1,13 @@
 {
-  "name": "Melper.Web",
-  "short_name": "Melper.Web",
-  "id": "./",
+  "name": "Melper",
+  "short_name": "Melper",
+  "description": "Mechabellum unit tables, damage math, breakpoints and buy advice.",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#03173d",
+  "background_color": "#212529",
+  "theme_color": "#212529",
+  "lang": "en",
   "prefer_related_applications": false,
   "icons": [
     {

@@ -5,6 +5,7 @@ self.importScripts('./service-worker-assets.js');
 self.addEventListener('install', event => event.waitUntil(onInstall(event)));
 self.addEventListener('activate', event => event.waitUntil(onActivate(event)));
 self.addEventListener('fetch', event => event.respondWith(onFetch(event)));
+self.addEventListener('message', event => onMessage(event));
 
 const cacheNamePrefix = 'offline-cache-';
 const cacheName = `${cacheNamePrefix}${self.assetsManifest.version}`;
@@ -35,6 +36,15 @@ async function onActivate(event) {
     await Promise.all(cacheKeys
         .filter(key => key.startsWith(cacheNamePrefix) && key !== cacheName)
         .map(key => caches.delete(key)));
+}
+
+// Without this the worker stays in 'waiting' until every client closes, which in
+// an installed standalone window can be days. index.html shows a prompt instead
+// and posts here when the user accepts, then reloads on 'controllerchange'.
+function onMessage(event) {
+    if (event.data?.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 }
 
 async function onFetch(event) {
