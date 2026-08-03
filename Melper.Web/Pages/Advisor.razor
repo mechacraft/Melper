@@ -8,7 +8,13 @@
 
 <PageTitle>Advisor</PageTitle>
 
-<UnitPicker OnChanged="OnSelectionChanged"/>
+<UnitPicker @ref="_picker" OnChanged="OnSelectionChanged"/>
+
+<button type="button" class="btn btn-outline-secondary mt-3"
+        title="Empties both halves - the same as pressing None on each"
+        @onclick="ResetSelection">
+    Reset
+</button>
 
 <hr class="my-4"/>
 
@@ -136,6 +142,8 @@
 
     private static readonly int[] LimitOptions = [25, 50, 100, 250];
 
+    private UnitPicker? _picker;
+
     private BreakPointSideConfig _left = new();
     private BreakPointSideConfig _right = new();
 
@@ -176,6 +184,13 @@
         Rebuild();
         StateHasChanged();
     }
+
+    /// <summary>
+    /// The picker raises OnChanged from this, so the list follows without a rebuild here.
+    /// Only the unit selection is reset: the technologies ticked below are what the roster
+    /// already owns, not a filter over it.
+    /// </summary>
+    private Task ResetSelection() => _picker?.ResetToNone() ?? Task.CompletedTask;
 
     private void Rebuild()
     {

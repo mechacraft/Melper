@@ -253,12 +253,39 @@
 
     private int CheckedCount(string key, Group group) => group.Units.Count(x => _selected[key].Contains(x.Name));
 
+    /// <summary>
+    /// Empties both halves, as if the None quick pick had been pressed on each. Public
+    /// because a page may want to offer it as one button; the picker itself keeps the
+    /// per-target picks, which is the finer control.
+    /// </summary>
+    public async Task ResetToNone()
+    {
+        foreach (var target in Targets)
+        {
+            _selected[target.Key].Clear();
+            await Store(target.Key);
+        }
+
+        // One event for the pair: notifying per target would hand a page a half-reset
+        // selection first, and it would calculate off it.
+        await Notify();
+
+        // The click that got here belongs to another component, so this one is not
+        // rerendered on its own - the checkboxes would stay ticked over empty state.
+        StateHasChanged();
+    }
+
     private async Task Save(string key)
+    {
+        await Store(key);
+        await Notify();
+    }
+
+    private async Task Store(string key)
     {
         var pattern = UnitFilterBuilder.Build(AllUnits.Where(x => _selected[key].Contains(x.Name)), AllUnits);
         _pattern[key] = pattern;
         await JS.InvokeVoidAsync("localStorage.setItem", key, pattern);
-        await Notify();
     }
 
     private Task Notify() =>
