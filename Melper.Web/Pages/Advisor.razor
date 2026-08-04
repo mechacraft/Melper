@@ -122,11 +122,7 @@
                        technology left to buy gets the whole row for it. *@
                     <div class="col-12 col-md">
                         <div class="d-md-none mb-1">@Head(column)</div>
-                        @if (items.Count == 0)
-                        {
-                            <span class="small text-body-secondary">nothing moves</span>
-                        }
-                        else
+                        @if (items.Count != 0)
                         {
                             <div class="d-flex flex-wrap gap-1">
                                 @foreach (var item in items)
