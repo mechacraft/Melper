@@ -56,14 +56,6 @@
     }
 
     <div class="col-12 col-md-6">
-        <label class="form-label fw-semibold">Show</label>
-        <select class="form-select w-auto" @bind="_limit" @bind:after="Rebuild">
-            @foreach (var option in LimitOptions)
-            {
-                <option value="@option">top @option</option>
-            }
-            <option value="@int.MaxValue">everything</option>
-        </select>
         <p class="mt-2 mb-0 text-body-secondary small">
             @if (_candidates.Count == 0)
             {
@@ -74,11 +66,10 @@
             else
             {
                 <text>
-                    Showing @_shown of @_total breakpoints, at most @PerUnitLimit per unit.
-                    The number on the right is how much of the crossing the technology's own
-                    percentage did not already pay for - 3 attacks into 2 off a 12% buy scores
-                    1.34, while 265 attacks into 305 off a 15% one scores 1.00 and sinks. That
-                    is the order. Level 1 stats; only the technologies set above are counted.
+                    @_total breakpoints over @_groups.Count units. Each pairing reads
+                    before &rarr; after; the biggest proportional move comes first, both
+                    across the units and inside a column. Level 1 stats; only the
+                    technologies set above are counted.
                 </text>
             }
         </p>
@@ -95,29 +86,47 @@
     </p>
 }
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-xxl-3 g-3">
+@* A row per unit rather than a card per unit: everything one unit has to say fits on one
+   line of the page, the narrow left cell names it, and the two halves are the two things
+   a technology can buy. Read as a table of one full-width cell each, since the height of
+   a row is whatever its opponents need. *@
+<div class="d-flex flex-column gap-2">
     @foreach (var group in _groups)
     {
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span class="fw-semibold">@group.Main.Name</span>
-                    <span class="text-body-secondary small">best @Multiplier(group.BestScore)</span>
-                </div>
-                <ul class="list-group list-group-flush">
-                    @foreach (var item in group.Items)
-                    {
-                        <li class="list-group-item d-flex justify-content-between align-items-center gap-2"
-                            title="@Explain(item)">
-                            <span>
-                                vs <span class="fw-semibold">@item.Vs.Name</span>:
-                                <span class="badge @Badge(item)">@item.Upgrade.Name</span>
-                                @item.Before &rarr; @item.After @Wording(item)
-                            </span>
-                            <span class="text-body-secondary small text-nowrap">@Multiplier(item.Score)</span>
-                        </li>
-                    }
-                </ul>
+        <div class="card">
+            <div class="card-body row g-2 py-2">
+                <div class="col-12 col-md-2 fw-semibold">@group.Main.Name</div>
+                @foreach (var column in Columns(group))
+                {
+                    @* An even share of what the name leaves, so a side with only one
+                       technology left to buy gets the whole row for it. *@
+                    <div class="col-12 col-md">
+                        @* What the arrows mean is said once here, so a pairing is only a
+                           name and its two counts - the counts fall on the left half and
+                           rise on the right, and both are the pairing getting better. *@
+                        <div class="small text-body-secondary mb-1">
+                            <span class="fw-semibold">@column.Label</span>
+                            <span class="badge @column.Badge">@column.Upgrade</span>
+                            @column.Hint
+                        </div>
+                        @if (column.Items.Count == 0)
+                        {
+                            <span class="small text-body-secondary">nothing moves</span>
+                        }
+                        else
+                        {
+                            <div class="d-flex flex-wrap gap-1">
+                                @foreach (var item in column.Items)
+                                {
+                                    <span class="badge fw-normal @Chip(column, item)" title="@Explain(item)">
+                                        @item.Vs.Name
+                                        <span class="fw-semibold">@item.Before&rarr;@item.After</span>
+                                    </span>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
             </div>
         </div>
     }
@@ -135,7 +144,19 @@
         Func<BreakPointSideConfig, int> Get,
         Action<BreakPointSideConfig, int> Set);
 
-    private sealed record MainGroup(Unit Main, double BestScore, List<BreakpointSuggestion> Items);
+    /// <param name="Items">
+    /// Every pairing the unit has, best first - the halves are cut out of this, so it is
+    /// what one unit's whole run of advice is ranked by.
+    /// </param>
+    private sealed record MainGroup(Unit Main, List<BreakpointSuggestion> Items);
+
+    /// <summary>One half of a unit's row: everything one kind of technology buys it.</summary>
+    private sealed record Column(
+        string Label,
+        string Upgrade,
+        string Hint,
+        string Badge,
+        List<BreakpointSuggestion> Items);
 
     private static readonly Track[] Tracks =
     [
@@ -163,12 +184,19 @@
     private const string RightConfigKey = "BreakPointSideConfig:right";
 
     /// <summary>
-    /// How many pairings one main unit contributes. A ranked list is only useful while it
-    /// stays short, and a strong unit would otherwise fill it with its whole match-up chart.
+    /// Where a pairing stops being a shortening and starts being a decision - 3 attacks
+    /// into 2, or 2 into 3 survived. Those are what the halves are coloured for; the rest
+    /// stay quiet so the ones worth buying for can be found without reading the counts.
     /// </summary>
-    private const int PerUnitLimit = 6;
+    private const double DecisiveRatio = 1.5;
 
-    private static readonly int[] LimitOptions = [25, 50, 100, 250];
+    /// <summary>
+    /// How much of the move has to be more than the technology's percentage already paid
+    /// for before the pairing is worth reading. 556 attacks into 496 off a 12% buy is the
+    /// 12% and nothing else - the count moved, no threshold was crossed - and a long tail
+    /// of those is what buried the pairings that did cross one.
+    /// </summary>
+    private const double NoticeableSurplus = 1.02;
 
     private UnitPicker? _picker;
 
@@ -179,12 +207,10 @@
     private Side[] Sides => [new("Unit owns", _left), new("Vs owns", _right)];
 
     private UnitSelection _selection = UnitSelection.Everything;
-    private int _limit = LimitOptions[1];
 
     private IReadOnlyList<UpgradeCandidate> _candidates = [];
     private List<MainGroup> _groups = [];
     private int _total;
-    private int _shown;
 
     // Nothing stored has been read yet, so this only makes the first paint agree with
     // itself - the list it puts up is the whole roster's, which is what an empty pattern
@@ -257,25 +283,33 @@
 
         _total = suggestions.Count;
 
-        // Capped per unit first, then overall: a list of ten units' best advice beats one
-        // unit's best ten, and the ordering inside a group is the ranking it came in with.
-        var perUnit = suggestions
+        // Nothing is dropped: a unit gets one row whatever its match-up chart looks like,
+        // and a row that stops halfway would read as if the rest of its pairings had no
+        // breakpoint at all. The ranking inside a group is the one it came in with.
+        _groups = suggestions
             .GroupBy(x => x.Main.Name, StringComparer.OrdinalIgnoreCase)
-            .Select(x => new MainGroup(x.First().Main, x.Max(s => s.Score), x.Take(PerUnitLimit).ToList()))
+            .Select(x => new MainGroup(x.First().Main, x.ToList()))
             .ToList();
 
-        perUnit.Sort(ByEffect);
+        _groups.Sort(ByEffect);
+    }
 
-        _groups = [];
-        _shown = 0;
-        foreach (var group in perUnit)
+    /// <summary>
+    /// The two halves of a row, in the order they are laid out. A kind with nothing left
+    /// to buy has no half at all - it would be an empty column on every row on the page.
+    /// </summary>
+    private IEnumerable<Column> Columns(MainGroup group)
+    {
+        foreach (var candidate in _candidates)
         {
-            if (_shown >= _limit) break;
+            var attack = candidate.Kind == UpgradeKind.Attack;
 
-            // A group is never split: taking half a unit's advice would read as if the rest
-            // of its pairings had no breakpoint at all.
-            _groups.Add(group);
-            _shown += group.Items.Count;
+            yield return new Column(
+                attack ? "Attack" : "Survive",
+                candidate.Name,
+                attack ? "attacks to kill" : "attacks survived",
+                attack ? "text-bg-danger" : "text-bg-primary",
+                group.Items.Where(x => x.Upgrade.Kind == candidate.Kind).ToList());
         }
     }
 
@@ -336,11 +370,19 @@
         await SaveConfig(RightConfigKey, _right);
     }
 
-    private static string Wording(BreakpointSuggestion item) =>
-        item.Upgrade.Kind == UpgradeKind.Attack ? "attacks to kill" : "attacks survived";
-
-    private static string Badge(BreakpointSuggestion item) =>
-        item.Upgrade.Kind == UpgradeKind.Attack ? "text-bg-danger" : "text-bg-primary";
+    /// <summary>
+    /// Colours a pairing by how far it moves rather than by which half it is in - the
+    /// half is already the column it sits in, and what a glance is looking for is the
+    /// handful of opponents the buy actually decides. Three steps: the ones that halve
+    /// the count, the ones that cross something, and the ones that only bank the
+    /// percentage the technology states.
+    /// </summary>
+    private static string Chip(Column column, BreakpointSuggestion item) => item switch
+    {
+        _ when item.Ratio >= DecisiveRatio => column.Badge,
+        _ when item.Score >= NoticeableSurplus => "border text-body-secondary",
+        _ => "text-body-secondary opacity-50"
+    };
 
     private static string Multiplier(double ratio) => ratio.ToString("0.##");
 
