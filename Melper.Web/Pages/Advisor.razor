@@ -90,33 +90,46 @@
    line of the page, the narrow left cell names it, and the two halves are the two things
    a technology can buy. Read as a table of one full-width cell each, since the height of
    a row is whatever its opponents need. *@
+@if (_columns.Count > 0)
+{
+    @* The table's one header. A borderless card so the cells line up with the rows',
+       which carry the card padding; sticky under the nav, since what the two halves are
+       has to still be readable 20 units down. Below md the halves stack, so a header
+       over them would name the wrong one - each row says it for itself there instead. *@
+    <div class="card border-0 bg-transparent d-none d-md-block sticky-top" style="top: 3.5rem">
+        <div class="card-body row g-2 py-1 bg-body">
+            <div class="col-md-2 small text-body-secondary">Unit</div>
+            @foreach (var column in _columns)
+            {
+                <div class="col-md">@Head(column)</div>
+            }
+        </div>
+    </div>
+}
+
 <div class="d-flex flex-column gap-2">
     @foreach (var group in _groups)
     {
         <div class="card">
             <div class="card-body row g-2 py-2">
                 <div class="col-12 col-md-2 fw-semibold">@group.Main.Name</div>
-                @foreach (var column in Columns(group))
+                @for (var i = 0; i < _columns.Count; i++)
                 {
+                    var column = _columns[i];
+                    var items = group.ByColumn[i];
+
                     @* An even share of what the name leaves, so a side with only one
                        technology left to buy gets the whole row for it. *@
                     <div class="col-12 col-md">
-                        @* What the arrows mean is said once here, so a pairing is only a
-                           name and its two counts - the counts fall on the left half and
-                           rise on the right, and both are the pairing getting better. *@
-                        <div class="small text-body-secondary mb-1">
-                            <span class="fw-semibold">@column.Label</span>
-                            <span class="badge @column.Badge">@column.Upgrade</span>
-                            @column.Hint
-                        </div>
-                        @if (column.Items.Count == 0)
+                        <div class="d-md-none mb-1">@Head(column)</div>
+                        @if (items.Count == 0)
                         {
                             <span class="small text-body-secondary">nothing moves</span>
                         }
                         else
                         {
                             <div class="d-flex flex-wrap gap-1">
-                                @foreach (var item in column.Items)
+                                @foreach (var item in items)
                                 {
                                     <span class="badge fw-normal @Chip(column, item)" title="@Explain(item)">
                                         @item.Vs.Name
@@ -148,15 +161,21 @@
     /// Every pairing the unit has, best first - the halves are cut out of this, so it is
     /// what one unit's whole run of advice is ranked by.
     /// </param>
-    private sealed record MainGroup(Unit Main, List<BreakpointSuggestion> Items);
+    /// <param name="ByColumn">The same pairings split up, positionally aligned with <see cref="_columns"/>.</param>
+    private sealed record MainGroup(
+        Unit Main,
+        List<BreakpointSuggestion> Items,
+        List<List<BreakpointSuggestion>> ByColumn);
 
-    /// <summary>One half of a unit's row: everything one kind of technology buys it.</summary>
+    /// <summary>
+    /// One half of the table: what one kind of technology buys, said once for every row.
+    /// </summary>
     private sealed record Column(
+        UpgradeKind Kind,
         string Label,
         string Upgrade,
         string Hint,
-        string Badge,
-        List<BreakpointSuggestion> Items);
+        string Badge);
 
     private static readonly Track[] Tracks =
     [
@@ -209,8 +228,20 @@
     private UnitSelection _selection = UnitSelection.Everything;
 
     private IReadOnlyList<UpgradeCandidate> _candidates = [];
+    private List<Column> _columns = [];
     private List<MainGroup> _groups = [];
     private int _total;
+
+    /// <summary>
+    /// The header of one half, in the one shape it has - the table's own header above the
+    /// rows, and inside a row on the widths the halves stack at.
+    /// </summary>
+    private readonly RenderFragment<Column> Head = column =>
+        @<span class="small text-body-secondary">
+            <span class="fw-semibold">@column.Label</span>
+            <span class="badge @column.Badge">@column.Upgrade</span>
+            @column.Hint
+        </span>;
 
     // Nothing stored has been read yet, so this only makes the first paint agree with
     // itself - the list it puts up is the whole roster's, which is what an empty pattern
@@ -282,36 +313,32 @@
             _candidates);
 
         _total = suggestions.Count;
+        _columns = Columns();
 
         // Nothing is dropped: a unit gets one row whatever its match-up chart looks like,
         // and a row that stops halfway would read as if the rest of its pairings had no
         // breakpoint at all. The ranking inside a group is the one it came in with.
         _groups = suggestions
             .GroupBy(x => x.Main.Name, StringComparer.OrdinalIgnoreCase)
-            .Select(x => new MainGroup(x.First().Main, x.ToList()))
+            .Select(x => new MainGroup(
+                x.First().Main,
+                x.ToList(),
+                _columns.Select(column => x.Where(s => s.Upgrade.Kind == column.Kind).ToList()).ToList()))
             .ToList();
 
         _groups.Sort(ByEffect);
     }
 
     /// <summary>
-    /// The two halves of a row, in the order they are laid out. A kind with nothing left
+    /// The halves of the table, in the order they are laid out. A kind with nothing left
     /// to buy has no half at all - it would be an empty column on every row on the page.
     /// </summary>
-    private IEnumerable<Column> Columns(MainGroup group)
-    {
-        foreach (var candidate in _candidates)
-        {
-            var attack = candidate.Kind == UpgradeKind.Attack;
-
-            yield return new Column(
-                attack ? "Attack" : "Survive",
-                candidate.Name,
-                attack ? "attacks to kill" : "attacks survived",
-                attack ? "text-bg-danger" : "text-bg-primary",
-                group.Items.Where(x => x.Upgrade.Kind == candidate.Kind).ToList());
-        }
-    }
+    private List<Column> Columns() =>
+        _candidates
+            .Select(candidate => candidate.Kind == UpgradeKind.Attack
+                ? new Column(candidate.Kind, "Attack", candidate.Name, "attacks to kill", "text-bg-danger")
+                : new Column(candidate.Kind, "Survive", candidate.Name, "attacks survived", "text-bg-primary"))
+            .ToList();
 
     /// <summary>
     /// Ranks two units by their whole run of advice rather than by their best line alone:
