@@ -13,9 +13,8 @@ public enum UpgradeKind
 }
 
 /// <summary>
-/// One buy the main side could make, folded into a single percentage step: a tier-2
-/// technology cannot be taken without its tier-1 prerequisite, so when that prerequisite
-/// is not owned yet its increase is part of the same step - and the name says so.
+/// One buy the main side could make, as a single percentage step: whatever
+/// <paramref name="Increase"/> the caller says that one step is worth.
 /// </summary>
 public sealed record UpgradeCandidate(string Name, UpgradeKind Kind, int Increase);
 
@@ -61,9 +60,10 @@ public sealed record BreakpointSuggestion(
 public static class BreakpointAdvisor
 {
     /// <summary>
-    /// The attack and hp technologies the main side has not bought yet, cheapest tier of
-    /// each kind first - the order <see cref="Suggest"/> relies on to drop a dearer tier
-    /// that lands on the very same breakpoint as a cheaper one.
+    /// The next attack and hp technology the main side could buy. A tier-2 technology
+    /// cannot be taken without its tier-1 prerequisite, so it is only offered once that
+    /// prerequisite is owned: advising on the pair as one purchase names a buy the side
+    /// cannot make, and the tier-1 half of it is already on the list on its own.
     /// </summary>
     public static IReadOnlyList<UpgradeCandidate> AttackAndHpCandidates(
         bool attack1, bool attack2, bool hp1, bool hp2)
@@ -74,26 +74,18 @@ public static class BreakpointAdvisor
         {
             candidates.Add(new UpgradeCandidate("Attack1", UpgradeKind.Attack, new Attack1Buff().DamageIncrease));
         }
-
-        if (attack2 == false)
+        else if (attack2 == false)
         {
-            candidates.Add(attack1
-                ? new UpgradeCandidate("Attack2", UpgradeKind.Attack, new Attack2Buff().DamageIncrease)
-                : new UpgradeCandidate("Attack1+2", UpgradeKind.Attack,
-                    new Attack1Buff().DamageIncrease + new Attack2Buff().DamageIncrease));
+            candidates.Add(new UpgradeCandidate("Attack2", UpgradeKind.Attack, new Attack2Buff().DamageIncrease));
         }
 
         if (hp1 == false)
         {
             candidates.Add(new UpgradeCandidate("Hp1", UpgradeKind.Hp, new Hp1Buff().HpIncrease));
         }
-
-        if (hp2 == false)
+        else if (hp2 == false)
         {
-            candidates.Add(hp1
-                ? new UpgradeCandidate("Hp2", UpgradeKind.Hp, new Hp2Buff().HpIncrease)
-                : new UpgradeCandidate("Hp1+2", UpgradeKind.Hp,
-                    new Hp1Buff().HpIncrease + new Hp2Buff().HpIncrease));
+            candidates.Add(new UpgradeCandidate("Hp2", UpgradeKind.Hp, new Hp2Buff().HpIncrease));
         }
 
         return candidates;

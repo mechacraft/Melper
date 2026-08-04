@@ -11,46 +11,45 @@
 <UnitPicker @ref="_picker" OnChanged="OnSelectionChanged"/>
 
 <button type="button" class="btn btn-outline-secondary mt-3"
-        title="Empties both halves - the same as pressing None on each"
-        @onclick="ResetSelection">
+        title="Empties both halves and puts every technology back to No"
+        @onclick="Reset">
     Reset
 </button>
 
 <hr class="my-4"/>
 
-@* Only the four attack and hp technologies: they are the ones the advice is about, so
-   the rest of the Breakpoints page's toggles are deliberately not repeated here. *@
+@* Only the attack and hp technologies: they are the ones the advice is about, so the
+   rest of the Breakpoints page's toggles are deliberately not repeated here. *@
 <div class="row g-4">
     @foreach (var side in Sides)
     {
-        <div class="col-6 col-md-3">
+        @* Widths the three level buttons stay on one line at: four cards to a row needs
+           the large breakpoint, and two of them need more than a phone is wide. *@
+        <div class="col-12 col-sm-6 col-lg-3">
             <label class="form-label fw-semibold">@side.Label</label>
             <div class="card">
                 <div class="card-body py-2">
-                    <label role="button" class="d-block">
-                        <input type="checkbox" class="form-check-input me-1"
-                               checked="@side.Config.Attack1"
-                               @onchange="e => SetAttack1(side.Config, e)"/>
-                        Attack1
-                    </label>
-                    <label role="button" class="d-block">
-                        <input type="checkbox" class="form-check-input me-1"
-                               checked="@side.Config.Attack2"
-                               @onchange="e => SetAttack2(side.Config, e)"/>
-                        Attack2
-                    </label>
-                    <label role="button" class="d-block">
-                        <input type="checkbox" class="form-check-input me-1"
-                               checked="@side.Config.Hp1"
-                               @onchange="e => SetHp1(side.Config, e)"/>
-                        Hp1
-                    </label>
-                    <label role="button" class="d-block">
-                        <input type="checkbox" class="form-check-input me-1"
-                               checked="@side.Config.Hp2"
-                               @onchange="e => SetHp2(side.Config, e)"/>
-                        Hp2
-                    </label>
+                    @* One group per track rather than a tick per tier: the tiers are a ladder,
+                       so one level says what is owned and there is no prerequisite to keep
+                       in step behind the click. *@
+                    @foreach (var track in Tracks)
+                    {
+                        var current = track.Get(side.Config);
+                        <div class="mb-2">
+                            <div class="small text-body-secondary">@track.Label</div>
+                            <div class="btn-group btn-group-sm w-100" role="group"
+                                 aria-label="@side.Label @track.Label">
+                                @foreach (var level in Levels)
+                                {
+                                    <button type="button"
+                                            class="btn @(current == level ? "btn-secondary" : "btn-outline-secondary")"
+                                            @onclick="() => SetLevel(track, side.Config, level)">
+                                        @LevelLabel(level)
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -68,7 +67,7 @@
         <p class="mt-2 mb-0 text-body-secondary small">
             @if (_candidates.Count == 0)
             {
-                @* Only the main side's ticks decide this: the vs ticks say what the opponent
+                @* Only the main side's levels decide this: the vs levels say what the opponent
                    already has, not what there is left to buy. *@
                 <text>The unit owns every attack and hp technology - nothing left to advise on.</text>
             }
@@ -78,8 +77,8 @@
                     Showing @_shown of @_total breakpoints, at most @PerUnitLimit per unit.
                     The number on the right is how much of the crossing the technology's own
                     percentage did not already pay for - 3 attacks into 2 off a 12% buy scores
-                    1.34, while 265 attacks into 385 off a 45% one scores 1.00 and sinks. That
-                    is the order. Level 1 stats; only the technologies ticked above are counted.
+                    1.34, while 265 attacks into 305 off a 15% one scores 1.00 and sinks. That
+                    is the order. Level 1 stats; only the technologies set above are counted.
                 </text>
             }
         </p>
@@ -127,7 +126,36 @@
 @code {
     private sealed record Side(string Label, BreakPointSideConfig Config);
 
+    /// <summary>
+    /// A ladder of technologies read and written as one level, so the tier-2 prerequisite
+    /// rule is the shape of the control rather than something to enforce after a click.
+    /// </summary>
+    private sealed record Track(
+        string Label,
+        Func<BreakPointSideConfig, int> Get,
+        Action<BreakPointSideConfig, int> Set);
+
     private sealed record MainGroup(Unit Main, double BestScore, List<BreakpointSuggestion> Items);
+
+    private static readonly Track[] Tracks =
+    [
+        new("Attack",
+            side => side.Attack2 ? 2 : side.Attack1 ? 1 : 0,
+            (side, level) =>
+            {
+                side.Attack1 = level >= 1;
+                side.Attack2 = level >= 2;
+            }),
+        new("Hp",
+            side => side.Hp2 ? 2 : side.Hp1 ? 1 : 0,
+            (side, level) =>
+            {
+                side.Hp1 = level >= 1;
+                side.Hp2 = level >= 2;
+            }),
+    ];
+
+    private static readonly int[] Levels = [0, 1, 2];
 
     /// <summary>Shared with the Breakpoints page, so what a side owns is stated once.</summary>
     private const string LeftConfigKey = "BreakPointSideConfig:left";
@@ -186,11 +214,32 @@
     }
 
     /// <summary>
-    /// The picker raises OnChanged from this, so the list follows without a rebuild here.
-    /// Only the unit selection is reset: the technologies ticked below are what the roster
-    /// already owns, not a filter over it.
+    /// Empties both halves of the picker and puts every technology back to No. The
+    /// technologies are stored, so they have to be saved before the picker's OnChanged
+    /// rebuilds off them - that event is what refreshes the list, so nothing rebuilds here.
+    /// Only the four technologies this page shows are cleared: the rest of the shared
+    /// config belongs to the Breakpoints page and has nothing on screen here.
     /// </summary>
-    private Task ResetSelection() => _picker?.ResetToNone() ?? Task.CompletedTask;
+    private async Task Reset()
+    {
+        foreach (var side in Sides)
+        {
+            foreach (var track in Tracks)
+            {
+                track.Set(side.Config, 0);
+            }
+        }
+
+        await SaveConfigs();
+
+        if (_picker is null)
+        {
+            Rebuild();
+            return;
+        }
+
+        await _picker.ResetToNone();
+    }
 
     private void Rebuild()
     {
@@ -267,50 +316,24 @@
         return BuffAggregates.From(buffs);
     }
 
-    private static bool Checked(ChangeEventArgs e) => e.Value is true;
+    private static string LevelLabel(int level) => level == 0 ? "No" : $"Lvl {level}";
 
-    private Task SetAttack1(BreakPointSideConfig side, ChangeEventArgs e)
+    private Task SetLevel(Track track, BreakPointSideConfig side, int level)
     {
-        side.Attack1 = Checked(e);
-
-        // A tier-2 technology cannot be held without its tier-1 prerequisite, so dropping
-        // the prerequisite drops the tier above it too.
-        if (side.Attack1 == false) side.Attack2 = false;
-
-        return OnConfigChanged();
-    }
-
-    private Task SetAttack2(BreakPointSideConfig side, ChangeEventArgs e)
-    {
-        side.Attack2 = Checked(e);
-        if (side.Attack2) side.Attack1 = true;
-
-        return OnConfigChanged();
-    }
-
-    /// <inheritdoc cref="SetAttack1"/>
-    private Task SetHp1(BreakPointSideConfig side, ChangeEventArgs e)
-    {
-        side.Hp1 = Checked(e);
-        if (side.Hp1 == false) side.Hp2 = false;
-
-        return OnConfigChanged();
-    }
-
-    /// <inheritdoc cref="SetAttack2"/>
-    private Task SetHp2(BreakPointSideConfig side, ChangeEventArgs e)
-    {
-        side.Hp2 = Checked(e);
-        if (side.Hp2) side.Hp1 = true;
-
+        track.Set(side, level);
         return OnConfigChanged();
     }
 
     private async Task OnConfigChanged()
     {
+        await SaveConfigs();
+        Rebuild();
+    }
+
+    private async Task SaveConfigs()
+    {
         await SaveConfig(LeftConfigKey, _left);
         await SaveConfig(RightConfigKey, _right);
-        Rebuild();
     }
 
     private static string Wording(BreakpointSuggestion item) =>

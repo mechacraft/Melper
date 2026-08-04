@@ -26,14 +26,26 @@ public class BreakpointAdvisorTests
     private static readonly UpgradeCandidate Attack = new("Attack1", UpgradeKind.Attack, 12);
     private static readonly UpgradeCandidate Hp = new("Hp1", UpgradeKind.Hp, 15);
 
+    /// <summary>
+    /// Two tiers of the same kind, cheapest first. The factory no longer builds a list
+    /// like this - it stops at the tier the side can actually buy - but <see cref="Suggest"/>
+    /// takes whatever it is handed, and how it picks between tiers is worth keeping tested.
+    /// </summary>
+    private static readonly UpgradeCandidate[] BothAttackTiers =
+    [
+        new("Attack1", UpgradeKind.Attack, 12),
+        new("Attack1+2", UpgradeKind.Attack, 36),
+    ];
+
     [Fact]
-    public void Candidates_WhenNothingOwned_FoldTheTier1PrerequisiteIntoTheTier2Step()
+    public void Candidates_WhenNothingOwned_StopAtTheTier1Technologies()
     {
         var candidates = BreakpointAdvisor.AttackAndHpCandidates(
             attack1: false, attack2: false, hp1: false, hp2: false);
 
+        // Tier 2 needs tier 1 first, so it is not a buy the side can make yet.
         Assert.Equal(
-            [("Attack1", 12), ("Attack1+2", 36), ("Hp1", 15), ("Hp1+2", 45)],
+            [("Attack1", 12), ("Hp1", 15)],
             candidates.Select(x => (x.Name, x.Increase)));
     }
 
@@ -45,6 +57,17 @@ public class BreakpointAdvisorTests
 
         Assert.Equal(
             [("Attack2", 24), ("Hp2", 30)],
+            candidates.Select(x => (x.Name, x.Increase)));
+    }
+
+    [Fact]
+    public void Candidates_TakeEachKindAsFarAsItsOwnLadderHasGone()
+    {
+        var candidates = BreakpointAdvisor.AttackAndHpCandidates(
+            attack1: true, attack2: true, hp1: false, hp2: false);
+
+        Assert.Equal(
+            [("Hp1", 15)],
             candidates.Select(x => (x.Name, x.Increase)));
     }
 
@@ -119,8 +142,7 @@ public class BreakpointAdvisorTests
         var cheaply = MakeUnit("cheaply", damage: 0, health: 220); // 3 -> 2 on +12% already
         var dearly = MakeUnit("dearly", damage: 0, health: 250);   // 3 -> 2 only once +36% lands
 
-        var candidates = BreakpointAdvisor.AttackAndHpCandidates(false, false, hp1: true, hp2: true);
-        var found = Suggest([main], [cheaply, dearly], candidates);
+        var found = Suggest([main], [cheaply, dearly], BothAttackTiers);
 
         // The same 3 -> 2 either way, so what separates them is what it cost to get there.
         Assert.All(found, x => Assert.Equal((3, 2), (x.Before, x.After)));
@@ -186,8 +208,7 @@ public class BreakpointAdvisorTests
         var main = MakeUnit("main", damage: 100, health: 1000);
         var vs = MakeUnit("vs", damage: 10, health: 220); // 3 attacks; +12% and +36% both reach 2
 
-        var candidates = BreakpointAdvisor.AttackAndHpCandidates(false, false, hp1: true, hp2: true);
-        var found = Suggest([main], [vs], candidates);
+        var found = Suggest([main], [vs], BothAttackTiers);
 
         var only = Assert.Single(found);
         Assert.Equal("Attack1", only.Upgrade.Name);
@@ -199,8 +220,7 @@ public class BreakpointAdvisorTests
         var main = MakeUnit("main", damage: 100, health: 1000);
         var vs = MakeUnit("vs", damage: 10, health: 135); // 2 attacks; +12% keeps 2, +36% reaches 1
 
-        var candidates = BreakpointAdvisor.AttackAndHpCandidates(false, false, hp1: true, hp2: true);
-        var found = Suggest([main], [vs], candidates);
+        var found = Suggest([main], [vs], BothAttackTiers);
 
         var only = Assert.Single(found);
         Assert.Equal("Attack1+2", only.Upgrade.Name);
