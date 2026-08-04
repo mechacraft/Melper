@@ -145,12 +145,12 @@
         var groups = CostBrackets
             .Select(bracket => new Group(
                 bracket.Label,
-                AllUnits.Where(x => x.Cost >= bracket.Min && x.Cost <= bracket.Max).ToList()))
+                Named(AllUnits.Where(x => x.Cost >= bracket.Min && x.Cost <= bracket.Max))))
             .Where(x => x.Units.Count > 0)
             .ToList();
 
         var bracketed = groups.SelectMany(x => x.Units).Select(x => x.Name).ToHashSet();
-        var rest = AllUnits.Where(x => bracketed.Contains(x.Name) == false).ToList();
+        var rest = Named(AllUnits.Where(x => bracketed.Contains(x.Name) == false));
         if (rest.Count > 0)
         {
             groups.Add(new Group("Other", rest));
@@ -158,6 +158,13 @@
 
         return groups;
     }
+
+    /// <summary>
+    /// A column of ticks is scanned for a name, so the roster's own order - which is the
+    /// order units.json happens to list them in - is no use inside a bracket.
+    /// </summary>
+    private static List<Unit> Named(IEnumerable<Unit> units) =>
+        units.OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase).ToList();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
