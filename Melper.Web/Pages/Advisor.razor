@@ -11,15 +11,16 @@
 <UnitPicker @ref="_picker" OnChanged="OnSelectionChanged"/>
 
 <button type="button" class="btn btn-outline-secondary mt-3"
-        title="Empties both halves and puts every technology back to No"
+        title="Empties both halves and puts every technology and spec back to No"
         @onclick="Reset">
     Reset
 </button>
 
 <hr class="my-4"/>
 
-@* Only the attack and hp technologies: they are the ones the advice is about, so the
-   rest of the Breakpoints page's toggles are deliberately not repeated here. *@
+@* The attack and hp technologies, which the advice is about, and the specs, which move the
+   stats it is measured against. The rest of the Breakpoints page's toggles are deliberately
+   not repeated here. *@
 <div class="row g-4">
     @foreach (var side in Sides)
     {
@@ -50,6 +51,33 @@
                             </div>
                         </div>
                     }
+
+                    @* The two specs are one control rather than two ticks: a side runs one
+                       of them at most, and no two sides run the same one - both rules are
+                       the shape of a single group of buttons instead of a check to undo
+                       after a click. *@
+                    @{
+                        var spec = Spec(side.Config);
+                    }
+                    <div class="mb-2">
+                        <div class="small text-body-secondary">Spec</div>
+                        <div class="btn-group btn-group-sm w-100" role="group"
+                             aria-label="@side.Label Spec">
+                            <button type="button"
+                                    class="btn @(spec is null ? "btn-secondary" : "btn-outline-secondary")"
+                                    @onclick="() => SetSpec(side.Config, null)">
+                                No
+                            </button>
+                            @foreach (var perk in Perks)
+                            {
+                                <button type="button"
+                                        class="btn @(ReferenceEquals(spec, perk) ? "btn-secondary" : "btn-outline-secondary")"
+                                        @onclick="() => SetSpec(side.Config, perk)">
+                                    @perk.Label
+                                </button>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -69,7 +97,7 @@
                     @_total breakpoints over @_groups.Count units. Each pairing reads
                     before &rarr; after; the biggest proportional move comes first, both
                     across the units and inside a column. Level 1 stats; only the
-                    technologies set above are counted.
+                    technologies and specs set above are counted.
                 </text>
             }
         </p>
@@ -153,6 +181,15 @@
         Func<BreakPointSideConfig, int> Get,
         Action<BreakPointSideConfig, int> Set);
 
+    /// <summary>
+    /// One of the specs a side can run. Held one at a time and one to a spec across the
+    /// two sides, so what a side has is a choice between these rather than a tick each.
+    /// </summary>
+    private sealed record Perk(
+        string Label,
+        Func<BreakPointSideConfig, bool> Get,
+        Action<BreakPointSideConfig, bool> Set);
+
     /// <param name="Items">
     /// Every pairing the unit has, best first - the halves are cut out of this, so it is
     /// what one unit's whole run of advice is ranked by.
@@ -189,6 +226,12 @@
                 side.Hp1 = level >= 1;
                 side.Hp2 = level >= 2;
             }),
+    ];
+
+    private static readonly Perk[] Perks =
+    [
+        new("Cost control", side => side.CostControl, (side, has) => side.CostControl = has),
+        new("Fortified", side => side.Fortified, (side, has) => side.Fortified = has),
     ];
 
     private static readonly int[] Levels = [0, 1, 2];
@@ -267,11 +310,11 @@
     }
 
     /// <summary>
-    /// Empties both halves of the picker and puts every technology back to No. The
+    /// Empties both halves of the picker and puts every technology and spec back to No. The
     /// technologies are stored, so they have to be saved before the picker's OnChanged
     /// rebuilds off them - that event is what refreshes the list, so nothing rebuilds here.
-    /// Only the four technologies this page shows are cleared: the rest of the shared
-    /// config belongs to the Breakpoints page and has nothing on screen here.
+    /// Only what this page shows is cleared: the rest of the shared config belongs to the
+    /// Breakpoints page and has nothing on screen here.
     /// </summary>
     private async Task Reset()
     {
@@ -280,6 +323,11 @@
             foreach (var track in Tracks)
             {
                 track.Set(side.Config, 0);
+            }
+
+            foreach (var perk in Perks)
+            {
+                perk.Set(side.Config, false);
             }
         }
 
@@ -357,9 +405,14 @@
     }
 
     /// <summary>
-    /// Only the four technologies this page shows. The shared config may also hold
-    /// Heavy armor and friends from the Breakpoints page; folding those in here would
-    /// move the numbers with nothing on screen to explain why.
+    /// Only what this page shows. The shared config may also hold Heavy armor and friends
+    /// from the Breakpoints page; folding those in here would move the numbers with nothing
+    /// on screen to explain why. A spec is not something left to buy, so it never becomes a
+    /// candidate - it only moves the stats the candidates are measured against, and
+    /// Fortified's hp makes the next hp technology worth proportionally less, so it moves
+    /// the order of the list as well as the counts. Cost control moves the counts alone:
+    /// it is a multiplier, and a multiplier sits outside the increase the scoring divides
+    /// by, so it cancels out of what a buy is worth.
     /// </summary>
     private static BuffAggregates Aggregates(BreakPointSideConfig side)
     {
@@ -369,6 +422,8 @@
         if (side.Attack2) buffs.Add(new Attack2Buff());
         if (side.Hp1 || side.Hp2) buffs.Add(new Hp1Buff());
         if (side.Hp2) buffs.Add(new Hp2Buff());
+        if (side.CostControl) buffs.Add(new CostControlBuff());
+        if (side.Fortified) buffs.Add(new FortifiedBuff());
 
         return BuffAggregates.From(buffs);
     }
@@ -378,6 +433,34 @@
     private Task SetLevel(Track track, BreakPointSideConfig side, int level)
     {
         track.Set(side, level);
+        return OnConfigChanged();
+    }
+
+    /// <summary>
+    /// What a side is running, or null for neither. The Breakpoints page writes the same
+    /// stored config with a tick each and no rule between them, so a side can arrive here
+    /// holding both - it reads as the first, and the next click here writes a legal state.
+    /// Nothing is normalised on load: that would rewrite the other page's state unasked.
+    /// </summary>
+    private static Perk? Spec(BreakPointSideConfig side) =>
+        Perks.FirstOrDefault(perk => perk.Get(side));
+
+    /// <summary>
+    /// Gives <paramref name="side"/> exactly <paramref name="perk"/>, and takes that same
+    /// perk off the other side - one spec to a side, and one side to a spec.
+    /// </summary>
+    private Task SetSpec(BreakPointSideConfig side, Perk? perk)
+    {
+        var other = ReferenceEquals(side, _left) ? _right : _left;
+
+        foreach (var candidate in Perks)
+        {
+            var picked = ReferenceEquals(candidate, perk);
+            candidate.Set(side, picked);
+
+            if (picked) candidate.Set(other, false);
+        }
+
         return OnConfigChanged();
     }
 
