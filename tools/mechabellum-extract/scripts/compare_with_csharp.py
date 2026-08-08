@@ -32,7 +32,7 @@ melper = json.load(open(MELPER, encoding="utf-8-sig"))
 roster = melper["Units"]
 game = {g["id"]: g for g in json.load(open(os.path.join(DATA, "units.json"), encoding="utf-8"))}
 by_id = {c["Id"]: c for c in roster}
-print(f"roster units: {len(roster)} (checked against the game on {melper['AsOf']}) | "
+print(f"roster units: {len(roster)} (checked against the game on {melper['Date']}) | "
       f"game units: {len(game)} "
       f"(main roster: {sum(1 for g in game.values() if g['roster'] == 'main')})\n")
 
@@ -106,4 +106,4 @@ else:
 
 # The Data page in the web app shows this date and starts warning once it goes stale,
 # so it has to move with the numbers.
-print(f'\nafter transferring anything above, set "AsOf": "{datetime.date.today()}" in units.json')
+print(f'\nafter transferring anything above, set "Date": "{datetime.date.today()}" in units.json')

@@ -14,9 +14,9 @@ public static class UnitsCollection
 
     /// <summary>
     /// When the checked-in numbers were last checked against the game. Bump the
-    /// <c>AsOf</c> line in <c>units.json</c> whenever the stats below it change.
+    /// <c>Date</c> line in <c>units.json</c> whenever the stats below it change.
     /// </summary>
-    public static DateOnly AsOf { get; } = UnitsJson.DeserializeRoster(DefaultJson).AsOf;
+    public static DateOnly Date { get; } = UnitsJson.DeserializeRoster(DefaultJson).Date;
 
     /// <summary>
     /// The roster in effect. Callers may hold on to this reference — <see cref="Replace"/>

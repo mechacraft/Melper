@@ -32,7 +32,7 @@ public static class UnitsJson
     public sealed record Roster
     {
         /// <summary>When the numbers below were last checked against the game.</summary>
-        public required DateOnly AsOf { get; init; }
+        public required DateOnly Date { get; init; }
 
         public required List<Unit> Units { get; init; }
     }
@@ -46,7 +46,7 @@ public static class UnitsJson
     /// <summary>
     /// Reads whichever of the two shapes it is handed: the bare array a tab keeps in
     /// sessionStorage, or the dated object the repository file and the Data page's export
-    /// use. An imported <c>AsOf</c> is read and then dropped — <see cref="UnitsCollection.AsOf"/>
+    /// use. An imported <c>Date</c> is read and then dropped — <see cref="UnitsCollection.Date"/>
     /// is fixed to the shipped file for the life of the process, and a pasted roster is
     /// someone's edits rather than a fresh reading of the game, so it must not claim a date.
     /// </summary>

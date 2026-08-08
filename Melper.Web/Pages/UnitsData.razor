@@ -6,13 +6,15 @@
 
 <PageTitle>Data</PageTitle>
 
+<Toast @ref="toast"/>
+
 <div class="row mb-3 align-items-end">
     <div class="col-4">
         <label class="form-label">Filter</label>
         <input class="form-control" @bind="nameFilter" @bind:event="oninput"/>
     </div>
     <div class="col-8 d-flex gap-2 justify-content-end flex-wrap">
-        <button class="btn btn-outline-secondary" @onclick="CopyExport">@(copied ? "Copied" : "Copy JSON")</button>
+        <button class="btn btn-outline-secondary" @onclick="CopyExport">Copy JSON</button>
         <button class="btn btn-outline-secondary" @onclick="DownloadExport">Download</button>
         <button class="btn btn-outline-secondary" @onclick="OpenImport">Import…</button>
         <button class="btn btn-primary" disabled="@(dirty == false)" @onclick="Apply">Apply</button>
@@ -64,7 +66,7 @@
 <div class="alert @(Stale ? "alert-warning" : "alert-secondary") py-2">
     <div>
         The values in the repository were last checked against the game on
-        <strong>@UnitsCollection.AsOf.ToString("d MMMM yyyy")</strong> (@Age).
+        <strong>@UnitsCollection.Date.ToString("d MMMM yyyy")</strong> (@Age).
         @if (Stale)
         {
             <text>
@@ -85,10 +87,6 @@
             <span class="ms-1">This tab is running an edited roster.</span>
         }
     </div>
-    @if (copyError is not null)
-    {
-        <div class="text-danger">@copyError</div>
-    }
 </div>
 
 <div class="rounded">
@@ -249,7 +247,7 @@
     private bool dirty;
 
     private static int DaysOld => Math.Max(
-        DateOnly.FromDateTime(DateTime.Now).DayNumber - UnitsCollection.AsOf.DayNumber, 0);
+        DateOnly.FromDateTime(DateTime.Now).DayNumber - UnitsCollection.Date.DayNumber, 0);
 
     /// <summary>
     /// Balance patches land far more often than every six months, so past that the shipped
@@ -304,13 +302,12 @@
 
     /// <summary>Held in C# rather than written into the attribute: Razor passes attribute
     /// text through as-is, so an entity for the quotes would show up spelled out.</summary>
-    private const string ImportPlaceholder = """{ "AsOf": …, "Units": [ … ] }""";
+    private const string ImportPlaceholder = """{ "Date": …, "Units": [ … ] }""";
 
+    private Toast toast = default!;
     private bool importing;
     private string importText = "";
     private string? importError;
-    private bool copied;
-    private string? copyError;
 
     /// <summary>
     /// What the table currently shows, unapplied edits and all — exporting the applied
@@ -321,33 +318,37 @@
     /// </summary>
     private string ExportJson() => UnitsJson.SerializeRoster(new UnitsJson.Roster
     {
-        AsOf = UnitsCollection.AsOf,
+        Date = UnitsCollection.Date,
         Units = rows.Select(r => r.ToUnit()).ToList(),
     });
 
+    /// <summary>
+    /// Chrome leaves the clipboard promise pending for as long as the tab is hidden rather
+    /// than rejecting it, so waiting on it alone can mean the click never says anything at
+    /// all. Whatever has not landed by now is not going to.
+    /// </summary>
+    private static readonly TimeSpan ClipboardTimeout = TimeSpan.FromSeconds(2);
+
     private async Task CopyExport()
     {
-        copyError = null;
+        var json = ExportJson();
         try
         {
-            await JS.InvokeVoidAsync("navigator.clipboard.writeText", ExportJson());
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", ClipboardTimeout, json);
         }
         catch
         {
-            // Clipboard access is refused outright on insecure origins and on a page the
-            // browser does not consider focused. Downloading is the way out.
-            copyError = "The browser would not let the page write to the clipboard. Use Download instead.";
+            // Also refused outright on insecure origins and on a page the browser does not
+            // consider focused. Downloading is the way out of all of it.
+            await toast.ShowAsync("The browser would not let the page write to the clipboard — use Download instead.", error: true);
             return;
         }
 
-        copied = true;
-        await Task.Delay(TimeSpan.FromSeconds(2));
-        copied = false;
+        await toast.ShowAsync($"Copied {rows.Count} units to the clipboard.");
     }
 
     private async Task DownloadExport()
     {
-        copyError = null;
         var stamp = DateTime.Now.ToString("yyyy-MM-dd");
         await JS.InvokeVoidAsync("melperDownload", $"units-{stamp}.json", ExportJson());
     }
@@ -356,7 +357,6 @@
     {
         importText = "";
         importError = null;
-        copyError = null;
         importing = true;
     }
 

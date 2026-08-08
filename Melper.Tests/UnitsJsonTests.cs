@@ -18,8 +18,8 @@ public class UnitsJsonTests
     [Fact]
     public void EmbeddedRoster_IsDated()
     {
-        Assert.True(UnitsCollection.AsOf > new DateOnly(2020, 1, 1));
-        Assert.True(UnitsCollection.AsOf <= DateOnly.FromDateTime(DateTime.Now).AddDays(1));
+        Assert.True(UnitsCollection.Date > new DateOnly(2020, 1, 1));
+        Assert.True(UnitsCollection.Date <= DateOnly.FromDateTime(DateTime.Now).AddDays(1));
     }
 
     /// <summary>
@@ -63,16 +63,16 @@ public class UnitsJsonTests
 
     /// <summary>
     /// What the Data page exports has to be droppable into <c>units.json</c>, which means
-    /// it has to carry the date the required <c>AsOf</c> member reads back from.
+    /// it has to carry the date the required <c>Date</c> member reads back from.
     /// </summary>
     [Fact]
     public void RosterRoundTrip_KeepsTheDateAndTheUnits()
     {
-        var roster = new UnitsJson.Roster { AsOf = new DateOnly(2026, 3, 4), Units = UnitsCollection.Defaults() };
+        var roster = new UnitsJson.Roster { Date = new DateOnly(2026, 3, 4), Units = UnitsCollection.Defaults() };
 
         var again = UnitsJson.DeserializeRoster(UnitsJson.SerializeRoster(roster));
 
-        Assert.Equal(roster.AsOf, again.AsOf);
+        Assert.Equal(roster.Date, again.Date);
         Assert.Equal(roster.Units, again.Units);
     }
 
@@ -96,7 +96,7 @@ public class UnitsJsonTests
     [InlineData("")]
     [InlineData("   \n ")]
     [InlineData("not json at all")]
-    [InlineData("""{"AsOf":"2026-01-01","Units":null}""")]
+    [InlineData("""{"Date":"2026-01-01","Units":null}""")]
     [InlineData("[null]")]
     public void DeserializeAny_RefusesWhatItCannotRead(string json) =>
         Assert.ThrowsAny<Exception>(() => UnitsJson.DeserializeAny(json));

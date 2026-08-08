@@ -1,0 +1,26 @@
+/* Bootstrap's own fade needs its JavaScript to drive the class changes; the entry
+   is an animation instead so it runs the moment the element is inserted, with no
+   second render to flip a class on. */
+.toast {
+    animation: melper-toast-in 180ms ease-out;
+}
+
+.toast.leaving {
+    opacity: 0;
+    transform: translateY(0.75rem);
+    transition: opacity 250ms ease-in, transform 250ms ease-in;
+}
+
+@keyframes melper-toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(0.75rem);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .toast, .toast.leaving {
+        animation: none;
+        transition: none;
+    }
+}

@@ -1,0 +1,78 @@
+@implements IDisposable
+
+@* The container stays in the DOM whether or not anything is showing: a live region
+   created in the same frame as its text is usually not announced at all. *@
+<div class="toast-container position-fixed bottom-0 end-0 p-3" aria-live="polite" aria-atomic="true">
+    @if (message is not null)
+    {
+        @* Keyed on the showing so a second message replaces the element rather than
+           reusing it - a reused one would not replay the entry animation. *@
+        <div @key="generation" role="status"
+             class="toast show d-flex align-items-center border-0 @(isError ? "text-bg-danger" : "text-bg-success") @(leaving ? "leaving" : "")">
+            <div class="toast-body flex-grow-1">@message</div>
+            <button type="button" class="btn-close btn-close-white me-2" aria-label="Close" @onclick="Dismiss"></button>
+        </div>
+    }
+</div>
+
+@code {
+
+    private static readonly TimeSpan Linger = TimeSpan.FromSeconds(3);
+
+    /// <summary>Kept in step with the fade-out in <c>Toast.razor.css</c>.</summary>
+    private static readonly TimeSpan FadeOut = TimeSpan.FromMilliseconds(250);
+
+    private string? message;
+    private bool isError;
+    private bool leaving;
+
+    /// <summary>
+    /// Counts the showings. It keys the element, and it is what lets a hide that is
+    /// still sleeping notice a newer message has taken over and leave it alone.
+    /// </summary>
+    private int generation;
+
+    private bool disposed;
+
+    public async Task ShowAsync(string text, bool error = false)
+    {
+        var mine = ++generation;
+        message = text;
+        isError = error;
+        leaving = false;
+        await Render();
+
+        await Task.Delay(Linger);
+        if (Superseded(mine))
+        {
+            return;
+        }
+
+        leaving = true;
+        await Render();
+
+        await Task.Delay(FadeOut);
+        if (Superseded(mine))
+        {
+            return;
+        }
+
+        message = null;
+        await Render();
+    }
+
+    private void Dismiss()
+    {
+        // Past the generation the sleeping hide is watching for, so it drops out
+        // rather than clearing a message shown after this one.
+        generation++;
+        message = null;
+    }
+
+    private bool Superseded(int mine) => disposed || mine != generation;
+
+    private Task Render() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => disposed = true;
+
+}
