@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Melper.Core.Services;
 using Melper.Data;
 
 namespace Melper.ViewModel;
@@ -26,16 +27,23 @@ public class UnitViewModel
     public double DpsPerCost { get; }
     public double HealthPerCost { get; }
 
+    /// <param name="buffs">
+    /// What the side owns, folded down the same way the Breakpoints page folds it, so the
+    /// two pages state one unit's damage and health identically. Nothing is owned by
+    /// default, which is the roster's own numbers.
+    /// </param>
     [SetsRequiredMembers]
-    public UnitViewModel(Unit unit)
+    public UnitViewModel(Unit unit, BuffAggregates? buffs = null)
     {
+        var owned = buffs ?? BuffAggregates.None;
+
         Name = unit.Name;
         Cost = unit.Cost;
         CountInPack = unit.CountInPack;
-        Damage = unit.Damage;
+        Damage = Buffed(unit.Damage, owned.DamageMul, owned.DamageIncrease);
         ProjectilesPerShotOverride = unit.ProjectilesPerShotOverride;
         ReloadTime = unit.ReloadTime;
-        Health = unit.Health;
+        Health = (long)Buffed(unit.Health, owned.HpMul, owned.HpIncrease);
         Range = unit.Range;
         CanAttackAir = unit.CanAttackAir;
         IsAir = unit.IsAir;
@@ -44,39 +52,48 @@ public class UnitViewModel
         Speed = unit.Speed;
         Splash = unit.Splash;
 
-        TotalHealth = (int)GetTotalHealth(unit);
-        DpsPerUnit = GetDpsPerUnit(unit);
-        TotalDps = GetTotalDps(unit);
-        DpsPerCost = GetDpsRel1KPer100Cost(unit);
-        HealthPerCost = GetHealthRel1KPer100Cost(unit);
+        // Everything below is derived from the buffed damage and health above, so a
+        // technology moves the efficiency columns the same way it moves the raw ones.
+        TotalHealth = (int)GetTotalHealth();
+        DpsPerUnit = GetDpsPerUnit();
+        TotalDps = GetTotalDps();
+        DpsPerCost = GetDpsRel1KPer100Cost();
+        HealthPerCost = GetHealthRel1KPer100Cost();
     }
 
-    private static double GetDpsPerUnit(Unit unit)
+    /// <summary>
+    /// One stat under what the side owns, in the shape <see cref="BreakPointsCalculator"/>
+    /// uses: the multipliers multiply and the percentages add.
+    /// </summary>
+    private static double Buffed(double stat, double mul, int increase) =>
+        stat * mul * (100 + increase) / 100d;
+
+    private double GetDpsPerUnit()
     {
         // The Data page can put a zero in either divisor, and an Infinity would poison
         // every derived column and sort the row straight to the top.
-        return unit.ReloadTime.TotalSeconds > 0
-            ? unit.Damage * (unit.ProjectilesPerShotOverride ?? 1) / unit.ReloadTime.TotalSeconds
+        return ReloadTime.TotalSeconds > 0
+            ? Damage * (ProjectilesPerShotOverride ?? 1) / ReloadTime.TotalSeconds
             : 0;
     }
 
-    private static double GetTotalDps(Unit unit)
+    private double GetTotalDps()
     {
-        return GetDpsPerUnit(unit) * unit.CountInPack;
+        return GetDpsPerUnit() * CountInPack;
     }
 
-    private static double GetDpsRel1KPer100Cost(Unit unit)
+    private double GetDpsRel1KPer100Cost()
     {
-        return unit.Cost > 0 ? GetTotalDps(unit) / 1000d / unit.Cost * 100d : 0;
+        return Cost > 0 ? GetTotalDps() / 1000d / Cost * 100d : 0;
     }
 
-    private static double GetTotalHealth(Unit unit)
+    private double GetTotalHealth()
     {
-        return (double)unit.Health * unit.CountInPack;
+        return (double)Health * CountInPack;
     }
 
-    private static double GetHealthRel1KPer100Cost(Unit unit)
+    private double GetHealthRel1KPer100Cost()
     {
-        return unit.Cost > 0 ? (GetTotalHealth(unit) / 1000d) / unit.Cost * 100d : 0;
+        return Cost > 0 ? (GetTotalHealth() / 1000d) / Cost * 100d : 0;
     }
 }

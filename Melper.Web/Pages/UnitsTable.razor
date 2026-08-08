@@ -1,15 +1,73 @@
 ﻿@page "/"
+@using System.Text.Json
 @using Melper.Core
+@using Melper.Core.Buffs
+@using Melper.Core.Services
 @using Melper.Data
 @using Melper.ViewModel
 @inject IJSRuntime JS
 
 <PageTitle>Units</PageTitle>
 
-<div class="row mb-3">
-    <div class="col-4">
+<div class="row g-4 mb-3">
+    <div class="col-12 col-sm-6 col-lg-4">
         <label class="form-label">Filter</label>
         <input class="form-control" @bind="mainNameFilter" @bind:after="OnMainNameFilterChanged"/>
+    </div>
+
+    @* The same technologies and specs the Advisor page offers, in the same controls and
+       off the same stored config - the table below states what a unit is worth, and what
+       it is worth depends on what the side owns. *@
+    <div class="col-12 col-sm-6 col-lg-4">
+        <label class="form-label fw-semibold">Unit owns</label>
+        <div class="card">
+            <div class="card-body py-2">
+                @* One group per track rather than a tick per tier: the tiers are a ladder,
+                   so one level says what is owned and there is no prerequisite to keep
+                   in step behind the click. *@
+                @foreach (var track in Tracks)
+                {
+                    var current = track.Get(_config);
+                    <div class="mb-2">
+                        <div class="small text-body-secondary">@track.Label</div>
+                        <div class="btn-group btn-group-sm w-100" role="group" aria-label="@track.Label">
+                            @foreach (var level in Levels)
+                            {
+                                <button type="button"
+                                        class="btn @(current == level ? "btn-secondary" : "btn-outline-secondary")"
+                                        @onclick="() => SetLevel(track, level)">
+                                    @LevelLabel(level)
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @* The two specs are one control rather than two ticks: a side runs one of
+                   them at most. *@
+                @{
+                    var spec = Spec(_config);
+                }
+                <div class="mb-2">
+                    <div class="small text-body-secondary">Spec</div>
+                    <div class="btn-group btn-group-sm w-100" role="group" aria-label="Spec">
+                        <button type="button"
+                                class="btn @(spec is null ? "btn-secondary" : "btn-outline-secondary")"
+                                @onclick="() => SetSpec(null)">
+                            No
+                        </button>
+                        @foreach (var perk in Perks)
+                        {
+                            <button type="button"
+                                    class="btn @(ReferenceEquals(spec, perk) ? "btn-secondary" : "btn-outline-secondary")"
+                                    @onclick="() => SetSpec(perk)">
+                                @perk.Label
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -67,7 +125,10 @@
                 <td class="text-end">@unit.CountInPack</td>
                 <td class="text-end">@unit.Health</td>
                 <td class="text-end">@unit.TotalHealth.ToString("0.##")</td>
-                <td class="text-end">@unit.Damage@(unit.ProjectilesPerShotOverride.HasValue ? $" * {unit.ProjectilesPerShotOverride}" : "")</td>
+                @* A whole number, the way the Breakpoints page states damage - a buffed
+                   stat is fractional, and rounding up is what a shot actually lands. The
+                   derived columns keep the fraction. *@
+                <td class="text-end">@Math.Ceiling(unit.Damage)@(unit.ProjectilesPerShotOverride.HasValue ? $" * {unit.ProjectilesPerShotOverride}" : "")</td>
                 <td class="text-end">@unit.ReloadTime.TotalSeconds</td>
                 <td class="text-end">@(unit.Range == 0 ? "melee" : unit.Range)</td>
                 <td class="text-end">@unit.Splash.ToString("0.##")</td>
@@ -82,7 +143,56 @@
 </div>
 
 @code {
-    private List<UnitViewModel> Units = UnitsCollection.Units.Select(x => new UnitViewModel(x)).ToList();
+    /// <summary>
+    /// A ladder of technologies read and written as one level, so the tier-2 prerequisite
+    /// rule is the shape of the control rather than something to enforce after a click.
+    /// </summary>
+    private sealed record Track(
+        string Label,
+        Func<BreakPointSideConfig, int> Get,
+        Action<BreakPointSideConfig, int> Set);
+
+    /// <summary>One of the specs the side can run, held one at a time.</summary>
+    private sealed record Perk(
+        string Label,
+        Func<BreakPointSideConfig, bool> Get,
+        Action<BreakPointSideConfig, bool> Set);
+
+    private static readonly Track[] Tracks =
+    [
+        new("Attack",
+            side => side.Attack2 ? 2 : side.Attack1 ? 1 : 0,
+            (side, level) =>
+            {
+                side.Attack1 = level >= 1;
+                side.Attack2 = level >= 2;
+            }),
+        new("Hp",
+            side => side.Hp2 ? 2 : side.Hp1 ? 1 : 0,
+            (side, level) =>
+            {
+                side.Hp1 = level >= 1;
+                side.Hp2 = level >= 2;
+            }),
+    ];
+
+    private static readonly Perk[] Perks =
+    [
+        new("Cost control", side => side.CostControl, (side, has) => side.CostControl = has),
+        new("Fortified", side => side.Fortified, (side, has) => side.Fortified = has),
+    ];
+
+    private static readonly int[] Levels = [0, 1, 2];
+
+    /// <summary>
+    /// The same side the Breakpoints and Advisor pages call main, so what a side owns is
+    /// stated once wherever it is shown.
+    /// </summary>
+    private const string ConfigKey = "BreakPointSideConfig:left";
+
+    private BreakPointSideConfig _config = new();
+
+    private List<UnitViewModel> Units = [];
     string mainNameFilter = "";
 
     private string? _sortColumn;
@@ -187,17 +297,102 @@
     }
 
 
+    // Nothing stored has been read yet, so this only makes the first paint agree with
+    // itself - the numbers it puts up are the roster's own, which is what owning nothing
+    // means anyway.
+    protected override void OnInitialized() => Rebuild();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             mainNameFilter = await JS.InvokeAsync<string>("localStorage.getItem", "mainNameFilter") ?? "";
+            _config = await LoadConfig(ConfigKey) ?? _config;
+
+            Rebuild();
             StateHasChanged();
         }
+    }
+
+    /// <summary>
+    /// Restates every row under what the side owns. The view models fold the buffs in at
+    /// construction, so this is what a click on a technology has to run.
+    /// </summary>
+    private void Rebuild()
+    {
+        var buffs = Aggregates(_config);
+        Units = UnitsCollection.Units.Select(x => new UnitViewModel(x, buffs)).ToList();
+    }
+
+    /// <summary>
+    /// Only what this page shows. The shared config may also hold Heavy armor and friends
+    /// from the Breakpoints page; folding those in here would move the numbers with nothing
+    /// on screen to explain why.
+    /// </summary>
+    private static BuffAggregates Aggregates(BreakPointSideConfig side)
+    {
+        var buffs = new List<IBuff>();
+
+        if (side.Attack1 || side.Attack2) buffs.Add(new Attack1Buff());
+        if (side.Attack2) buffs.Add(new Attack2Buff());
+        if (side.Hp1 || side.Hp2) buffs.Add(new Hp1Buff());
+        if (side.Hp2) buffs.Add(new Hp2Buff());
+        if (side.CostControl) buffs.Add(new CostControlBuff());
+        if (side.Fortified) buffs.Add(new FortifiedBuff());
+
+        return BuffAggregates.From(buffs);
+    }
+
+    private static string LevelLabel(int level) => level == 0 ? "No" : $"Lvl {level}";
+
+    private Task SetLevel(Track track, int level)
+    {
+        track.Set(_config, level);
+        return OnConfigChanged();
+    }
+
+    /// <summary>
+    /// What the side is running, or null for neither. The Breakpoints page writes the same
+    /// stored config with a tick each and no rule between them, so it can arrive here
+    /// holding both - it reads as the first, and the next click here writes a legal state.
+    /// </summary>
+    private static Perk? Spec(BreakPointSideConfig side) =>
+        Perks.FirstOrDefault(perk => perk.Get(side));
+
+    private Task SetSpec(Perk? perk)
+    {
+        foreach (var candidate in Perks)
+        {
+            candidate.Set(_config, ReferenceEquals(candidate, perk));
+        }
+
+        return OnConfigChanged();
+    }
+
+    private async Task OnConfigChanged()
+    {
+        await JS.InvokeVoidAsync("localStorage.setItem", ConfigKey, JsonSerializer.Serialize(_config));
+        Rebuild();
     }
 
     private async Task OnMainNameFilterChanged()
     {
         await JS.InvokeVoidAsync("localStorage.setItem", "mainNameFilter", mainNameFilter ?? "");
+    }
+
+    private async Task<BreakPointSideConfig?> LoadConfig(string key)
+    {
+        var json = await JS.InvokeAsync<string?>("localStorage.getItem", key);
+        if (string.IsNullOrEmpty(json)) return null;
+
+        try
+        {
+            return JsonSerializer.Deserialize<BreakPointSideConfig>(json);
+        }
+        catch (JsonException)
+        {
+            // Older builds stored "[object Object]" here.
+            return null;
+        }
     }
 }
