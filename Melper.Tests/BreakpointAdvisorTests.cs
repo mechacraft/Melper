@@ -279,6 +279,58 @@ public class BreakpointAdvisorTests
         Assert.Empty(Suggest([support], [vs], [Attack, Hp]));
     }
 
+    /// <summary>
+    /// A unit flagged out of the damage calculations gates the half its own damage decides
+    /// and only that half - as the main it keeps its hp advice, and as the opponent it is
+    /// still something worth shortening the kill on. Which is the whole point of the flag:
+    /// the unit takes part in the calculations where it is the one being killed.
+    /// </summary>
+    [Fact]
+    public void Suggest_WhenTheMainSkipsDamage_KeepsItsHpAdviceAndDropsItsAttackAdvice()
+    {
+        var main = MakeUnit("main", damage: 100, health: 200) with { SkipDamageCalculations = true };
+        var vs = MakeUnit("vs", damage: 100, health: 220);
+
+        var found = Suggest([main], [vs], [Attack, Hp]);
+
+        Assert.Equal([UpgradeKind.Hp], found.Select(x => x.Upgrade.Kind));
+    }
+
+    /// <inheritdoc cref="Suggest_WhenTheMainSkipsDamage_KeepsItsHpAdviceAndDropsItsAttackAdvice"/>
+    [Fact]
+    public void Suggest_WhenTheOpponentSkipsDamage_StillGetsShotAtButNoLongerShootsBack()
+    {
+        var main = MakeUnit("main", damage: 100, health: 200);
+        var vs = MakeUnit("vs", damage: 100, health: 220) with { SkipDamageCalculations = true };
+
+        var found = Suggest([main], [vs], [Attack, Hp]);
+
+        Assert.Equal([UpgradeKind.Attack], found.Select(x => x.Upgrade.Kind));
+    }
+
+    /// <summary>Both flags at once leaves a pairing with no damage in it either way.</summary>
+    [Fact]
+    public void Suggest_WhenBothSidesSkipDamage_HasNothingToSay()
+    {
+        var main = MakeUnit("main", damage: 100, health: 200) with { SkipDamageCalculations = true };
+        var vs = MakeUnit("vs", damage: 100, health: 220) with { SkipDamageCalculations = true };
+
+        Assert.Empty(Suggest([main], [vs], [Attack, Hp]));
+    }
+
+    /// <summary>Without the flag the same pairing has both kinds, so the two tests above
+    /// are measuring the flag rather than a pairing that was one-sided to begin with.</summary>
+    [Fact]
+    public void Suggest_WithoutTheFlag_TheSamePairingHasBothKinds()
+    {
+        var main = MakeUnit("main", damage: 100, health: 200);
+        var vs = MakeUnit("vs", damage: 100, health: 220);
+
+        var found = Suggest([main], [vs], [Attack, Hp]);
+
+        Assert.Equal([UpgradeKind.Attack, UpgradeKind.Hp], found.Select(x => x.Upgrade.Kind).Order());
+    }
+
     [Fact]
     public void Suggest_OverTheRealRoster_FindsTheAdviceForAFreshMatch()
     {

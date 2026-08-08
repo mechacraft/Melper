@@ -112,6 +112,7 @@
             <th>Air</th>
             <th title="Breakpoints count a single projectile, not the whole volley">1proj</th>
             <th title="Damage lands as a salvo">Salvo</th>
+            <th title="Leave this unit's damage out of the Damage, Breakpoints and Advisor pages; it still counts as a target">No dmg calc</th>
         </tr>
         </thead>
         <tbody>
@@ -181,6 +182,9 @@
                 <td class="text-center">
                     <input type="checkbox" class="form-check-input" @bind="row.CalculateSalvoMode" @bind:after="MarkDirty"/>
                 </td>
+                <td class="text-center">
+                    <input type="checkbox" class="form-check-input" @bind="row.SkipDamageCalculations" @bind:after="MarkDirty"/>
+                </td>
             </tr>
         }
         </tbody>
@@ -212,6 +216,7 @@
         public bool IsAir { get; set; } = unit.IsAir;
         public bool CountBreakpointsForSingleProjectile { get; set; } = unit.CountBreakpointsForSingleProjectile;
         public bool CalculateSalvoMode { get; set; } = unit.CalculateSalvoMode;
+        public bool SkipDamageCalculations { get; set; } = unit.SkipDamageCalculations;
 
         /// <summary>Fields the editor does not expose, carried through untouched.</summary>
         private readonly Unit _source = unit;
@@ -235,6 +240,7 @@
             IsAir = IsAir,
             CountBreakpointsForSingleProjectile = CountBreakpointsForSingleProjectile,
             CalculateSalvoMode = CalculateSalvoMode,
+            SkipDamageCalculations = SkipDamageCalculations,
         };
     }
 

@@ -192,7 +192,7 @@
                 if (buff.DamageIncrease > 0)
                 {
                     <td>
-                        @if (HasKillValue(calc))
+                        @if (HasKillValue(row, calc))
                         {
                             @calc.ShotsToKill
                             <text>=></text>
@@ -253,6 +253,17 @@
         /// the vs unit never lands a shot, so ShotsToLive means nothing.
         /// </summary>
         public required bool VsCanHitMain { get; init; }
+
+        /// <summary>
+        /// The two halves of a row, each false when the unit whose damage that half is
+        /// worked out from is flagged not to have its damage calculated: ShotsToKill is
+        /// main's damage against vs, ShotsToLive is vs's damage against main. A flagged
+        /// unit still fills the other half, where it is only the thing being killed.
+        /// </summary>
+        public required bool MainDealsDamage { get; init; }
+
+        /// <inheritdoc cref="MainDealsDamage"/>
+        public required bool VsDealsDamage { get; init; }
 
         /// <summary>Results positionally aligned with <see cref="buffsToShow"/>.</summary>
         public required BreakPointsResults[] ByBuff { get; init; }
@@ -389,6 +400,8 @@
                     Main = main,
                     Vs = vs,
                     VsCanHitMain = main.IsAir == false || vs.CanEverAttackAir,
+                    MainDealsDamage = main.SkipDamageCalculations == false,
+                    VsDealsDamage = vs.SkipDamageCalculations == false,
                     ByBuff = byBuff
                 });
             }
@@ -404,16 +417,21 @@
             .SelectMany(x => Enumerable.Range(1, Math.Max(lvls, 1)).Select(lvl => x with { Level = lvl }))
             .ToList();
 
-    /// <summary>Whether a ShotsToKill cell shows anything — the buff has to move the count.</summary>
-    private static bool HasKillValue(BreakPointsResults calc) => calc.ShotsToKill != calc.ShotsToKillNew;
+    /// <summary>
+    /// Whether a ShotsToKill cell shows anything — the buff has to move the count, and
+    /// main's damage has to be something the roster wants calculated at all.
+    /// </summary>
+    private static bool HasKillValue(RowItem row, BreakPointsResults calc) =>
+        row.MainDealsDamage && calc.ShotsToKill != calc.ShotsToKillNew;
 
     /// <summary>
     /// Whether a ShotsToLive cell shows anything. The numbers are computed for every row,
-    /// but they are meaningless when the vs unit can never reach an air main — such a row
-    /// renders blank, so sorting must treat it as having no value rather than as a big win.
+    /// but they are meaningless when the vs unit can never reach an air main, or when its
+    /// damage is flagged out of the calculations — such a row renders blank, so sorting
+    /// must treat it as having no value rather than as a big win.
     /// </summary>
     private static bool HasLiveValue(RowItem row, BreakPointsResults calc) =>
-        row.VsCanHitMain && calc.ShotsToLive != calc.ShotsToLiveNew;
+        row.VsCanHitMain && row.VsDealsDamage && calc.ShotsToLive != calc.ShotsToLiveNew;
 
     /// <summary>Reorders the already-computed rows in place; never recalculates.</summary>
     private void ApplySort()
@@ -435,7 +453,7 @@
         // Blank cells sort to the bottom whichever way the column is pointing, so they
         // never break up the run of real numbers the sort was asked for.
         Func<RowItem, bool> hasValue = sortByKillPerc
-            ? r => HasKillValue(r.ByBuff[index])
+            ? r => HasKillValue(r, r.ByBuff[index])
             : r => HasLiveValue(r, r.ByBuff[index]);
 
         var ordered = rows.OrderByDescending(hasValue);

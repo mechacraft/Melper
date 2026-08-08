@@ -108,7 +108,12 @@
     {
         var results = new List<RowData>();
 
-        foreach (var main in UnitsCollection.Units.Where(x => string.IsNullOrEmpty(mainNameFilter) || x.Name.RegMatch(mainNameFilter)))
+        // Every column here is worked out from the main unit's damage, so a unit whose damage
+        // is not to be calculated has nothing to say as the attacker — it only appears in the
+        // vs column, where the question is what it takes to kill it.
+        foreach (var main in UnitsCollection.Units
+                     .Where(x => x.SkipDamageCalculations == false)
+                     .Where(x => string.IsNullOrEmpty(mainNameFilter) || x.Name.RegMatch(mainNameFilter)))
         {
             foreach (var vs in UnitsCollection.Units.Where(x => string.IsNullOrEmpty(vsNameFilter) || x.Name.RegMatch(vsNameFilter)))
             {

@@ -122,7 +122,8 @@
       "ReloadTime": 0.2,
       "Health": 4571,
       "Range": 45,
-      "Speed": 16
+      "Speed": 16,
+      "SkipDamageCalculations": true
     },
     {
       "Id": 24,
@@ -289,7 +290,8 @@
       "Range": 115,
       "CanAttackAir": true,
       "Speed": 6,
-      "Splash": 3
+      "Splash": 3,
+      "SkipDamageCalculations": true
     },
     {
       "Id": 1,

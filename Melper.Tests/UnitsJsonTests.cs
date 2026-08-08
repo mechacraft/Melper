@@ -22,6 +22,22 @@ public class UnitsJsonTests
         Assert.True(UnitsCollection.AsOf <= DateOnly.FromDateTime(DateTime.Now).AddDays(1));
     }
 
+    /// <summary>
+    /// The two units the roster flags out of the damage calculations, and nothing else.
+    /// The flag is only reachable through the Data page's tick, so a typo in the JSON key
+    /// would read back as false and quietly put their damage back into every page.
+    /// </summary>
+    [Fact]
+    public void EmbeddedRoster_SkipsDamageForTheStatedUnits()
+    {
+        Assert.Equal(
+            ["Melting Point", "Steel Ball"],
+            UnitsCollection.Defaults()
+                .Where(u => u.SkipDamageCalculations)
+                .Select(u => u.Name)
+                .Order());
+    }
+
     [Fact]
     public void RoundTrip_PreservesEveryUnit()
     {

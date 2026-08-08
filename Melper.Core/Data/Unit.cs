@@ -100,4 +100,14 @@ public record Unit
     public required int Speed { get; set; }
     public decimal Splash { get; set; }
     public bool CalculateSalvoMode { get; init; }
+
+    /// <summary>
+    /// Whether to leave this unit's own damage out of the calculations entirely. A unit
+    /// flagged here still takes part as a target — what it costs to kill it is exactly
+    /// the question that stays worth asking — but nothing is ever worked out from the
+    /// damage it deals: the Damage page drops it as an attacker, and the Breakpoints and
+    /// Advisor pages leave out whichever half of a pairing its damage would have decided.
+    /// The Units page is unaffected and states its stats as they are.
+    /// </summary>
+    public bool SkipDamageCalculations { get; init; }
 }

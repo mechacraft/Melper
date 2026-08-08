@@ -111,12 +111,18 @@ public static class BreakpointAdvisor
             {
                 // The two kinds have their own reach test, and they are not the same one:
                 // a ground unit cannot shoot a Wasp, but the Wasp still shoots it, so its
-                // hp advice stands even though its attack advice is meaningless.
-                var attackApplies = main.DamageForBreakpoints > 0
+                // hp advice stands even though its attack advice is meaningless. The same
+                // asymmetry holds for a unit flagged out of the damage calculations: the
+                // side whose damage the kind is worked out from is the side it gates, so
+                // such a unit still gets hp advice about surviving what shoots at it, and
+                // still shows up as an opponent worth shortening the kill on.
+                var attackApplies = main.SkipDamageCalculations == false
+                                    && main.DamageForBreakpoints > 0
                                     && vs.Health > 0
                                     && (main.CanAttackAir || vs.IsAir == false);
 
-                var hpApplies = vs.DamageForBreakpoints > 0
+                var hpApplies = vs.SkipDamageCalculations == false
+                                && vs.DamageForBreakpoints > 0
                                 && main.Health > 0
                                 && (main.IsAir == false || vs.CanEverAttackAir);
 
