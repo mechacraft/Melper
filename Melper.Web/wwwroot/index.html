@@ -54,6 +54,22 @@
         <button type="button" class="btn-close dismiss" aria-label="Dismiss"></button>
     </div>
 
+    <script>
+        // Saving generated text as a file has no Blazor-side equivalent - the Data
+        // page's export calls this. Object URL rather than a data: URL so the roster
+        // is not capped by the browser's limit on how long a URL may be.
+        window.melperDownload = function (filename, text) {
+            var url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+            var link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            // Revoked late: Firefox cancels a download whose URL dies too soon after the click.
+            setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+        };
+    </script>
     <script src="_framework/blazor.webassembly.js"></script>
     <script>
         // Offline support and the install prompt both hang off the service worker;

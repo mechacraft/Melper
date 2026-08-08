@@ -45,6 +45,46 @@ public class UnitsJsonTests
         Assert.Equal(zeroed, Assert.Single(again));
     }
 
+    /// <summary>
+    /// What the Data page exports has to be droppable into <c>units.json</c>, which means
+    /// it has to carry the date the required <c>AsOf</c> member reads back from.
+    /// </summary>
+    [Fact]
+    public void RosterRoundTrip_KeepsTheDateAndTheUnits()
+    {
+        var roster = new UnitsJson.Roster { AsOf = new DateOnly(2026, 3, 4), Units = UnitsCollection.Defaults() };
+
+        var again = UnitsJson.DeserializeRoster(UnitsJson.SerializeRoster(roster));
+
+        Assert.Equal(roster.AsOf, again.AsOf);
+        Assert.Equal(roster.Units, again.Units);
+    }
+
+    [Fact]
+    public void DeserializeAny_ReadsTheDatedShape()
+    {
+        var units = UnitsJson.DeserializeAny(UnitsCollection.DefaultJson);
+
+        Assert.Equal(UnitsCollection.Defaults(), units);
+    }
+
+    [Fact]
+    public void DeserializeAny_ReadsTheBareArrayATabStores()
+    {
+        var units = UnitsJson.DeserializeAny(UnitsJson.Serialize(UnitsCollection.Defaults()));
+
+        Assert.Equal(UnitsCollection.Defaults(), units);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   \n ")]
+    [InlineData("not json at all")]
+    [InlineData("""{"AsOf":"2026-01-01","Units":null}""")]
+    [InlineData("[null]")]
+    public void DeserializeAny_RefusesWhatItCannotRead(string json) =>
+        Assert.ThrowsAny<Exception>(() => UnitsJson.DeserializeAny(json));
+
     [Fact]
     public void Replace_IsVisibleThroughAnAlreadyCapturedReference()
     {

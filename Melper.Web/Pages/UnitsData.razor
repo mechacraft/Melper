@@ -11,12 +11,55 @@
         <label class="form-label">Filter</label>
         <input class="form-control" @bind="nameFilter" @bind:event="oninput"/>
     </div>
-    <div class="col-8 d-flex gap-2 justify-content-end">
+    <div class="col-8 d-flex gap-2 justify-content-end flex-wrap">
+        <button class="btn btn-outline-secondary" @onclick="CopyExport">@(copied ? "Copied" : "Copy JSON")</button>
+        <button class="btn btn-outline-secondary" @onclick="DownloadExport">Download</button>
+        <button class="btn btn-outline-secondary" @onclick="OpenImport">Import…</button>
         <button class="btn btn-primary" disabled="@(dirty == false)" @onclick="Apply">Apply</button>
         <button class="btn btn-outline-secondary" disabled="@(dirty == false)" @onclick="Revert">Revert</button>
         <button class="btn btn-outline-danger" disabled="@(edited == false)" @onclick="Reset">Reset to repo</button>
     </div>
 </div>
+
+@if (importing)
+{
+    @* Hand-rolled rather than Bootstrap's own modal: the page loads Bootstrap's CSS
+       but not its JavaScript, and .d-block is all the CSS needs to show it. *@
+    <div class="modal d-block" tabindex="-1" role="dialog" @onkeydown="EscapeCloses">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Import roster</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="CloseImport"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-body-secondary">
+                        Paste a roster below, or pick a <code>.json</code> file. Both the exported
+                        shape and a bare array of units are accepted; a file fills the box so you
+                        can look it over first. Importing only loads the values into the table —
+                        nothing changes for the other pages until you press Apply.
+                    </p>
+                    <div class="mb-2">
+                        <InputFile class="form-control" accept=".json,application/json" OnChange="ReadFile"/>
+                    </div>
+                    <textarea class="form-control font-monospace" rows="14" spellcheck="false"
+                              placeholder="@ImportPlaceholder"
+                              @bind="importText" @bind:event="oninput"></textarea>
+                    @if (importError is not null)
+                    {
+                        <div class="alert alert-danger mt-2 mb-0 py-2">@importError</div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" @onclick="CloseImport">Cancel</button>
+                    <button class="btn btn-primary" disabled="@string.IsNullOrWhiteSpace(importText)"
+                            @onclick="RunImport">Load into table</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
 
 <div class="alert @(Stale ? "alert-warning" : "alert-secondary") py-2">
     <div>
@@ -42,6 +85,10 @@
             <span class="ms-1">This tab is running an edited roster.</span>
         }
     </div>
+    @if (copyError is not null)
+    {
+        <div class="text-danger">@copyError</div>
+    }
 </div>
 
 <div class="rounded">
@@ -247,6 +294,124 @@
         await UnitsStorage.ResetAsync(JS);
         LoadRows();
         dirty = false;
+    }
+
+    /// <summary>Held in C# rather than written into the attribute: Razor passes attribute
+    /// text through as-is, so an entity for the quotes would show up spelled out.</summary>
+    private const string ImportPlaceholder = """{ "AsOf": …, "Units": [ … ] }""";
+
+    private bool importing;
+    private string importText = "";
+    private string? importError;
+    private bool copied;
+    private string? copyError;
+
+    /// <summary>
+    /// What the table currently shows, unapplied edits and all — exporting the applied
+    /// roster instead would silently hand back something other than what is on screen.
+    /// Written in the dated shape of <c>units.json</c> so the file can be dropped straight
+    /// into the repository; the date is the one the shipped roster carries, since these
+    /// edits are not a fresh reading of the game and it is the editor's job to bump it.
+    /// </summary>
+    private string ExportJson() => UnitsJson.SerializeRoster(new UnitsJson.Roster
+    {
+        AsOf = UnitsCollection.AsOf,
+        Units = rows.Select(r => r.ToUnit()).ToList(),
+    });
+
+    private async Task CopyExport()
+    {
+        copyError = null;
+        try
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", ExportJson());
+        }
+        catch
+        {
+            // Clipboard access is refused outright on insecure origins and on a page the
+            // browser does not consider focused. Downloading is the way out.
+            copyError = "The browser would not let the page write to the clipboard. Use Download instead.";
+            return;
+        }
+
+        copied = true;
+        await Task.Delay(TimeSpan.FromSeconds(2));
+        copied = false;
+    }
+
+    private async Task DownloadExport()
+    {
+        copyError = null;
+        var stamp = DateTime.Now.ToString("yyyy-MM-dd");
+        await JS.InvokeVoidAsync("melperDownload", $"units-{stamp}.json", ExportJson());
+    }
+
+    private void OpenImport()
+    {
+        importText = "";
+        importError = null;
+        copyError = null;
+        importing = true;
+    }
+
+    private void CloseImport() => importing = false;
+
+    private void EscapeCloses(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            CloseImport();
+        }
+    }
+
+    /// <summary>A whole roster runs to tens of kilobytes; the cap is only here to stop a
+    /// misdropped file from being read into memory, and the 500 KB default is too tight
+    /// to be sure of.</summary>
+    private const long MaxImportBytes = 4 * 1024 * 1024;
+
+    private async Task ReadFile(InputFileChangeEventArgs e)
+    {
+        importError = null;
+        try
+        {
+            await using var stream = e.File.OpenReadStream(MaxImportBytes);
+            using var reader = new StreamReader(stream);
+            importText = await reader.ReadToEndAsync();
+        }
+        catch (Exception ex)
+        {
+            importError = $"Could not read that file: {ex.Message}";
+        }
+    }
+
+    private void RunImport()
+    {
+        List<Unit> imported;
+        try
+        {
+            imported = UnitsJson.DeserializeAny(importText);
+        }
+        catch (Exception ex)
+        {
+            importError = $"That is not a roster this page can read: {ex.Message}";
+            return;
+        }
+
+        if (imported.Count == 0)
+        {
+            importError = "That roster has no units in it.";
+            return;
+        }
+
+        // Loaded into the table rather than applied: Apply and Revert then work on an
+        // import exactly as they do on typing, so a bad paste is one click from undone.
+        rows = imported.Select(u => new Row(u)).ToList();
+        dirty = true;
+        importing = false;
+        importText = "";
+        // An imported roster whose names miss the filter would otherwise land in an empty
+        // table, which reads as the import having failed.
+        nameFilter = "";
     }
 
 }

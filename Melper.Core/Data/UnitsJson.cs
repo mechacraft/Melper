@@ -41,6 +41,35 @@ public static class UnitsJson
         JsonSerializer.Deserialize<Roster>(json, Options)
         ?? throw new JsonException("Roster JSON deserialized to null.");
 
+    public static string SerializeRoster(Roster roster) => JsonSerializer.Serialize(roster, Options);
+
+    /// <summary>
+    /// Reads whichever of the two shapes it is handed: the bare array a tab keeps in
+    /// sessionStorage, or the dated object the repository file and the Data page's export
+    /// use. An imported <c>AsOf</c> is read and then dropped — <see cref="UnitsCollection.AsOf"/>
+    /// is fixed to the shipped file for the life of the process, and a pasted roster is
+    /// someone's edits rather than a fresh reading of the game, so it must not claim a date.
+    /// </summary>
+    public static List<Unit> DeserializeAny(string json)
+    {
+        var text = json.AsSpan().TrimStart();
+        if (text.IsEmpty)
+        {
+            throw new JsonException("The JSON is empty.");
+        }
+
+        var units = text[0] == '[' ? Deserialize(json) : DeserializeRoster(json).Units;
+
+        // A required member only has to be present, not non-null, so "Units": null and a
+        // null entry in the array both read as valid and would then blow up on first use.
+        if (units is null || units.Any(u => u is null))
+        {
+            throw new JsonException("The roster has nulls where units should be.");
+        }
+
+        return units;
+    }
+
     public static string Serialize(IEnumerable<Unit> units) =>
         JsonSerializer.Serialize(units.ToList(), Options);
 
