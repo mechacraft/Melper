@@ -14,10 +14,11 @@
         <input class="form-control" @bind="nameFilter" @bind:event="oninput"/>
     </div>
     <div class="col-8 d-flex gap-2 justify-content-end flex-wrap">
+        <button class="btn btn-outline-success" @onclick="AddRow">Add unit</button>
         <button class="btn btn-outline-secondary" @onclick="CopyExport">Copy JSON</button>
         <button class="btn btn-outline-secondary" @onclick="DownloadExport">Download</button>
         <button class="btn btn-outline-secondary" @onclick="OpenImport">Import…</button>
-        <button class="btn btn-primary" disabled="@(dirty == false)" @onclick="Apply">Apply</button>
+        <button class="btn btn-primary" disabled="@(dirty == false || rows.Count == 0)" @onclick="Apply">Apply</button>
         <button class="btn btn-outline-secondary" disabled="@(dirty == false)" @onclick="Revert">Revert</button>
         <button class="btn btn-outline-danger" disabled="@(edited == false)" @onclick="Reset">Reset to repo</button>
     </div>
@@ -111,6 +112,7 @@
             <th title="Breakpoints count a single projectile, not the whole volley">1proj</th>
             <th title="Damage lands as a salvo">Salvo</th>
             <th title="Leave this unit's damage out of the Damage, Breakpoints and Advisor pages; it still counts as a target">No dmg calc</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -183,11 +185,23 @@
                 <td class="text-center">
                     <input type="checkbox" class="form-check-input" @bind="row.SkipDamageCalculations" @bind:after="MarkDirty"/>
                 </td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-danger" title="Remove this unit"
+                            @onclick="() => DeleteRow(row)">&times;</button>
+                </td>
             </tr>
         }
         </tbody>
     </table>
 </div>
+
+@if (rows.Count == 0)
+{
+    <p class="text-body-secondary">
+        Every unit has been removed. Add one or press Revert — an empty roster leaves the
+        other pages with nothing to work on, so it cannot be applied.
+    </p>
+}
 
 @code {
 
@@ -279,6 +293,53 @@
         rows.Where(r => r.Name.PassesFilter(nameFilter));
 
     private void MarkDirty() => dirty = true;
+
+    /// <summary>
+    /// Added at the top rather than the bottom: the roster runs to dozens of rows, so a new
+    /// one appended below the fold reads as the button having done nothing. <see cref="Unit.Id"/>
+    /// stays 0, which is what the record already reserves for units that are not the game's.
+    /// </summary>
+    private void AddRow()
+    {
+        rows.Insert(0, new Row(new Unit
+        {
+            Name = NextNewName(),
+            CountInPack = 1,
+            // Not zero: the Units page divides by the reload time to state damage per second.
+            ReloadTime = TimeSpan.FromSeconds(1),
+            Speed = 0,
+        }));
+
+        // A fresh row that the filter hides looks exactly like nothing having happened.
+        nameFilter = "";
+        dirty = true;
+    }
+
+    /// <summary>"New unit", then "New unit 2" and up, so repeated clicks stay tellable apart.</summary>
+    private string NextNewName()
+    {
+        const string stem = "New unit";
+        var taken = rows.Select(r => r.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        if (taken.Contains(stem) == false)
+        {
+            return stem;
+        }
+
+        var n = 2;
+        while (taken.Contains($"{stem} {n}"))
+        {
+            n++;
+        }
+
+        return $"{stem} {n}";
+    }
+
+    /// <summary>No confirmation: Revert undoes it in one click for as long as it is unapplied.</summary>
+    private void DeleteRow(Row row)
+    {
+        rows.Remove(row);
+        dirty = true;
+    }
 
     private async Task Apply()
     {
