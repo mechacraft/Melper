@@ -276,7 +276,7 @@
     }
 
     private IEnumerable<Row> Visible() =>
-        rows.Where(r => string.IsNullOrEmpty(nameFilter) || r.Name.RegMatch(nameFilter));
+        rows.Where(r => r.Name.PassesFilter(nameFilter));
 
     private void MarkDirty() => dirty = true;
 

@@ -9,9 +9,11 @@
 <div class="row mb-3">
     <div class="col-4">
         <label class="form-label">Main filter</label>
-        <input class="form-control" @bind="mainNameFilter" @bind:after="OnMainNameFilterChanged"/>
+        <input class="form-control" @bind="mainNameFilter" @bind:event="oninput"
+               @bind:after="OnMainNameFilterChanged"/>
         <label class="form-label">Vs filter</label>
-        <input class="form-control" @bind="vsNameFilter" @bind:after="OnVsNameFilterChanged"/>
+        <input class="form-control" @bind="vsNameFilter" @bind:event="oninput"
+               @bind:after="OnVsNameFilterChanged"/>
     </div>
 </div>
 
@@ -113,9 +115,9 @@
         // vs column, where the question is what it takes to kill it.
         foreach (var main in UnitsCollection.Units
                      .Where(x => x.SkipDamageCalculations == false)
-                     .Where(x => string.IsNullOrEmpty(mainNameFilter) || x.Name.RegMatch(mainNameFilter)))
+                     .Where(x => x.Name.PassesFilter(mainNameFilter)))
         {
-            foreach (var vs in UnitsCollection.Units.Where(x => string.IsNullOrEmpty(vsNameFilter) || x.Name.RegMatch(vsNameFilter)))
+            foreach (var vs in UnitsCollection.Units.Where(x => x.Name.PassesFilter(vsNameFilter)))
             {
                 if (main.CanAttackAir == false && vs.IsAir)
                 {

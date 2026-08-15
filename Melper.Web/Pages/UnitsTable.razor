@@ -12,7 +12,8 @@
 <div class="row g-4 mb-3">
     <div class="col-12 col-sm-6 col-lg-4">
         <label class="form-label">Filter</label>
-        <input class="form-control" @bind="mainNameFilter" @bind:after="OnMainNameFilterChanged"/>
+        <input class="form-control" @bind="mainNameFilter" @bind:event="oninput"
+               @bind:after="OnMainNameFilterChanged"/>
     </div>
 
     @* The same technologies and specs the Advisor page offers, in the same controls and
@@ -275,7 +276,7 @@
             _ => Units,
         };
 
-        return sorted.Where(x => string.IsNullOrEmpty(mainNameFilter) || x.Name.RegMatch(mainNameFilter));
+        return sorted.Where(x => x.Name.PassesFilter(mainNameFilter));
     }
 
 

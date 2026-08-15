@@ -93,9 +93,11 @@
     </div>
     <div class="col-3">
         <label class="form-label">Main filter</label>
-        <input class="form-control" @bind="mainNameFilter" @bind:after="OnMainNameFilterChanged"/>
+        <input class="form-control" @bind="mainNameFilter" @bind:event="oninput"
+               @bind:after="OnMainNameFilterChanged"/>
         <label class="form-label">Vs filter</label>
-        <input class="form-control" @bind="vsNameFilter" @bind:after="OnVsNameFilterChanged"/>
+        <input class="form-control" @bind="vsNameFilter" @bind:event="oninput"
+               @bind:after="OnVsNameFilterChanged"/>
         <p class="mt-2 text-muted small">@rows.Count rows</p>
     </div>
 </div>
@@ -413,7 +415,7 @@
 
     private static List<Unit> ExpandLevels(string nameFilter, int lvls) =>
         UnitsCollection.Units
-            .Where(x => string.IsNullOrEmpty(nameFilter) || x.Name.RegMatch(nameFilter))
+            .Where(x => x.Name.PassesFilter(nameFilter))
             .SelectMany(x => Enumerable.Range(1, Math.Max(lvls, 1)).Select(lvl => x with { Level = lvl }))
             .ToList();
 
