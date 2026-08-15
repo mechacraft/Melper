@@ -377,7 +377,8 @@
       "Range": 100,
       "CanAttackAir": true,
       "IsAir": true,
-      "Speed": 10
+      "Speed": 10,
+      "SkipDamageCalculations": true
     },
     {
       "Id": 2002,
