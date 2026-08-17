@@ -18,6 +18,27 @@ public enum UpgradeKind
 /// </summary>
 public sealed record UpgradeCandidate(string Name, UpgradeKind Kind, int Increase);
 
+/// <summary>
+/// How much of a pairing's move is worth reporting at all. The order is the order of
+/// interest: a caller showing only what matters takes everything down to
+/// <see cref="Noticeable"/>.
+/// </summary>
+public enum SuggestionTier
+{
+    /// <summary>
+    /// The move is the technology's percentage and nothing else - the count shifted,
+    /// no threshold was crossed. 556 attacks into 496 off a 12% buy is this, and a long
+    /// tail of them is what buries the pairings that did cross something.
+    /// </summary>
+    Marginal,
+
+    /// <summary>Something was crossed: the move is worth more than the stats alone paid for.</summary>
+    Noticeable,
+
+    /// <summary>The pairing is decided rather than shortened - the count halves or better.</summary>
+    Decisive
+}
+
 /// <summary>A breakpoint one <see cref="UpgradeCandidate"/> crosses against one opponent.</summary>
 /// <param name="Flat">
 /// What the buy multiplies the stat by from where the side stands now. Not the technology's
@@ -51,6 +72,30 @@ public sealed record BreakpointSuggestion(
     /// fight where 8->4 only shortens one.
     /// </summary>
     public int SmallEnd => Upgrade.Kind == UpgradeKind.Attack ? After : Before;
+
+    /// <summary>
+    /// Where a pairing stops being a shortening and starts being a decision - 3 attacks
+    /// into 2, or 2 into 3 survived.
+    /// </summary>
+    public const double DecisiveRatio = 1.5;
+
+    /// <summary>
+    /// How much of the move has to be more than the technology's percentage already paid
+    /// for before the pairing is worth reading at all.
+    /// </summary>
+    public const double NoticeableSurplus = 1.02;
+
+    /// <summary>
+    /// How far the pairing moves, said in the three steps every surface reports in: the
+    /// web page colours its chips by this, and the console tool drops
+    /// <see cref="SuggestionTier.Marginal"/> from what it reads out.
+    /// </summary>
+    public SuggestionTier Tier => this switch
+    {
+        _ when Ratio >= DecisiveRatio => SuggestionTier.Decisive,
+        _ when Score >= NoticeableSurplus => SuggestionTier.Noticeable,
+        _ => SuggestionTier.Marginal
+    };
 }
 
 /// <summary>
@@ -89,6 +134,31 @@ public static class BreakpointAdvisor
         }
 
         return candidates;
+    }
+
+    /// <summary>
+    /// What one side's technologies come to, from the ladder level of each track plus the
+    /// two specs. Only the things the advice is about: the rest of the game's technologies
+    /// would move the numbers with nothing said about them anywhere the advice is read.
+    /// A spec is not something left to buy, so it never becomes a candidate - it only moves
+    /// the stats the candidates are measured against, and Fortified's hp makes the next hp
+    /// technology worth proportionally less, so it moves the order of the list as well as
+    /// the counts. Cost control moves the counts alone: it is a multiplier, and a multiplier
+    /// sits outside the increase the scoring divides by, so it cancels out of what a buy
+    /// is worth.
+    /// </summary>
+    public static BuffAggregates Aggregates(int attackLevel, int hpLevel, bool costControl, bool fortified)
+    {
+        var buffs = new List<IBuff>();
+
+        if (attackLevel >= 1) buffs.Add(new Attack1Buff());
+        if (attackLevel >= 2) buffs.Add(new Attack2Buff());
+        if (hpLevel >= 1) buffs.Add(new Hp1Buff());
+        if (hpLevel >= 2) buffs.Add(new Hp2Buff());
+        if (costControl) buffs.Add(new CostControlBuff());
+        if (fortified) buffs.Add(new FortifiedBuff());
+
+        return BuffAggregates.From(buffs);
     }
 
     /// <summary>

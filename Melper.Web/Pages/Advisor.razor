@@ -241,21 +241,6 @@
 
     private const string RightConfigKey = "BreakPointSideConfig:right";
 
-    /// <summary>
-    /// Where a pairing stops being a shortening and starts being a decision - 3 attacks
-    /// into 2, or 2 into 3 survived. Those are what the halves are coloured for; the rest
-    /// stay quiet so the ones worth buying for can be found without reading the counts.
-    /// </summary>
-    private const double DecisiveRatio = 1.5;
-
-    /// <summary>
-    /// How much of the move has to be more than the technology's percentage already paid
-    /// for before the pairing is worth reading. 556 attacks into 496 off a 12% buy is the
-    /// 12% and nothing else - the count moved, no threshold was crossed - and a long tail
-    /// of those is what buried the pairings that did cross one.
-    /// </summary>
-    private const double NoticeableSurplus = 1.02;
-
     private UnitPicker? _picker;
 
     private BreakPointSideConfig _left = new();
@@ -407,26 +392,15 @@
     /// <summary>
     /// Only what this page shows. The shared config may also hold Heavy armor and friends
     /// from the Breakpoints page; folding those in here would move the numbers with nothing
-    /// on screen to explain why. A spec is not something left to buy, so it never becomes a
-    /// candidate - it only moves the stats the candidates are measured against, and
-    /// Fortified's hp makes the next hp technology worth proportionally less, so it moves
-    /// the order of the list as well as the counts. Cost control moves the counts alone:
-    /// it is a multiplier, and a multiplier sits outside the increase the scoring divides
-    /// by, so it cancels out of what a buy is worth.
+    /// on screen to explain why. What the levels and specs come to is
+    /// <see cref="BreakpointAdvisor.Aggregates"/>, shared with the console tool.
     /// </summary>
-    private static BuffAggregates Aggregates(BreakPointSideConfig side)
-    {
-        var buffs = new List<IBuff>();
-
-        if (side.Attack1 || side.Attack2) buffs.Add(new Attack1Buff());
-        if (side.Attack2) buffs.Add(new Attack2Buff());
-        if (side.Hp1 || side.Hp2) buffs.Add(new Hp1Buff());
-        if (side.Hp2) buffs.Add(new Hp2Buff());
-        if (side.CostControl) buffs.Add(new CostControlBuff());
-        if (side.Fortified) buffs.Add(new FortifiedBuff());
-
-        return BuffAggregates.From(buffs);
-    }
+    private static BuffAggregates Aggregates(BreakPointSideConfig side) =>
+        BreakpointAdvisor.Aggregates(
+            side.Attack2 ? 2 : side.Attack1 ? 1 : 0,
+            side.Hp2 ? 2 : side.Hp1 ? 1 : 0,
+            side.CostControl,
+            side.Fortified);
 
     private static string LevelLabel(int level) => level == 0 ? "No" : $"Lvl {level}";
 
@@ -479,14 +453,13 @@
     /// <summary>
     /// Colours a pairing by how far it moves rather than by which half it is in - the
     /// half is already the column it sits in, and what a glance is looking for is the
-    /// handful of opponents the buy actually decides. Three steps: the ones that halve
-    /// the count, the ones that cross something, and the ones that only bank the
-    /// percentage the technology states.
+    /// handful of opponents the buy actually decides. The three steps are
+    /// <see cref="SuggestionTier"/>, which the console tool reads the same way.
     /// </summary>
-    private static string Chip(Column column, BreakpointSuggestion item) => item switch
+    private static string Chip(Column column, BreakpointSuggestion item) => item.Tier switch
     {
-        _ when item.Ratio >= DecisiveRatio => column.Badge,
-        _ when item.Score >= NoticeableSurplus => "border text-body-secondary",
+        SuggestionTier.Decisive => column.Badge,
+        SuggestionTier.Noticeable => "border text-body-secondary",
         _ => "text-body-secondary opacity-50"
     };
 

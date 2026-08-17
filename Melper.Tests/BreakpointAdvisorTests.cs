@@ -351,4 +351,45 @@ public class BreakpointAdvisorTests
         Assert.NotEmpty(marksman);
         Assert.Contains(marksman, x => x.Vs.IsAir);
     }
+
+    /// <summary>
+    /// The three steps the web page colours by and the console tool reads out, pinned to
+    /// the numbers rather than to the thresholds - both surfaces drop Marginal, so what
+    /// falls in it decides what a caller ever hears about.
+    /// </summary>
+    [Theory]
+    // Halving the kill, and gaining an attack survived off a two-attack life: decisions.
+    [InlineData(UpgradeKind.Attack, 4, 2, 1.12, SuggestionTier.Decisive)]
+    [InlineData(UpgradeKind.Hp, 2, 3, 1.15, SuggestionTier.Decisive)]
+    // Something was crossed, but the pairing is only shortened.
+    [InlineData(UpgradeKind.Attack, 5, 4, 1.12, SuggestionTier.Noticeable)]
+    // 265 into 237 off a 12% buy is the 12% and nothing else.
+    [InlineData(UpgradeKind.Attack, 265, 237, 1.12, SuggestionTier.Marginal)]
+    public void Tier_SaysHowFarThePairingMoved(
+        UpgradeKind kind, int before, int after, double flat, SuggestionTier expected)
+    {
+        var main = MakeUnit("main", damage: 100, health: 200);
+        var vs = MakeUnit("vs", damage: 100, health: 200);
+        var upgrade = new UpgradeCandidate("buy", kind, 12);
+
+        var suggestion = new BreakpointSuggestion(main, vs, upgrade, before, after, flat);
+
+        Assert.Equal(expected, suggestion.Tier);
+    }
+
+    /// <summary>
+    /// A whole roster's worth of advice is mostly tail: if it were not, the console tool
+    /// dropping Marginal would be doing nothing and the page's grey chips would be a
+    /// distinction without a difference.
+    /// </summary>
+    [Fact]
+    public void Tier_OverTheRealRoster_LeavesMostOfTheListInTheTail()
+    {
+        var roster = UnitsCollection.Defaults();
+        var found = Suggest(roster, roster, BreakpointAdvisor.AttackAndHpCandidates(false, false, false, false));
+
+        var worth = found.Count(x => x.Tier >= SuggestionTier.Noticeable);
+
+        Assert.InRange(worth, 1, found.Count - 1);
+    }
 }
