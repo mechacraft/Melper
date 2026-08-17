@@ -15,6 +15,7 @@ if (-not (Test-Path $py)) {
 
 & $py scripts\dump_all.py
 & $py scripts\make_units.py
+& $py scripts\make_techs.py
 if ($Compare) { & $py scripts\compare_with_csharp.py }
 
-Write-Host "`ndone -> data\units.csv" -ForegroundColor Green
+Write-Host "`ndone -> data\units.csv, data\technologies.csv" -ForegroundColor Green

@@ -1,0 +1,436 @@
+﻿unitId,unitNameCn,unitName,roster,order,inDefaultList,techId,name,category,supply,unlockCost,previousTechID,activeLevel,isTestData,iconName,text,description,descParams
+1,堡垒,Fortress,main,0,True,1001,保护屏障,advancedEnergyShieldTechnologies,500,0,0,0,False,UT_Energy_Barrier,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加40000,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加{0},40000
+1,堡垒,Fortress,main,1,True,10201,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,提升攻击距离40,提升攻击距离{0},40;
+1,堡垒,Fortress,main,2,True,1105,防空弹幕,extraWeaponTechnologies,200,0,0,1,False,UT_Rockets2,每10秒发射16枚防空弹幕攻击敌人，弹幕只对空中单位造成伤害，每枚导弹造成900点伤害，射程170米,每{0}秒发射{1}枚防空弹幕攻击敌人，弹幕只对空中单位造成伤害，每枚导弹造成{2}点伤害，射程{3}米,10;16;900;170
+1,堡垒,Fortress,main,3,True,1201,尖牙制造,supportUnitTechnologies,300,0,0,0,False,UT_Summon_Bot,每36秒生产8个尖牙，生产3次,每{0}秒生产{1}个尖牙，生产{2}次,36;8;3
+1,堡垒,Fortress,main,4,False,10301,发射器过载,technologyDatas,150,0,0,0,False,UT_Overdrive,堡垒的攻击间隔减少50%，同时射程减少20米,堡垒的攻击间隔减少{0}%，同时射程减少{1}米,50;20
+1,堡垒,Fortress,main,5,False,10801,精英射手,technologyDatas,150,0,0,0,False,UT_Elite_Shooter,效果跟随单位等级提升，每级射程增加5，攻击力增加25%,效果跟随单位等级提升，每级射程增加{0}，攻击力增加{1}%,5;25
+1,堡垒,Fortress,main,6,False,701,双发,multiAttackTechnologies,100,0,0,0,False,UT_Double_Shot,每次攻击连续发射2枚炮弹，但是上弹时间会增加12%,每次攻击连续发射{0}枚炮弹，但是上弹时间会增加{1}%,2;12
+1,堡垒,Fortress,main,7,False,3001,装甲强化,armorStrengthenTechnologyDatas,150,0,0,0,False,UT_Armor_Strengthen,生命值增加50%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;50
+1,堡垒,Fortress,main,8,False,110201,火箭拳,extraWeaponTechnologies,300,0,0,1,False,UT_Rocket_Punch,"堡垒发射拳头攻击敌人，在堡垒生命值低于85%和55%时各触发一次。火箭拳的射程180米，对半径25米内的敌人造成12000点,伤害随着单位等级提高，每级增加12000点伤害","堡垒发射拳头攻击敌人，在堡垒生命值低于{0}%和{1}%时各触发一次。火箭拳的射程{2}米，对半径{3}米内的敌人造成{4}点,伤害随着单位等级提高，每级增加{5}点伤害",85;55;180;25;12000;12000
+1,堡垒,Fortress,main,9,False,10401,实心弹,technologyDatas,200,0,0,0,False,UT_Sniper_Mode,堡垒的攻击距离上升60米，溅射范围减少2，攻击间隔增加0.7秒,堡垒的攻击距离上升{0}米，溅射范围减少{1}，攻击间隔增加{2}秒,60;2;0.7
+2,长弓,Marksman,main,0,True,702,双发,multiAttackTechnologies,250,0,0,0,False,UT_Double_Shot,每次攻击连续发射2枚子弹，但是上弹时间会增加15%,每次攻击连续发射{0}枚子弹，但是上弹时间会增加{1}%,2;15
+2,长弓,Marksman,main,1,True,10202,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,提升攻击距离40,提升攻击距离{0},40;
+2,长弓,Marksman,main,2,True,10402,快速弹夹,technologyDatas,150,0,0,0,False,UT_Fast_Reload,攻击间隔减少50%，但是攻击力降低60%,攻击间隔减少{0}%，但是攻击力降低{1}%,50;60
+2,长弓,Marksman,main,3,True,1802,电磁弹,buffTechnologies,250,0,0,0,False,UT_EMP,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低40%,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低{0}%,40
+2,长弓,Marksman,main,4,False,10802,精英射手,technologyDatas,400,0,0,0,False,UT_Elite_Shooter,效果跟随单位等级提升，每级射程增加5，攻击力增加17%,效果跟随单位等级提升，每级射程增加{0}，攻击力增加{1}%,5;17
+2,长弓,Marksman,main,5,False,1202,射击小队,supportUnitTechnologies,300,0,0,0,False,UT_Summon_Partner,战斗开始时召唤4个与长弓等级相同的尖牙与自己并肩作战,战斗开始时召唤{0}个与长弓等级相同的尖牙与自己并肩作战,4
+2,长弓,Marksman,main,6,False,10102,突击模式,technologyDatas,200,0,0,0,False,UT_Assault_Mode,长弓生命值增加500%，移动速度增加3，攻击力增加60%，并且攻击带有9米的范围伤害，但是射程减少70。,长弓生命值增加{0}%，移动速度增加{1}，攻击力增加{2}%，并且攻击带有{3}米的范围伤害，但是射程减少{4}。,500;3;60;9;70
+2,长弓,Marksman,main,7,False,3202,防空专精,searchTargetSpecificDatas,250,0,0,0,False,UT_Anti_Air,对空中单位的攻击力增加90%，攻击空中单位时射程增加30,对空中单位的攻击力增加{0}%，攻击空中单位时射程增加{1},90;30;
+3,火神,Vulcan,main,0,True,180203,引燃,buffTechnologies,300,0,0,0,False,UT_On_Fire,攻击会引燃目标单位，被引燃的单位每秒损失6%的生命值并且无法恢复生命，持续2秒,攻击会引燃目标单位，被引燃的单位每秒损失{0}%的生命值并且无法恢复生命，持续{1}秒,6;2
+3,火神,Vulcan,main,1,True,10203,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,提升攻击距离40,提升攻击距离{0},40;
+3,火神,Vulcan,main,2,True,1103,燃烧弹,extraWeaponTechnologies,250,0,0,1,False,UT_Flaming_Barrage,每16秒发射一批燃烧弹点燃远处敌人脚下的地面，燃烧弹的射程为180米，最小射程为40米,每{0}秒发射一批燃烧弹点燃远处敌人脚下的地面，燃烧弹的射程为{1}米，最小射程为{2}米,16;180;40
+3,火神,Vulcan,main,3,True,10603,高温火焰,technologyDatas,300,0,0,0,False,UT_Hot_Flame,火神的攻击力上升85%,火神的攻击力上升{0}%,85
+3,火神,Vulcan,main,4,False,1203,最佳搭档,supportUnitTechnologies,350,0,0,0,False,UT_Summon_Partner,战斗开始时召唤1个与火神等级相同的长弓与自己并肩作战,战斗开始时召唤{0}个与火神等级相同的长弓与自己并肩作战,1
+3,火神,Vulcan,main,5,False,11010,黏油弹,extraWeaponTechnologies,150,0,0,1,False,UT_Oil_Barrage,每16秒发射向远处的敌人发射具有减速效果的黏油弹，黏油弹的射程为180米，最小射程为40米,每{0}秒发射向远处的敌人发射具有减速效果的黏油弹，黏油弹的射程为{1}米，最小射程为{2}米,16;180;40
+3,火神,Vulcan,main,6,False,3003,装甲强化,armorStrengthenTechnologyDatas,150,0,0,0,False,UT_Armor_Strengthen,生命值增加50%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;50
+4,熔点,Melting Point,main,0,True,304,能量汲取,lifestealTechnologies,200,0,0,0,False,UT_Life_Steal,生命值上升60%，将对敌人造成的伤害转换为自身的生命值,生命值上升{0}%，将对敌人造成的伤害转换为自身的生命值,60;
+4,熔点,Melting Point,main,1,True,10204,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,提升攻击距离40,提升攻击距离{0},40;
+4,熔点,Melting Point,main,2,True,1107,能量散射,extraWeaponTechnologies,150,0,0,1,False,UT_Energy_Scattering,熔点射程降低30米，但是可以发射5条射线进行攻击，每条射线造成原来17%的伤害。,熔点射程降低{0}米，但是可以发射{1}条射线进行攻击，每条射线造成原来{2}%的伤害。,30;5;17
+4,熔点,Melting Point,main,3,True,1106,电磁弹幕,extraWeaponTechnologies,300,0,0,1,False,UT_EMP_Barrage,每15秒发射16枚电磁弹攻击敌人，每枚电磁弹对护盾造成6000点伤害，对命中的单位减速并且禁用科技8秒，射程180米,每{0}秒发射{1}枚电磁弹攻击敌人，每枚电磁弹对护盾造成{2}点伤害，对命中的单位减速并且禁用科技{3}秒，射程{4}米,15;16;6000;8;180
+4,熔点,Melting Point,main,4,False,1204,爬虫制造,supportUnitTechnologies,300,0,0,0,False,UT_Summon_Spider,每36秒生产8个爬虫，生产3次,每{0}秒生产{1}个爬虫，生产{2}次,36;8;3
+4,熔点,Melting Point,main,5,False,3004,装甲强化,armorStrengthenTechnologyDatas,100,0,0,0,False,UT_Armor_Strengthen,生命值增加50%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;50
+5,犀牛,Rhino,main,0,True,1109,旋风斩,extraWeaponTechnologies,150,0,0,1,False,UT_Rotation,当周围有复数敌人时，犀牛使用旋风斩攻击周围的所有敌人，旋风斩造成犀牛攻击力的1.4倍伤害，但是耗时较长。,当周围有复数敌人时，犀牛使用旋风斩攻击周围的所有敌人，旋风斩造成犀牛攻击力的{0}倍伤害，但是耗时较长。,1.4
+5,犀牛,Rhino,main,1,True,180305,光子涂层,buffTechnologies,300,0,0,0,False,UT_Photon_Coating,全身覆盖光子涂层，在开战后的30秒内受到的伤害降低30%，并且免疫电磁、引燃、酸液、退化光束效果,全身覆盖光子涂层，在开战后的{0}秒内受到的伤害降低{1}%，并且免疫电磁、引燃、酸液、退化光束效果,30;30
+5,犀牛,Rhino,main,2,True,905,战地维修,autoRecoveryTechnologies,200,0,0,0,False,UT_Auto_Recover,受伤后每秒自动恢复最大生命值的4.5%,受伤后每秒自动恢复最大生命值的{0}%,4.5
+5,犀牛,Rhino,main,3,True,2805,最后一击,deadExplosiveTechnologyDatas,250,0,0,0,False,UT_Last_Hit,犀牛在生命值为0时会启动自毁装置，对48米内的所有单位造成等同于犀牛最大生命值的伤害。,犀牛在生命值为0时会启动自毁装置，对{0}米内的所有单位造成等同于犀牛最大生命值的伤害。,48
+5,犀牛,Rhino,main,4,False,10505,机械狂暴,technologyDatas,100,0,0,0,False,UT_Rage,单位的移动速度提升5，攻击间隔减少0.3秒,单位的移动速度提升{0}，攻击间隔减少{1}秒,5;0.3
+5,犀牛,Rhino,main,5,False,2305,残骸利用,wreckageRecoveryTechnologies,100,0,0,0,False,UT_Debris_Utilization,攻击力上升60%，击毁敌人后，恢复与敌人生命值相等的生命值,攻击力上升{0}%，击毁敌人后，恢复与敌人生命值相等的生命值,60
+5,犀牛,Rhino,main,6,False,2505,动力装甲,ignoreBuffEffectTechnologyDatas,300,0,0,0,False,UT_Speed_armor,生命值上升25%，并且无法被减速,生命值上升{0}%，并且无法被减速,25
+5,犀牛,Rhino,main,7,False,3005,装甲强化,armorStrengthenTechnologyDatas,200,0,0,0,False,UT_Armor_Strengthen,生命值增加50%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;50
+5,犀牛,Rhino,main,8,False,180805,战斗进化,buffTechnologies,150,0,0,0,False,UT_Weapon_Preheat,战斗开始后，犀牛的生命值每秒增加2.5%，攻击力每秒增加4.5%,战斗开始后，犀牛的生命值每秒增加{0}%，攻击力每秒增加{1}%,2.5;4.5
+6,兵蜂,Wasp,main,0,True,206,能量护盾,energyShieldTechnologies,300,0,0,0,False,UT_Shield,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,
+6,兵蜂,Wasp,main,1,True,10206,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,提升攻击距离40,提升攻击距离{0},40;
+6,兵蜂,Wasp,main,2,True,1606,高速引擎,mobilityIntensifyTechnologies,100,0,0,0,False,UT_Mobility,兵蜂的移动速度增加5，并且在每回合的部署阶段都可以随意改变部署位置,兵蜂的移动速度增加{0}，并且在每回合的部署阶段都可以随意改变部署位置,5;
+6,兵蜂,Wasp,main,3,True,506,对地专精,damageIntensifyTechnologies,200,0,0,0,False,UT_Anti_Ground,对地面单位的攻击力增加200%,对地面单位的攻击力增加{0}%,200
+6,兵蜂,Wasp,main,4,False,10806,精英射手,technologyDatas,400,0,0,0,False,UT_Elite_Shooter,效果跟随单位等级提升，每级射程增加5，攻击力增加25%,效果跟随单位等级提升，每级射程增加{0}，攻击力增加{1}%,5;25
+6,兵蜂,Wasp,main,5,False,180206,引燃,buffTechnologies,100,0,0,0,False,UT_On_Fire,攻击有一定概率引燃目标单位，被引燃的单位每秒损失6%的生命值并且无法恢复生命，持续2秒,攻击有一定概率引燃目标单位，被引燃的单位每秒损失{0}%的生命值并且无法恢复生命，持续{1}秒,6;2
+6,兵蜂,Wasp,main,6,False,1806,电磁弹,buffTechnologies,100,0,0,0,False,UT_EMP,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低40%,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低{0}%,40
+6,兵蜂,Wasp,main,7,False,406,高爆弹药,splashTechnologies,100,0,0,0,False,UT_Splash,攻击造成的溅射伤害范围增加7米，但是攻击力降低30%,攻击造成的溅射伤害范围增加{0}米，但是攻击力降低{1}%,7;30
+6,兵蜂,Wasp,main,8,False,10606,穿甲弹,technologyDatas,100,0,0,0,False,UT_Piercing_Bullet,攻击力上升50%,攻击力上升{0}%,50
+6,兵蜂,Wasp,main,9,False,3206,防空专精,searchTargetSpecificDatas,200,0,0,0,False,UT_Anti_Air,对空中单位的攻击力增加90%，攻击空中单位时射程增加30,对空中单位的攻击力增加{0}%，攻击空中单位时射程增加{1},90;30;
+7,野马,Mustang,main,0,True,3307,导弹拦截,interceptMissileTechnologyDatas,200,0,0,0,False,UT_Missile_interception,尝试拦截150米内的敌方导弹（战场技能无法被拦截），长时间的连续拦截会导致拦截命中率有所下降。拦截能力与野马的攻击力和等级无关。,尝试拦截{0}米内的敌方导弹（战场技能无法被拦截），长时间的连续拦截会导致拦截命中率有所下降。拦截能力与野马的攻击力和等级无关。,150;
+7,野马,Mustang,main,1,True,10207,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+7,野马,Mustang,main,2,True,407,高爆弹药,splashTechnologies,50,0,0,0,False,UT_Splash,攻击造成的溅射伤害范围增加7米，但是攻击力降低35%,攻击造成的溅射伤害范围增加{0}米，但是攻击力降低{1}%,7;35
+7,野马,Mustang,main,3,True,3207,防空专精,searchTargetSpecificDatas,300,0,0,0,False,UT_Anti_Air,对空中单位的攻击力增加90%，攻击空中单位时射程增加30,对空中单位的攻击力增加{0}%，攻击空中单位时射程增加{1},90;30;
+7,野马,Mustang,main,4,False,10607,穿甲弹,technologyDatas,250,0,0,0,False,UT_Piercing_Bullet,攻击力上升50%,攻击力上升{0}%,50
+7,野马,Mustang,main,5,False,4607,斩杀弹,deadLineTechDatas,250,0,0,0,False,UT_Destruction_Line,攻击直接摧毁当前生命值低于320（每升一级+200）的目标。攻击力下降35%。,攻击直接摧毁当前生命值低于{0}（每升一级+{1}）的目标。攻击力下降{2}%。,320;200;35
+8,钢球,Steel Ball,main,0,True,308,能量汲取,lifestealTechnologies,200,0,0,0,False,UT_Life_Steal,生命值上升40%，将对敌人造成的伤害转换为自身的生命值,生命值上升{0}%，将对敌人造成的伤害转换为自身的生命值,40;
+8,钢球,Steel Ball,main,1,True,608,伤害分摊,damageShareTechnologies,250,0,0,0,False,UT_Life_Link,将相邻的钢球链接在一起，生命值增加120%，并且平分受到的伤害,将相邻的钢球链接在一起，生命值增加{0}%，并且平分受到的伤害,120
+8,钢球,Steel Ball,main,2,True,10208,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+8,钢球,Steel Ball,main,3,True,1308,机械分裂,deadSummonTechnologies,300,0,0,0,False,UT_Multiply,在钢球被击毁后，产生5个1级的爬虫继续战斗,在钢球被击毁后，产生{0}个{1}级的爬虫继续战斗,5;1;
+8,钢球,Steel Ball,main,4,False,3008,装甲强化,armorStrengthenTechnologyDatas,300,0,0,0,False,UT_Armor_Strengthen,生命值增加35%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;35
+8,钢球,Steel Ball,main,5,False,2408,重装锁定,searchTargetModifyTechnologies,200,0,0,1,False,UT_Heavy_Lock,在切换攻击目标时优先选择射程内生命值最高的敌方单位,在切换攻击目标时优先选择射程内生命值最高的敌方单位,
+8,钢球,Steel Ball,main,6,False,180808,滚动充能,buffTechnologies,150,0,0,0,False,UT_Onsite_scanning,钢球每移动7米，射程增加1米，最大增加100米。,钢球每移动{0}米，射程增加{1}米，最大增加{2}米。,7;1;100
+9,尖牙,Fang,main,0,True,180209,引燃,buffTechnologies,150,0,0,0,False,UT_On_Fire,攻击有一定概率引燃目标单位，被引燃的单位每秒损失6%的生命值并且无法恢复生命，持续2秒,攻击有一定概率引燃目标单位，被引燃的单位每秒损失{0}%的生命值并且无法恢复生命，持续{1}秒,6;2
+9,尖牙,Fang,main,1,True,10209,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+9,尖牙,Fang,main,2,True,10509,机械狂暴,technologyDatas,250,0,0,0,False,UT_Rage,单位的移动速度提升5，攻击间隔减少0.5秒,单位的移动速度提升{0}，攻击间隔减少{1}秒,5;0.5
+9,尖牙,Fang,main,3,True,209,随身护盾,energyShieldTechnologies,500,0,0,0,False,UT_Shield,每个尖牙获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,每个尖牙获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,
+9,尖牙,Fang,main,4,False,10609,穿甲弹,technologyDatas,100,0,0,0,False,UT_Piercing_Bullet,攻击力上升50%,攻击力上升{0}%,50
+9,尖牙,Fang,main,5,False,3109,榴弹发射器,airAttackTechnologyDatas,150,0,0,0,False,UT_Rifle_grenade,尖牙改为使用榴弹发射器，射程增加10米，对目标周围7米范围内的敌人造成溅射伤害，但是无法对空。,尖牙改为使用榴弹发射器，射程增加{1}米，对目标周围{0}米范围内的敌人造成溅射伤害，但是无法对空。,7;10
+10,爬虫,Crawler,main,0,True,10510,机械狂暴,technologyDatas,100,0,0,0,False,UT_Rage,单位的移动速度提升5，攻击间隔减少0.2秒,单位的移动速度提升{0}，攻击间隔减少{1}秒,5;0.2
+10,爬虫,Crawler,main,1,True,180110,复制,buffTechnologies,250,0,0,0,False,UT_Remains_Copy,利用被击毁的敌人制造更多的爬虫,利用被击毁的敌人制造更多的爬虫,
+10,爬虫,Crawler,main,2,True,2610,潜地行动,burrowTechnologies,350,0,0,0,False,UT_Burrow,移动速度增加3，在50米内没有敌人时潜入地下，减免45%受到的伤害，在到达敌人附近时会钻出进行攻击,移动速度增加{0}，在{1}米内没有敌人时潜入地下，减免{2}%受到的伤害，在到达敌人附近时会钻出进行攻击,3;50;45
+10,爬虫,Crawler,main,3,True,2710,酸性爆炸,deadAcidRangeItemTechnologyDatas,100,0,0,0,False,UT_Acid_Blast,爬虫被击毁后会在地面上留下半径为9米的酸性液体，在酸液中的单位每秒损失3%的生命值，并且被攻击时受到250%的伤害。,爬虫被击毁后会在地面上留下半径为{0}米的酸性液体，在酸液中的单位每秒损失{1}%的生命值，并且被攻击时受到{2}%的伤害。,9;3;250;
+10,爬虫,Crawler,main,4,False,10710,冲击钻头,technologyDatas,150,0,0,0,False,UT_Attack_First,攻击力上升125%,攻击力上升{0}%,125;
+10,爬虫,Crawler,main,5,False,3510,松散队列,rVORadiusChangeTechnologyTechDatas,250,0,0,0,False,UT_Disperse,生命值减少40%，爬虫会以更松散的队形前进,生命值减少{0}%，爬虫会以更松散的队形前进,40
+11,霸主,Overlord,main,0,True,1108,舰炮,extraWeaponTechnologies,300,0,0,1,False,UT_Shipboard_Srtillery,为霸主加装两门只能对地攻击的舰炮，射程140，每3秒攻击一次，造成7000点伤害，伤害随着单位等级提高，每级增加7000点伤害,为霸主加装两门只能对地攻击的舰炮，射程{0}，每{1}秒攻击一次，造成{2}点伤害，伤害随着单位等级提高，每级增加{2}点伤害,140;3;7000
+11,霸主,Overlord,main,1,True,10311,发射器过载,technologyDatas,300,0,0,0,False,UT_Overdrive,霸主的攻击间隔减少50%，同时射程减少20米,霸主的攻击间隔减少{0}%，同时射程减少{1}米,50;20
+11,霸主,Overlord,main,2,True,1211,母舰,supportUnitTechnologies,250,0,0,0,False,UT_Summon_Plane,每32秒生产5个兵蜂，生产3次,每{0}秒生产{1}个兵蜂，生产{2}次,32;5;3
+11,霸主,Overlord,main,3,True,1611,高速引擎,mobilityIntensifyTechnologies,300,0,0,0,False,UT_Mobility,霸主的移动速度增加5，并且在每回合的部署阶段都可以随意改变部署位置,霸主的移动速度增加{0}，并且在每回合的部署阶段都可以随意改变部署位置,5;
+11,霸主,Overlord,main,4,False,180311,光子投射,buffTechnologies,300,0,0,0,False,UT_Photon_Beam,开战后向周围100米范围内的友军(不包括自己)投射光子涂层，使其在20秒内受到的伤害减低30%，并且免疫电磁、引燃、酸液、退化光束效果,开战后向周围{0}米范围内的友军(不包括自己)投射光子涂层，使其在{1}秒内受到的伤害减低{2}%，并且免疫电磁、引燃、酸液、退化光束效果,100;20;30
+11,霸主,Overlord,main,5,False,10211,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+11,霸主,Overlord,main,6,False,3011,装甲强化,armorStrengthenTechnologyDatas,150,0,0,0,False,UT_Armor_Strengthen,生命值增加35%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;35
+11,霸主,Overlord,main,7,False,911,战地维修,autoRecoveryTechnologies,150,0,0,0,False,UT_Auto_Recover,生命值上升30%，受伤后每秒自动恢复最大生命值的4.5%,生命值上升{0}%，受伤后每秒自动恢复最大生命值的{1}%,30;4.5
+11,霸主,Overlord,main,8,False,411,高爆弹药,splashTechnologies,200,0,0,0,False,UT_Splash,霸主的导弹造成的溅射伤害范围增加7米，但是攻击力降低40%,霸主的导弹造成的溅射伤害范围增加{0}米，但是攻击力降低{1}%,7;40
+12,暴雨,Stormcaller,main,0,True,812,燃烧弹,fireIntensifyTechnologies,350,0,0,0,False,UT_Fire,射程减少20，单位的攻击会导致大面积地面燃烧，地面火焰持续15秒，燃烧范围5.5米，每秒造成270点伤害，对友军也会造成伤害,射程减少{3}，单位的攻击会导致大面积地面燃烧，地面火焰持续{0}秒，燃烧范围{1}米，每秒造成{2}点伤害，对友军也会造成伤害,15;5.5;270;20
+12,暴雨,Stormcaller,main,1,True,10212,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+12,暴雨,Stormcaller,main,2,True,10312,发射器过载,technologyDatas,250,0,0,0,False,UT_Overdrive,暴雨的攻击间隔减少50%，射程减少40米，移动速度增加5,暴雨的攻击间隔减少{0}%，射程减少{1}米，移动速度增加{2},50;40;5
+12,暴雨,Stormcaller,main,3,True,412,高爆弹药,splashTechnologies,150,0,0,0,False,UT_Splash,攻击造成的溅射伤害范围增加5米，但是攻击力降低50%,攻击造成的溅射伤害范围增加{0}米，但是攻击力降低{1}%,5;50
+12,暴雨,Stormcaller,main,4,False,1812,电磁爆炸,buffTechnologies,300,0,0,0,False,UT_EMP,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低40%,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低{0}%,40
+12,暴雨,Stormcaller,main,5,False,10912,重型导弹,technologyDatas,200,0,0,0,False,UT_Heavy_Missile,攻击力上升80%，导弹生命值增加200%，但是攻击间隔增加25%。,攻击力上升{0}%，导弹生命值增加{2}%，但是攻击间隔增加{1}%。,80;25;200
+13,铁锤,Sledgehammer,main,0,True,913,战地维修,autoRecoveryTechnologies,200,0,0,0,False,UT_Auto_Recover,生命值上升30%，受伤后每秒自动恢复最大生命值的4.5%,生命值上升{0}%，受伤后每秒自动恢复最大生命值的{1}%,30;4.5
+13,铁锤,Sledgehammer,main,1,True,613,伤害分摊,damageShareTechnologies,200,0,0,0,False,UT_Life_Link,将相邻的坦克链接在一起，生命值增加120%，并且平分受到的伤害,将相邻的坦克链接在一起，生命值增加{0}%，并且平分受到的伤害,120
+13,铁锤,Sledgehammer,main,2,True,10513,机械狂暴,technologyDatas,250,0,0,0,False,UT_Rage,单位的移动速度提升6，攻击间隔减少1秒,单位的移动速度提升{0}，攻击间隔减少{1}秒,6;1
+13,铁锤,Sledgehammer,main,3,True,10213,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+13,铁锤,Sledgehammer,main,4,False,1813,电磁弹,buffTechnologies,350,0,0,0,False,UT_EMP,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低40%,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低{0}%,40
+13,铁锤,Sledgehammer,main,5,False,10613,穿甲弹,technologyDatas,100,0,0,0,False,UT_Piercing_Bullet,攻击力上升250%，攻击间隔增加30%,攻击力上升{0}%，攻击间隔增加{1}%,250;30
+13,铁锤,Sledgehammer,main,6,False,3013,装甲强化,armorStrengthenTechnologyDatas,250,0,0,0,False,UT_Armor_Strengthen,生命值增加35%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;35
+14,骇客,Hacker,main,0,True,11014,多重控制,extraWeaponTechnologies,250,0,0,1,False,UT_Multi-control,骇客射程降低25米，但是可以同时发射5个控制光束，每个光束的控制效率是原来的17%,骇客射程降低{0}米，但是可以同时发射{1}个控制光束，每个光束的控制效率是原来的{2}%,25;5;17
+14,骇客,Hacker,main,1,True,1014,保护屏障,advancedEnergyShieldTechnologies,400,0,0,0,False,UT_Energy_Barrier,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加16000,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加{0},16000
+14,骇客,Hacker,main,2,True,10214,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+14,骇客,Hacker,main,3,True,1714,强化控制,controllBeamLifeRecoveryTechnologies,300,0,0,0,False,UT_Control_Recovery,被骇客控制的单位会立即恢复到最大生命值,被骇客控制的单位会立即恢复到最大生命值,
+14,骇客,Hacker,main,4,False,1814,电磁干扰,buffTechnologies,100,0,0,0,False,UT_EMP,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低40%,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低{0}%,40
+15,弧光,Arclight,main,0,True,10215,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+15,弧光,Arclight,main,1,True,1815,电磁弹,buffTechnologies,400,0,0,0,False,UT_EMP,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低40%,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低{0}%,40
+15,弧光,Arclight,main,2,True,10915,蓄能攻击,technologyDatas,100,0,0,0,False,UT_Charge_Shot,攻击力上升300%，攻击间隔增加35%,攻击力上升{0}%，攻击间隔增加{1}%,300;35
+15,弧光,Arclight,main,3,True,3015,装甲强化,armorStrengthenTechnologyDatas,100,0,0,0,False,UT_Armor_Strengthen,生命值增加50%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;50
+15,弧光,Arclight,main,4,False,3115,防空弹药,airAttackTechnologyDatas,300,0,0,0,False,UT_Anti_Air_weapon,可以攻击空中单位,可以攻击空中单位,
+15,弧光,Arclight,main,5,False,10815,精英射手,technologyDatas,400,0,0,0,False,UT_Elite_Shooter,效果跟随单位等级提升，每级射程增加5，攻击力增加17%,效果跟随单位等级提升，每级射程增加{0}，攻击力增加{1}%,5;17
+15,弧光,Arclight,main,6,False,4515,震荡波,secondaryDamageIntensifyTechDatas,250,0,0,0,False,UT_Shock_wave,弧光的射程减少5米，攻击时产生震荡波，对目标周围30米范围内的敌人造成75点伤害。,弧光的射程减少{0}米，攻击时产生震荡波，对目标周围{1}米范围内的敌人造成{2}点伤害。,5;30;75
+16,凤凰,Phoenix,main,0,True,2916,量子重组,rebirthEffectTechologyDatas,150,0,0,0,False,UT_Rebirth,凤凰被击毁后，驾驶舱会跟随在最近的己方凤凰身后，并在12秒之后恢复为完整的凤凰，每场战斗仅限1次,凤凰被击毁后，驾驶舱会跟随在最近的己方凤凰身后，并在{0}秒之后恢复为完整的凤凰，每场战斗仅限{1}次,12;1
+16,凤凰,Phoenix,main,1,True,10216,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+16,凤凰,Phoenix,main,2,True,10316,发射器过载,technologyDatas,200,0,0,0,False,UT_Overdrive,攻击间隔减少50%，同时射程减少25米,攻击间隔减少{0}%，同时射程减少{1}米,50;25
+16,凤凰,Phoenix,main,3,True,216,能量护盾,energyShieldTechnologies,200,0,0,0,False,UT_Shield,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,
+16,凤凰,Phoenix,main,4,False,1616,高速引擎,mobilityIntensifyTechnologies,100,0,0,0,False,UT_Mobility,凤凰的移动速度增加5，并且在每回合的部署阶段都可以随意改变部署位置,凤凰的移动速度增加{0}，并且在每回合的部署阶段都可以随意改变部署位置,5;
+16,凤凰,Phoenix,main,5,False,1816,电磁弹,buffTechnologies,200,0,0,0,False,UT_EMP,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低40%,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低{0}%,40
+16,凤凰,Phoenix,main,6,False,10816,精英射手,technologyDatas,400,0,0,0,False,UT_Elite_Shooter,效果跟随单位等级提升，每级射程增加5，攻击力增加20%,效果跟随单位等级提升，每级射程增加{0}，攻击力增加{1}%,5;20
+16,凤凰,Phoenix,main,7,False,10916,蓄能攻击,technologyDatas,200,0,0,0,False,UT_Charge_Shot,攻击力上升200%，射程减少25,攻击力上升{0}%，射程减少{1},200;25
+17,战争工厂,War Factory,main,0,True,10217,射程强化,technologyDatas,500,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+17,战争工厂,War Factory,main,1,True,12017,凤凰制造,supportUnitTechnologies,500,0,0,0,False,UT_Summon_Phoenix,每17.2秒生产1个凤凰，生产6次,每{0}秒生产{1}个凤凰，生产{2}次,17.2;1;6
+17,战争工厂,War Factory,main,2,True,12117,钢球制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Steel Ball,每9.7秒生产1个钢球，生产10次,每{0}秒生产{1}个钢球，生产{2}次,9.7;1;10
+17,战争工厂,War Factory,main,3,False,12217,铁锤制造,supportUnitTechnologies,400,0,0,0,False,UT_Summon_Sledgehammer,每6.6秒生产1个铁锤，生产14次,每{0}秒生产{1}个铁锤，生产{2}次,6.6;1;14
+17,战争工厂,War Factory,main,4,True,3317,导弹拦截,interceptMissileTechnologyDatas,350,0,0,0,False,UT_Missile_interception,尝试拦截150米内的敌方导弹（战场技能无法被拦截），长时间的连续拦截会导致拦截命中率有所下降。拦截能力与战争工厂的攻击力和等级无关。,尝试拦截{0}米内的敌方导弹（战场技能无法被拦截），长时间的连续拦截会导致拦截命中率有所下降。拦截能力与战争工厂的攻击力和等级无关。,150;
+17,战争工厂,War Factory,main,5,True,10317,发射器过载,technologyDatas,300,0,0,0,False,UT_Overdrive,战争工厂的攻击间隔减少50%，同时射程减少20米,战争工厂的攻击间隔减少{0}%，同时射程减少{1}米,50;20
+17,战争工厂,War Factory,main,6,True,180317,光子涂层,buffTechnologies,200,0,0,0,False,UT_Photon_Coating,全身覆盖光子涂层，在开战后的30秒内受到的伤害降低30%，并且免疫电磁、引燃、酸液、退化光束效果,全身覆盖光子涂层，在开战后的{0}秒内受到的伤害降低{1}%，并且免疫电磁、引燃、酸液、退化光束效果,30;30
+17,战争工厂,War Factory,main,7,False,3017,装甲强化,armorStrengthenTechnologyDatas,350,0,0,0,False,UT_Armor_Strengthen,生命值增加50%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;50
+17,战争工厂,War Factory,main,8,False,417,高爆弹药,splashTechnologies,350,0,0,0,False,UT_Splash,主炮的溅射伤害范围增加7米，但是攻击力降低40%,主炮的溅射伤害范围增加{0}米，但是攻击力降低{1}%,7;40
+18,恶灵,Wraith,main,0,True,110181,浮游炮阵,extraWeaponTechnologies,400,0,0,1,False,UT_Matrix_Bombardment,恶灵的浮游炮数量从4门增加至8门。,恶灵的浮游炮数量从4门增加至{0}门。,8
+18,恶灵,Wraith,main,1,True,10218,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+18,恶灵,Wraith,main,2,True,3018,装甲强化,armorStrengthenTechnologyDatas,200,0,0,0,False,UT_Armor_Strengthen,生命值增加35%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;35
+18,恶灵,Wraith,main,3,True,180418,退化光束,buffTechnologies,200,0,0,0,False,UT_Degenerate_Beam,向120米范围内的敌方单位发射退化光束，受影响的敌方单位移动速度下降40%，攻击力下降20%，并且在受到攻击时额外承受30%的伤害。,向{0}米范围内的敌方单位发射退化光束，受影响的敌方单位移动速度下降{1}%，攻击力下降{2}%，并且在受到攻击时额外承受{3}%的伤害。,120;40;20;30
+18,恶灵,Wraith,main,4,False,918,战地维修,autoRecoveryTechnologies,200,0,0,0,False,UT_Auto_Recover,生命值上升30%，受伤后每秒自动恢复最大生命值的4.5%,生命值上升{0}%，受伤后每秒自动恢复最大生命值的{1}%,30;4.5
+18,恶灵,Wraith,main,5,False,418,高爆弹药,splashTechnologies,150,0,0,0,False,UT_Splash,浮游炮的溅射伤害范围增加7米，但是攻击力降低30%,浮游炮的溅射伤害范围增加{0}米，但是攻击力降低{1}%,7;30
+18,恶灵,Wraith,main,6,False,4418,地面巡航,flyTechDatas,300,0,0,0,False,UT_Low_altitude_Cruising,恶灵成为地面单位，无法再攻击空中目标，但是射程增加50米，攻击间隔增加0.6秒,恶灵成为地面单位，无法再攻击空中目标，但是射程增加{0}米，攻击间隔增加{1}秒,50;0.6
+19,狂蝎,Scorpion,main,0,True,180519,酸性攻击,buffTechnologies,250,0,0,0,False,UT_Corrosive_Virus,狂蝎的攻击会在命中点产生半径15米的酸液区域。酸液区域持续18秒，在酸液中的单位每秒损失3%的生命值，并且被攻击时受到250%的伤害。,狂蝎的攻击会在命中点产生半径{0}米的酸液区域。酸液区域持续{1}秒，在酸液中的单位每秒损失{2}%的生命值，并且被攻击时受到{3}%的伤害。,15;18;3;250;
+19,狂蝎,Scorpion,main,1,True,10019,攻城模式,technologyDatas,300,0,0,0,False,UT_Projectile_Mode,狂蝎进入攻城模式，射程增加100米，但是攻击力减少40%，攻击间隔增加1.5秒，并且无法攻击身边75米范围内的敌人。,狂蝎进入攻城模式，射程增加{0}米，但是攻击力减少{1}%，攻击间隔增加{3}秒，并且无法攻击身边{2}米范围内的敌人。,100;40;75;1.5
+19,狂蝎,Scorpion,main,2,True,10219,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+19,狂蝎,Scorpion,main,3,True,719,双发,multiAttackTechnologies,100,0,0,0,False,UT_Double_Shot,每次攻击连续发射2枚炮弹，但是上弹时间会增加12%,每次攻击连续发射{0}枚炮弹，但是上弹时间会增加{1}%,2;12
+19,狂蝎,Scorpion,main,4,False,919,战地维修,autoRecoveryTechnologies,150,0,0,0,False,UT_Auto_Recover,生命值上升30%，受伤后每秒自动恢复最大生命值的4.5%,生命值上升{0}%，受伤后每秒自动恢复最大生命值的{1}%,30;4.5
+19,狂蝎,Scorpion,main,5,False,3019,装甲强化,armorStrengthenTechnologyDatas,100,0,0,0,False,UT_Armor_Strengthen,生命值增加50%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;50
+19,狂蝎,Scorpion,main,6,False,10419,收束射击,technologyDatas,100,0,0,0,False,UT_Fast_Charge,攻击距离上升30米，攻击间隔减少1秒，但是溅射范围减少8,攻击距离上升{0}米，攻击间隔减少{1}秒，但是溅射范围减少{2},30;1;8
+20,火獾,Fire Badger,main,0,True,10220,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+20,火獾,Fire Badger,main,1,True,820,液态火,fireIntensifyTechnologies,250,0,0,0,False,UT_Fire,生命值减少30%，攻击会引燃目标周围12米的地面，地面火焰持续8秒，每秒造成270伤害。,生命值减少{3}%，攻击会引燃目标周围{0}米的地面，地面火焰持续{1}秒，每秒造成{2}伤害。,12;8;270;30
+20,火獾,Fire Badger,main,2,True,180220,引燃,buffTechnologies,100,0,0,0,False,UT_On_Fire,攻击有一定概率引燃目标单位，被引燃的单位每秒损失6%的生命值并且无法恢复生命，持续2秒,攻击有一定概率引燃目标单位，被引燃的单位每秒损失{0}%的生命值并且无法恢复生命，持续{1}秒,6;2
+20,火獾,Fire Badger,main,3,True,920,战地维修,autoRecoveryTechnologies,150,0,0,0,False,UT_Auto_Recover,生命值上升30%，受伤后每秒自动恢复最大生命值的4.5%,生命值上升{0}%，受伤后每秒自动恢复最大生命值的{1}%,30;4.5
+20,火獾,Fire Badger,main,4,False,10620,高温火焰,technologyDatas,300,0,0,0,False,UT_Hot_Flame,火獾的攻击力上升85%,火獾的攻击力上升{0}%,85
+20,火獾,Fire Badger,main,5,False,11020,焦土冲击,extraWeaponTechnologies,200,0,0,1,False,UT_Rage_assault,火獾生命值增加80%，当其生命值低于50%时，向敌人发起冲锋并自爆，对半径40米内的单位造成与火獾剩余生命值相同的伤害，并引燃周围的地面。,火獾生命值增加{0}%，当其生命值低于{1}%时，向敌人发起冲锋并自爆，对半径{2}米内的单位造成与火獾剩余生命值相同的伤害，并引燃周围的地面。,80;50;40;100;40
+20,火獾,Fire Badger,main,6,False,180620,逆火 ,buffTechnologies,200,0,0,0,False,UT_Counter_attack,生命值上升50%。受到伤害后，火獾的射程增加70，持续20秒。,生命值上升{2}%。受到伤害后，火獾的射程增加{0}，持续{1}秒。,70;20;50
+21,剑齿虎,Sabertooth,main,0,True,10221,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+21,剑齿虎,Sabertooth,main,1,True,10321,战地维修,autoRecoveryTechnologies,200,0,0,0,False,UT_Auto_Recover,生命值上升30%，受伤后每秒自动恢复最大生命值的4.5%,生命值上升{0}%，受伤后每秒自动恢复最大生命值的{1}%,30;4.5
+21,剑齿虎,Sabertooth,main,2,True,3321,导弹拦截,interceptMissileTechnologyDatas,100,0,0,0,False,UT_Missile_interception,尝试拦截150米内的敌方导弹（战场技能无法被拦截），长时间的连续拦截会导致拦截命中率有所下降。拦截能力与剑齿虎的攻击力和等级无关。,尝试拦截{0}米内的敌方导弹（战场技能无法被拦截），长时间的连续拦截会导致拦截命中率有所下降。拦截能力与剑齿虎的攻击力和等级无关。,150;
+21,剑齿虎,Sabertooth,main,3,True,721,双发,multiAttackTechnologies,150,0,0,0,False,UT_Double_Shot,每次攻击连续发射2枚炮弹，但是上弹时间会增加12%,每次攻击连续发射{0}枚炮弹，但是上弹时间会增加{1}%,2;12
+21,剑齿虎,Sabertooth,main,4,False,110211,副炮,extraWeaponTechnologies,200,0,0,1,False,UT_2ndweapons,在剑齿虎的左右两侧各加装1门副炮，副炮的射程为95，每4秒攻击一次，造成2000点伤害，伤害随着单位等级提高，每级增加2000点伤害。,在剑齿虎的左右两侧各加装1门副炮，副炮的射程为{0}，每{1}秒攻击一次，造成{2}点伤害，伤害随着单位等级提高，每级增加{2}点伤害。,95;4;2000
+21,剑齿虎,Sabertooth,main,5,False,4721,野战工事,siegeModeTechDatas,200,0,0,0,False,UT_Tank_trench,战斗开始时原地部署堑壕。驻扎期间无法移动，生命值上升50%，射程上升20，攻击间隔下降20%。若射程内连续7秒没有敌人，剑齿虎将离开并摧毁堑壕。,战斗开始时原地部署堑壕。驻扎期间无法移动，生命值上升{0}%，射程上升{2}，攻击间隔下降{1}%。若射程内连续{3}秒没有敌人，剑齿虎将离开并摧毁堑壕。,50;20;20;7
+22,台风,Typhoon,main,0,True,10222,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+22,台风,Typhoon,main,1,True,1102022,防空标记,extraWeaponTechnologies,300,0,0,1,False,UT_Airplane_Mark,每10秒发射一枚射程160米的标记弹，对目标周围100米范围内的敌方空军施加标记。被标记的单位射程减少20，并在受到攻击时额外承受30%的伤害，持续10秒。,每{0}秒发射一枚射程{1}米的标记弹，对目标周围{2}米范围内的敌方空军施加标记。被标记的单位射程减少{4}，并在受到攻击时额外承受{3}%的伤害，持续{5}秒。,10;160;100;30;20;10
+22,台风,Typhoon,main,2,True,5122,反应装甲,reactiveArmorTechDatas,150,0,0,0,False,UT_Reactive_Armor,受到攻击时可以抵挡80%的伤害，最多5次。,受到攻击时可以抵挡{0}%的伤害，最多{1}次。,80;5
+22,台风,Typhoon,main,3,True,5222,维修阵列,recoveryTechDatas,200,0,0,0,False,UT_Recover_Station,每3秒一次，为台风自身及周围100米内的友方单位恢复500点生命值。恢复量随台风等级提升，每级增加500点。,每{1}秒一次，为台风自身及周围{0}米内的友方单位恢复{2}点生命值。恢复量随台风等级提升，每级增加{3}点。,100;3;500;500
+22,台风,Typhoon,main,4,False,4722,野战工事,siegeModeTechDatas,200,0,0,0,False,UT_Tank_trench,战斗开始时原地部署堑壕。驻扎期间无法移动，生命值上升70%，射程上升20。若射程内连续7秒没有敌人，台风将离开并摧毁堑壕。,战斗开始时原地部署堑壕。驻扎期间无法移动，生命值上升{0}%，射程上升{1}。若射程内连续{2}秒没有敌人，台风将离开并摧毁堑壕。,70;20;7
+22,台风,Typhoon,main,5,False,2922,战地重组,rebirthEffectTechologyDatas,300,0,0,0,False,UT_Resurrect,台风被击毁后会进入重组修复状态，在5秒后以100%生命值重新回到战场，每回合限1次。,台风被击毁后会进入重组修复状态，在{0}秒后以100%生命值重新回到战场，每回合限{1}次。,5;1
+22,台风,Typhoon,main,6,False,5322,残骸引爆,killExplosionTechDatas,200,0,0,0,False,UT_Chain_Explosion,被台风击毁的单位会发生剧烈爆炸，对其周围12米内的所有单位造成115点伤害。,被台风击毁的单位会发生剧烈爆炸，对其周围{0}米内的所有单位造成{1}点伤害。,12;115
+23,沙虫,Sandworm,main,0,True,10523,机械狂暴,technologyDatas,150,0,0,0,False,UT_Rage,单位的移动速度提升5，攻击间隔减少0.8秒,单位的移动速度提升{0}，攻击间隔减少{1}秒,5;0.8
+23,沙虫,Sandworm,main,1,False,3023,装甲强化,armorStrengthenTechnologyDatas,250,0,0,0,False,UT_Armor_Strengthen,生命值增加50%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;50
+23,沙虫,Sandworm,main,2,True,13023,机械分裂,deadSummonTechnologies,200,0,0,0,False,UT_Multiply,在沙虫被击毁后，产生4个与沙虫等级相同的幼虫。,在沙虫被击毁后，产生{0}个与沙虫等级相同的幼虫。,4;1;
+23,沙虫,Sandworm,main,3,False,3123,对空,airAttackTechnologyDatas,100,0,0,0,False,UT_DuiKong,射程增加20，使沙虫可以攻击空中目标。,射程增加{0}，使沙虫可以攻击空中目标。,20
+23,沙虫,Sandworm,main,4,True,923,潜地维修,autoRecoveryTechnologies,150,0,0,0,False,UT_QianDiWeiXiu,生命值上升20%，沙虫在潜地状态时，每秒恢复最大生命值的20%。,生命值上升{0}%，沙虫在潜地状态时，每秒恢复最大生命值的{1}%。,20;20
+23,沙虫,Sandworm,main,5,True,3623,复制,moveAbilitySummonTechDatas,250,0,0,0,False,UT_FuZhi,每次沙虫钻出地面时，都会制造1个与沙虫等级相同的幼虫。,每次沙虫钻出地面时，都会制造{0}个与沙虫等级相同的幼虫。,1
+23,沙虫,Sandworm,main,6,False,3723,沙暴,moveAbilityRangeItemTechDatas,200,0,0,0,False,UT_ShaBao,沙虫钻出地面时，产生一个半径120米持续7秒的沙暴，沙暴内的单位：射程降低50%，遭到远程攻击时受到的伤害减少30%,沙虫钻出地面时，产生一个半径{0}米持续{1}秒的沙暴，沙暴内的单位：射程降低{2}%，遭到远程攻击时受到的伤害减少{3}%,120;7;50;30
+23,沙虫,Sandworm,main,7,False,3823,突袭,moveAbilityAttackIntensifyTechDatas,100,0,0,0,False,UT_Quick_raids,沙虫钻出地面的速度更快，钻出地面后的首次攻击也更强：攻击力增加30%，溅射范围增加10米。,沙虫钻出地面的速度更快，钻出地面后的首次攻击也更强：攻击力增加{0}%，溅射范围增加{1}米。,30;10;
+24,狼蛛,Tarantula,main,0,True,11024,蜘蛛雷,extraWeaponTechnologies,150,0,0,1,False,UT_Spider_Mine,每15秒发射2枚生命值为750的蜘蛛雷。蜘蛛雷会冲向敌人进行自爆攻击，自爆会对周围12米范围内的所有单位造成2500点伤害。蜘蛛雷属性值随着狼蛛等级提高，每级增加750点生命值和2500点伤害。,每{0}秒发射{1}枚生命值为{2}的蜘蛛雷。蜘蛛雷会冲向敌人进行自爆攻击，自爆会对周围{3}米范围内的所有单位造成{4}点伤害。蜘蛛雷属性值随着狼蛛等级提高，每级增加{2}点生命值和{4}点伤害。,15;2;750;12;2500
+24,狼蛛,Tarantula,main,1,True,10224,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+24,狼蛛,Tarantula,main,2,True,10524,机械狂暴,technologyDatas,400,0,0,0,False,UT_Rage,单位的移动速度提升4，攻击间隔减少0.2秒,单位的移动速度提升{0}，攻击间隔减少{1}秒,4;0.2
+24,狼蛛,Tarantula,main,3,True,10624,穿甲弹,technologyDatas,150,0,0,0,False,UT_Piercing_Bullet,攻击力上升50%,攻击力上升{0}%,50
+24,狼蛛,Tarantula,main,4,False,924,战地维修,autoRecoveryTechnologies,150,0,0,0,False,UT_Auto_Recover,生命值上升30%，受伤后每秒自动恢复最大生命值的4.5%,生命值上升{0}%，受伤后每秒自动恢复最大生命值的{1}%,30;4.5
+24,狼蛛,Tarantula,main,5,False,3024,装甲强化,armorStrengthenTechnologyDatas,100,0,0,0,False,UT_Armor_Strengthen,生命值增加50%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;50
+24,狼蛛,Tarantula,main,6,False,3124,防空弹药,airAttackTechnologyDatas,150,0,0,0,False,UT_Anti_Air_weapon,可以攻击空中单位,可以攻击空中单位,
+24,狼蛛,Tarantula,main,7,False,424,高爆弹药,splashTechnologies,300,0,0,0,False,UT_Splash,攻击造成的溅射伤害范围增加7米，但是攻击力降低45%,攻击造成的溅射伤害范围增加{0}米，但是攻击力降低{1}%,7;45
+25,鬼鳐,Phantom Ray,main,0,True,725,全弹发射,multiAttackTechnologies,200,0,0,0,False,UT_Full_launch,每次攻击发射10枚导弹，但是上弹时间上升150%,每次攻击发射{1}枚导弹，但是上弹时间上升{0}%,150;10
+25,鬼鳐,Phantom Ray,main,1,True,10225,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+25,鬼鳐,Phantom Ray,main,2,False,3025,装甲强化,armorStrengthenTechnologyDatas,250,0,0,0,False,UT_Armor_Strengthen,生命值增加35%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;35
+25,鬼鳐,Phantom Ray,main,3,True,11025,黏油弹,extraWeaponTechnologies,100,0,0,1,False,UT_oil_bombs,每12秒向敌人发射一枚具有减速效果的黏油弹，黏油弹的射程为180米，黏油弹可以被火焰点燃。,每{0}秒向敌人发射一枚具有减速效果的黏油弹，黏油弹的射程为{1}米，黏油弹可以被火焰点燃。,12;180;20
+25,鬼鳐,Phantom Ray,main,4,True,3925,隐形,moveAbilityDynamicTechDatas,100,0,0,0,False,UT_Stealth,鬼鳐攻击力上升20%，生命值上升20%，并且默认处于隐形状态。鬼鳐在隐形状态下无法被敌方锁定，但是会在攻击时显形。,鬼鳐攻击力上升{1}%，生命值上升{2}%，并且默认处于隐形状态。鬼鳐在隐形状态下无法被敌方锁定，但是会在攻击时显形。,2.5;20;20
+25,鬼鳐,Phantom Ray,main,5,False,425,高爆弹药,splashTechnologies,150,0,0,0,False,UT_Splash,攻击造成的溅射伤害范围增加7米，但是攻击力降低40%,攻击造成的溅射伤害范围增加{0}米，但是攻击力降低{1}%,7;40
+25,鬼鳐,Phantom Ray,main,6,False,225,能量护盾,energyShieldTechnologies,400,0,0,0,False,UT_Shield,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,
+25,鬼鳐,Phantom Ray,main,7,False,3225,对地锁定,searchTargetSpecificDatas,200,0,0,0,False,UT_Anti_ground_Range,鬼鳐对地面单位的攻击距离增加60米。,鬼鳐对地面单位的攻击距离增加{0}米。,60;
+26,先知,Farseer,main,0,True,180326,光子投射,buffTechnologies,400,0,0,0,False,UT_Photon_Beam,开战后向周围100米范围内的地面友军(不包括自己)投射光子涂层，使其在20秒内受到的伤害减低30%，并且免疫电磁、引燃、酸液、退化光束效果,开战后向周围{0}米范围内的地面友军(不包括自己)投射光子涂层，使其在{1}秒内受到的伤害减低{2}%，并且免疫电磁、引燃、酸液、退化光束效果,100;20;30
+26,先知,Farseer,main,1,True,180526,搜索雷达,buffTechnologies,200,0,0,0,False,UT_Radar,启动搜索雷达，使半径100米内的友方地面单位的射程增加10米。多个搜索雷达效果不会叠加。,启动搜索雷达，使半径{0}米内的友方地面单位的射程增加{1}米。多个搜索雷达效果不会叠加。,100;10
+26,先知,Farseer,main,2,True,3326,导弹拦截,interceptMissileTechnologyDatas,200,0,0,0,False,UT_Missile_interception,尝试拦截150米内的敌方导弹（战场技能无法被拦截），长时间的连续拦截会导致拦截命中率有所下降。拦截能力与先知的攻击力和等级无关。,尝试拦截{0}米内的敌方导弹（战场技能无法被拦截），长时间的连续拦截会导致拦截命中率有所下降。拦截能力与先知的攻击力和等级无关。,150;
+26,先知,Farseer,main,3,True,1826,电磁爆炸,buffTechnologies,150,0,0,0,False,UT_EMP,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低40%,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低{0}%,40
+26,先知,Farseer,main,4,False,10226,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+26,先知,Farseer,main,5,False,726,全弹发射,multiAttackTechnologies,150,0,0,0,False,UT_Full_launch,每次攻击发射12枚导弹，但是上弹时间上升200%,每次攻击发射{1}枚导弹，但是上弹时间上升{0}%,200;12
+26,先知,Farseer,main,6,False,3226,防空专精,searchTargetSpecificDatas,200,0,0,0,False,UT_Anti_Air,对空中单位的攻击力增加90%，攻击空中单位时射程增加30,对空中单位的攻击力增加{0}%，攻击空中单位时射程增加{1},90;30;
+27,雷霆,Raiden,main,0,True,110271,分叉,extraWeaponTechnologies,250,0,0,1,False,UT_scatter,雷霆射程降低10，每次攻击发出的闪电数量从3道增加至5道。,雷霆射程降低{0}，每次攻击发出的闪电数量从{1}道增加至{2}道。,10;3;5
+27,雷霆,Raiden,main,1,True,4027,连锁,iterationHitDamageTechDatas,200,0,0,0,False,UT_lightning_chain,雷霆射程减少20，当闪电命中敌人时，会跳跃至60米内的其他敌人，造成25%的伤害。,雷霆射程减少{2}，当闪电命中敌人时，会跳跃至{0}米内的其他敌人，造成{1}%的伤害。,60;25;20
+27,雷霆,Raiden,main,2,True,4127,电离,additionalDamageTechDatas,100,0,0,0,False,UT_ionization,雷霆的攻击力减少70%，但攻击会额外造成目标当前生命值50%的伤害。,雷霆的攻击力减少{0}%，但攻击会额外造成目标当前生命值{1}%的伤害。,70;50
+27,雷霆,Raiden,main,3,True,10227,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+27,雷霆,Raiden,main,4,False,1827,电磁弹,buffTechnologies,300,0,0,0,False,UT_EMP,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低40%,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低{0}%,40
+27,雷霆,Raiden,main,5,False,227,能量护盾,energyShieldTechnologies,150,0,0,0,False,UT_Shield,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,
+28,猎犬,Hound,main,0,True,10528,机械狂暴,technologyDatas,300,0,0,0,False,UT_Rage,单位的移动速度提升4，攻击间隔减少0.8秒,单位的移动速度提升{0}，攻击间隔减少{1}秒,4;0.8
+28,猎犬,Hound,main,1,True,10228,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+28,猎犬,Hound,main,2,True,4228,消防装置,clearRangeItemTechDatas,200,0,0,0,False,UT_Sweep_ground,猎犬会清除周围40米地面的燃烧、酸液和烟雾效果,猎犬会清除周围{0}米地面的燃烧、酸液和烟雾效果,40
+28,猎犬,Hound,main,3,True,11028,燃烧弹,extraWeaponTechnologies,250,0,0,1,False,UT_Fire_rocket,每16秒发射1枚燃烧弹点燃远处敌人脚下的地面，燃烧弹的射程为160米，最小射程为40米,每{0}秒发射{3}枚燃烧弹点燃远处敌人脚下的地面，燃烧弹的射程为{1}米，最小射程为{2}米,16;160;40;1
+28,猎犬,Hound,main,4,False,3028,装甲强化,armorStrengthenTechnologyDatas,250,0,0,0,False,UT_Armor_Strengthen,生命值增加20%，并且在受到攻击时阻挡60点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡60点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,60;20
+28,猎犬,Hound,main,5,False,180828,枪膛增压,buffTechnologies,300,0,0,0,False,UT_Weapon_Preheat,猎犬的攻击间隔增加0.6秒。战斗开始后，猎犬的攻击力每秒增加65%，猎犬攻击后重置攻击力。,猎犬的攻击间隔增加{1}秒。战斗开始后，猎犬的攻击力每秒增加{0}%，猎犬攻击后重置攻击力。,65;0.6
+29,深渊,Abyss,main,0,True,10229,射程强化,technologyDatas,500,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+29,深渊,Abyss,main,1,True,12029,暗黑伙伴,supportUnitTechnologies,300,0,0,0,False,UT_elzz,战斗开始时召唤1个与深渊等级相同的恶灵。,战斗开始时召唤1个与深渊等级相同的恶灵。,1000000;1;1;2
+29,深渊,Abyss,main,2,True,180329,光子涂层,buffTechnologies,250,0,0,0,False,UT_Photon_Coating,全身覆盖光子涂层，在开战后的30秒内受到的伤害降低30%，并且免疫电磁、引燃、酸液、退化光束效果,全身覆盖光子涂层，在开战后的{0}秒内受到的伤害降低{1}%，并且免疫电磁、引燃、酸液、退化光束效果,30;30
+29,深渊,Abyss,main,3,True,11029,裂解,extraWeaponTechnologies,350,0,0,1,False,UT_Pyrolysis_wave,每15秒轰击250米范围内的地面敌方单位，使其损失当前生命值的20%，并且降低其移动速度40%，减速效果持续5秒。,每{0}秒轰击{1}米范围内的地面敌方单位，使其损失当前生命值的{2}%，并且降低其移动速度{4}%，减速效果持续{3}秒。,15;250;20;5;40
+29,深渊,Abyss,main,4,True,110291,蜂群导弹,extraWeaponTechnologies,500,0,0,1,False,UT_Swarm_missiles,每15秒发射46枚导弹攻击地面上的敌人，每枚导弹造成400伤害（单位每提升1级，伤害增加400），射程200米。,每{0}秒发射{1}枚导弹攻击地面上的敌人，每枚导弹造成{2}伤害（单位每提升1级，伤害增加{2}），射程{3}米。,15;46;400;200
+29,深渊,Abyss,main,5,False,2329,残骸利用,wreckageRecoveryTechnologies,200,0,0,0,False,UT_Debris_Utilization,攻击力上升35%，击毁敌人后，恢复与敌人生命值相等的生命值,攻击力上升{0}%，击毁敌人后，恢复与敌人生命值相等的生命值,35
+29,深渊,Abyss,main,6,True,4329,纵扫,sweepSkillIntensifyTechDatas,350,0,0,0,False,UT_Longitudinal_laser,深渊攻击力上升50%，激光改为纵向扫射。,深渊攻击力上升{0}%，激光改为纵向扫射。,50
+30,魔眼,Void eye,main,0,True,10230,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+30,魔眼,Void eye,main,1,True,230,能量护盾,energyShieldTechnologies,250,0,0,0,False,UT_Shield,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,
+30,魔眼,Void eye,main,2,True,10930,蓄能攻击,technologyDatas,100,0,0,0,False,UT_Charge_Shot,攻击力上升120%，攻击间隔增加25%,攻击力上升{0}%，攻击间隔增加{1}%,120;25
+30,魔眼,Void eye,main,3,True,4430,飞行模式,flyTechDatas,150,0,0,0,False,UT_Airplane_mode,魔眼变为可对空攻击的飞行单位，移动速度增加3，但射程减少15,魔眼变为可对空攻击的飞行单位，移动速度增加{1}，但射程减少{0},15;3
+30,魔眼,Void eye,main,4,False,330,能量汲取,lifestealTechnologies,50,0,0,0,False,UT_Life_Steal,生命值上升60%，将对敌人造成的伤害转换为自身的生命值,生命值上升{0}%，将对敌人造成的伤害转换为自身的生命值,60;
+30,魔眼,Void eye,main,5,False,180430,压制射击,buffTechnologies,100,0,0,0,False,UT_Range_interference,魔眼射程增加10，并且攻击会在3.5秒内减少目标的射程30%,魔眼射程增加{2}，并且攻击会在{0}秒内减少目标的射程{1}%,3.5;30;10
+30,魔眼,Void eye,main,6,False,180530,电磁装甲,buffTechnologies,300,0,0,0,False,UT_AntiEMP_armor,魔眼对攻击自己的敌人进行电磁干扰，使敌人的科技暂时失效，并且降低其移动速度降低40%，持续3秒,魔眼对攻击自己的敌人进行电磁干扰，使敌人的科技暂时失效，并且降低其移动速度降低{1}%，持续{0}秒,3;40
+31,磁暴,Vortex,main,0,True,10231,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+31,磁暴,Vortex,main,1,True,180931,移动电站,buffTechnologies,250,0,0,0,False,UT_Charge_Station,射程增加10，提升100米内地面友军单位30%的攻击力（效果不可叠加）。,射程增加{2}，提升{0}米内地面友军单位{1}%的攻击力（效果不可叠加）。,100;30;10
+31,磁暴,Vortex,main,2,True,4531,电磁云,secondaryDamageIntensifyTechDatas,400,0,0,0,False,UT_EMP_Splash,攻击对目标和目标周围10米内的敌方单位形成电磁干扰。,攻击对目标和目标周围{0}米内的敌方单位形成电磁干扰。,10
+31,磁暴,Vortex,main,3,True,123101,电磁双生,supportUnitTechnologies,350,0,0,0,False,UT_Holo_Partner,战斗开始时，在身后生成1个1级磁暴幻影。幻影的生命值为1，且攻击力为普通磁暴的30%。,战斗开始时，在身后生成{0}个{3}级磁暴幻影。幻影的生命值为{1}，且攻击力为普通磁暴的{2}%。,1;1;30;1
+31,磁暴,Vortex,main,4,False,493101,储能护盾,spawnAdvancedShieldTechDatas,300,0,0,0,False,UT_Summon_Barrier,攻击时在内部储能。每攻击5次，在当前位置部署一个半径40的护盾，且增加下次部署护盾所需攻击次数5。护盾基础生命值为2000，磁暴每提升一级增加2000。,攻击时在内部储能。每攻击{0}次，在当前位置部署一个半径{1}的护盾，且增加下次部署护盾所需攻击次数{3}。护盾基础生命值为{2}，磁暴每提升一级增加{2}。,5;40;2000;5
+31,磁暴,Vortex,main,5,False,631,并网,damageShareTechnologies,250,0,0,0,False,UT_Power_Link,与35米内的其他磁暴产生链接。每多一个互相链接的单位，攻击力上升35%，最大上升105%,与{1}米内的其他磁暴产生链接。每多一个互相链接的单位，攻击力上升{0}%，最大上升{2}%,35;35;105
+31,磁暴,Vortex,main,6,False,503101,应急装甲,stealthTechData,150,0,0,0,False,UT_Last_Defence,生命值首次低于50%时，启动应急装甲，抵抗所有伤害且无法被敌人锁定，持续4秒。生命值为0时无法启动应急装甲。,生命值首次低于{0}%时，启动应急装甲，抵抗所有伤害且无法被敌人锁定，持续{1}秒。生命值为{2}时无法启动应急装甲。,50;4;0
+31,磁暴,Vortex,main,7,False,931,战地维修,autoRecoveryTechnologies,150,0,0,0,False,UT_Auto_Recover,生命值上升30%，受伤后每秒自动恢复最大生命值的4.5%,生命值上升{0}%，受伤后每秒自动恢复最大生命值的{1}%,30;4.5
+51,试验级堡垒,,survive,0,True,180651,试验级单位,buffTechnologies,0,0,0,0,False,UT_Unstable,试验级单位无法稳定运行，战斗开始40秒后会开始自毁：每秒损失2%的生命值。,试验级单位无法稳定运行，战斗开始{0}秒后会开始自毁：每秒损失{1}%的生命值。,40;2
+51,试验级堡垒,,survive,1,True,1051,超级保护屏障,advancedEnergyShieldTechnologies,450,0,0,0,False,UT_Energy_Barrier,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加100000,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加{0},100000
+51,试验级堡垒,,survive,2,True,3051,超级装甲强化,armorStrengthenTechnologyDatas,450,0,0,0,False,UT_Armor_Strengthen,生命值增加35%，并且在受到攻击时阻挡200点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡200点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,200;35
+51,试验级堡垒,,survive,3,True,12051,弧光制造,supportUnitTechnologies,450,0,0,0,False,UT_hgzz,每8秒生产2个3级弧光，生产11次,每{0}秒生产{1}个3级弧光，生产{2}次,8;2;11
+51,试验级堡垒,,survive,4,True,11051,超级火箭弹幕,extraWeaponTechnologies,450,0,0,1,False,UT_Rockets,每10秒发射50枚火箭弹幕攻击敌人，每枚导弹造成600点伤害，射程200米,每{0}秒发射{1}枚火箭弹幕攻击敌人，每枚导弹造成{2}点伤害，射程{3}米,10;50;600;200
+51,试验级堡垒,,survive,5,True,180351,超级光子涂层,buffTechnologies,450,0,0,0,False,UT_Photon_Coating,每45秒全身覆盖光子涂层，25秒内受到的伤害降低30%，并且免疫电磁、引燃、酸液、退化光束效果,每{0}秒全身覆盖光子涂层，{1}秒内受到的伤害降低{2}%，并且免疫电磁、引燃、酸液、退化光束效果,45;25;30
+51,试验级堡垒,,survive,6,True,751,超级双发,multiAttackTechnologies,450,0,0,0,False,UT_Double_Shot,每次攻击连续发射2枚炮弹，且上弹时间会减少10%,每次攻击连续发射{0}枚炮弹，且上弹时间会减少{1}%,2;10
+51,试验级堡垒,,survive,7,True,10351,超级发射器过载,technologyDatas,450,0,0,0,False,UT_Overdrive,"试验级堡垒的攻击间隔减少50%,同时射程增加40米","试验级堡垒的攻击间隔减少{0}%,同时射程增加{1}米",50;40
+51,试验级堡垒,,survive,8,True,120511,尖牙制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Bot,每11秒生产18个尖牙，生产8次,每{0}秒生产{1}个尖牙，生产{2}次,11;18;8
+51,试验级堡垒,,survive,9,True,120512,弧光制造,supportUnitTechnologies,450,0,0,0,False,UT_hgzz,每8秒生产1个弧光，生产11次,每{0}秒生产{1}个弧光，生产{2}次,8;1;11
+52,试验级长弓,,survive,0,True,180652,试验级单位,buffTechnologies,0,0,0,0,False,UT_Unstable,试验级单位无法稳定运行，战斗开始40秒后会开始自毁：每秒损失2%的生命值。,试验级单位无法稳定运行，战斗开始{0}秒后会开始自毁：每秒损失{1}%的生命值。,40;2
+52,试验级长弓,,survive,1,True,10452,超级快速弹夹,technologyDatas,450,0,0,0,False,UT_Fast_Reload,试验级长弓的攻击速度大幅增加，但是每发子弹的伤害降低80%,试验级长弓的攻击速度大幅增加，但是每发子弹的伤害降低80%,
+52,试验级长弓,,survive,2,True,12052,超级射击小队,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Partner,每50秒生产1个与试验级长弓等级相同的长弓，生产2次,每{0}秒生产{1}个与试验级长弓等级相同的长弓，生产{2}次,50;1;2
+52,试验级长弓,,survive,3,True,104521,狙击模式,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加80,射程增加{0},80;
+52,试验级长弓,,survive,4,True,2452,超级重装锁定,searchTargetModifyTechnologies,450,0,0,1,False,UT_Heavy_Lock,在切换攻击目标时优先选择射程内生命值最高的敌方单位,在切换攻击目标时优先选择射程内生命值最高的敌方单位,
+52,试验级长弓,,survive,5,True,120521,尖牙制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Bot,每25秒生产9个尖牙，生产4次,每{0}秒生产{1}个尖牙，生产{2}次,25;9;4
+52,试验级长弓,,survive,6,True,120522,长弓制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Partner,每28秒生产1个长弓，生产3次,每{0}秒生产{1}个长弓，生产{2}次,28;1;3
+52,试验级长弓,,survive,7,True,1852,电磁弹,buffTechnologies,200,0,0,0,False,UT_EMP,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低40%,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低{0}%,40
+53,试验级火神,,survive,0,True,10153,超级突击模式,technologyDatas,450,0,0,0,False,UT_Assault_Mode,试验级火神生命值增加50%，移动速度增加10，溅射范围增加5米，但是射程减少45。,试验级火神生命值增加{0}%，移动速度增加{1}，溅射范围增加{2}米，但是射程减少{3}。,50;10;5;45
+53,试验级火神,,survive,1,True,2353,残骸利用,wreckageRecoveryTechnologies,450,0,0,0,False,UT_Debris_Utilization,击毁敌人后，恢复与敌人生命值相等的生命值,击毁敌人后，恢复与敌人生命值相等的生命值,
+53,试验级火神,,survive,2,True,180353,超级光子涂层,buffTechnologies,450,0,0,0,False,UT_Photon_Coating,每45秒全身覆盖光子涂层，25秒内受到的伤害降低30%，并且免疫电磁、引燃、酸液、退化光束效果,每{0}秒全身覆盖光子涂层，{1}秒内受到的伤害降低{2}%，并且免疫电磁、引燃、酸液、退化光束效果,45;25;30
+53,试验级火神,,survive,3,True,180253,超级引燃,buffTechnologies,450,0,0,0,False,UT_On_Fire,攻击会引燃目标单位，被引燃的单位每秒损失9%的生命值并且无法恢复生命，持续2秒,攻击会引燃目标单位，被引燃的单位每秒损失{0}%的生命值并且无法恢复生命，持续{1}秒,9;2
+53,试验级火神,,survive,4,True,10653,超级高温火焰,technologyDatas,450,0,0,0,False,UT_Hot_Flame,试验级火神的攻击力上升250%,试验级火神的攻击力上升{0}%,250
+54,丧钟,,survive,0,True,180654,试验级单位,buffTechnologies,0,0,0,0,False,UT_Unstable,试验级单位无法稳定运行，战斗开始40秒后会开始自毁：每秒损失2%的生命值。,试验级单位无法稳定运行，战斗开始{0}秒后会开始自毁：每秒损失{1}%的生命值。,40;2
+54,丧钟,,survive,1,True,11054,超级散射,extraWeaponTechnologies,450,0,0,1,False,UT_Energy_Scattering,熔点射程降低30米，但是可以发射15条射线进行攻击，每条射线造成原来6%的伤害。,熔点射程降低{0}米，但是可以发射{1}条射线进行攻击，每条射线造成原来{2}%的伤害。,30;15;6
+54,丧钟,,survive,2,True,110542,超级电磁轰炸,extraWeaponTechnologies,450,0,0,1,False,UT_EMP_Barrage,每13秒发射30枚电磁弹攻击敌人，每枚电磁弹对护盾造成4000点伤害，对命中的单位减速并且禁用科技15秒，射程200米,每{0}秒发射{1}枚电磁弹攻击敌人，每枚电磁弹对护盾造成{2}点伤害，对命中的单位减速并且禁用科技{3}秒，射程{4}米,13;30;4000;15;200
+54,丧钟,,survive,3,True,1054,超级保护屏障,advancedEnergyShieldTechnologies,450,0,0,0,False,UT_Energy_Barrier,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加100000,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加{0},100000
+54,丧钟,,survive,4,True,12054,生产钢球,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Steel Ball,每10秒生产2个钢球，生产9次,每{0}秒生产{1}个钢球，生产{2}次,10;2;9
+54,丧钟,,survive,5,True,10254,射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+54,丧钟,,survive,6,True,1803541,超级过载,buffTechnologies,450,0,0,0,False,UT_xzjc,开战30秒后，进入过载状态，移动速度提升150%，攻击间隔降低50%，并且免疫电磁、引燃、酸液、退化光束效果,开战{0}秒后，进入过载状态，移动速度提升{1}%，攻击间隔降低{2}%，并且免疫电磁、引燃、酸液、退化光束效果,30;150;50
+54,丧钟,,survive,7,True,120541,爬虫制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Spider,每10秒生产12个爬虫，生产9次,每{0}秒生产{1}个爬虫，生产{2}次,10;12;9
+55,试验级犀牛,,survive,0,True,28055,超级最后一击,deadExplosiveTechnologyDatas,450,0,0,0,True,UT_Last_Hit,试验级犀牛在生命值为0时会启动自毁装置，对60米内的所有单位造成等同于犀牛最大生命值的伤害。,试验级犀牛在生命值为0时会启动自毁装置，对{0}米内的所有单位造成等同于犀牛最大生命值的伤害。,60
+55,试验级犀牛,,survive,1,True,13055,超级机械分裂,deadSummonTechnologies,450,0,0,0,False,UT_Multiply,在试验级犀牛被击毁后，产生5个1级拥有最后一击的犀牛继续战斗,在试验级犀牛被击毁后，产生{0}个{1}级拥有最后一击的犀牛继续战斗,5;1;
+55,试验级犀牛,,survive,2,True,11055,烟雾弹投射,extraWeaponTechnologies,450,0,0,1,False,UT_Rockets,每20秒发射6枚烟雾弹,每{0}秒发射{1}枚烟雾弹,20;6
+55,试验级犀牛,,survive,3,True,110551,超级旋风斩,extraWeaponTechnologies,450,0,0,1,False,UT_Rotation,当周围有复数敌人时，犀牛使用旋风斩攻击周围的所有敌人，旋风斩造成犀牛攻击力的2倍伤害，但是耗时较长。,当周围有复数敌人时，犀牛使用旋风斩攻击周围的所有敌人，旋风斩造成犀牛攻击力的{0}倍伤害，但是耗时较长。,2
+55,试验级犀牛,,survive,4,True,180355,超级光子涂层,buffTechnologies,450,0,0,0,False,UT_Photon_Coating,全身覆盖光子涂层，在开战后的30秒内受到的伤害降低50%，并且免疫电磁、引燃、酸液、退化光束效果,全身覆盖光子涂层，在开战后的{0}秒内受到的伤害降低{1}%，并且免疫电磁、引燃、酸液、退化光束效果,30;50
+55,试验级犀牛,,survive,5,True,15055,应激反应,lifeBuffTechnologies,450,0,0,0,False,UT_yjfy,当试验级犀牛的生命值少于50%时，发出电磁冲击，在8秒内禁用周围敌人科技并降低周围敌人的移动速度和攻击力,当试验级犀牛的生命值少于{0}%时，发出电磁冲击，在8秒内禁用周围敌人科技并降低周围敌人的移动速度和攻击力,50
+56,试验级兵蜂,,survive,0,True,10206,射程强化,technologyDatas,300,0,0,0,False,UT_Attack_Range_Increase,提升攻击距离40,提升攻击距离{0},40;
+56,试验级兵蜂,,survive,1,True,10956,超级蓄能攻击,technologyDatas,450,0,0,0,False,UT_Charge_Shot,攻击力上升200%，射程增加20，攻击间隔增加35%,攻击力上升{0}%，射程增加{1}，攻击间隔增加{2}%,200;20;35
+56,试验级兵蜂,,survive,2,True,256,能量护盾,energyShieldTechnologies,450,0,0,0,False,UT_Shield,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,
+56,试验级兵蜂,,survive,3,True,456,超级高爆弹药,splashTechnologies,450,0,0,0,False,UT_Splash,试验级兵蜂的攻击可造成7米的溅射伤害,试验级兵蜂的攻击可造成{0}米的溅射伤害,7;0
+56,试验级兵蜂,,survive,4,True,1856,病毒弹药,buffTechnologies,450,0,0,0,False,UT_bddy,对命中的目标植入病毒，使目标科技将暂时失效，移动速度降低40%，攻击降低50%,对命中的目标植入病毒，使目标科技将暂时失效，移动速度降低{0}%，攻击降低{1}%,40;50
+56,试验级兵蜂,,survive,5,True,180673,试验级单位,buffTechnologies,0,0,0,0,False,UT_Unstable,试验级单位无法稳定运行，战斗开始40秒后会开始自毁：每秒损失2%的生命值。,试验级单位无法稳定运行，战斗开始{0}秒后会开始自毁：每秒损失{1}%的生命值。,40;2
+56,试验级兵蜂,,survive,6,True,10256,超级射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加60,射程增加{0},60;
+57,试验级野马,,survive,0,True,10257,超级射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加60,射程增加{0},60;
+57,试验级野马,,survive,1,True,357,超级能量汲取,lifestealTechnologies,450,0,0,0,False,UT_Life_Steal,生命值上升60%，将对敌人造成的伤害转换为自身的生命值,生命值上升{0}%，将对敌人造成的伤害转换为自身的生命值,60;
+57,试验级野马,,survive,2,True,457,超级高爆弹药,splashTechnologies,450,0,0,0,False,UT_Splash,试验级野马的攻击可造成7米的溅射伤害,试验级野马的攻击可造成{0}米的溅射伤害,7;0
+57,试验级野马,,survive,3,True,657,超级伤害分摊,damageShareTechnologies,450,0,0,0,False,UT_Life_Link,将相邻的试验级野马链接在一起，生命值增加200%，并且平分受到的伤害,将相邻的试验级野马链接在一起，生命值增加{0}%，并且平分受到的伤害,200
+57,试验级野马,,survive,4,True,1857,电磁弹,buffTechnologies,450,0,0,0,False,UT_EMP,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低40%,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低{0}%,40
+58,试验级钢球,,survive,0,True,12058,生产钢球,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Steel Ball,每8秒生产1个与试验级钢球等级相同的钢球，生产11次,每{0}秒生产{1}个与试验级钢球等级相同的钢球，生产{2}次,8;1;11
+58,试验级钢球,,survive,1,True,2458,超级重装锁定,searchTargetModifyTechnologies,450,0,0,1,False,UT_Heavy_Lock,攻击距离增加20，在切换攻击目标时优先选择射程内生命值最高的敌方单位,攻击距离增加{0}，在切换攻击目标时优先选择射程内生命值最高的敌方单位,20
+58,试验级钢球,,survive,2,True,13058,超级机械分裂,deadSummonTechnologies,450,0,0,0,False,UT_Multiply,在试验级钢球被击毁后，产生12个与试验级钢球等级相同的钢球继续战斗,在试验级钢球被击毁后，产生{0}个与试验级钢球等级相同的钢球继续战斗,12;1;
+58,试验级钢球,,survive,3,True,180358,超级光子投射,buffTechnologies,450,0,0,0,False,UT_Photon_Beam,开战后每15秒向周围100米范围内的友军投射光子涂层，使其在20秒内受到的伤害减低50%，并且免疫电磁、引燃、酸液、退化光束效果,开战后每{0}秒向周围{1}米范围内的友军投射光子涂层，使其在{2}秒内受到的伤害减低{3}%，并且免疫电磁、引燃、酸液、退化光束效果,15;100;20;50
+59,试验级尖牙,,survive,0,True,180259,超级引燃,buffTechnologies,450,0,0,0,False,UT_On_Fire,攻击会引燃目标单位，被引燃的单位每秒损失9%的生命值并且无法恢复生命，持续2秒,攻击会引燃目标单位，被引燃的单位每秒损失{0}%的生命值并且无法恢复生命，持续{1}秒,9;2
+59,试验级尖牙,,survive,1,True,10259,超级射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加60,射程增加{0},60;
+59,试验级尖牙,,survive,2,True,459,超级高爆弹药,splashTechnologies,450,0,0,0,False,UT_Splash,试验级尖牙的攻击可造成7米的溅射伤害,试验级尖牙的攻击可造成{0}米的溅射伤害,7;0
+59,试验级尖牙,,survive,3,True,259,能量护盾,energyShieldTechnologies,450,0,0,0,False,UT_Shield,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,
+59,试验级尖牙,,survive,4,True,180359,间歇过载,buffTechnologies,450,0,0,0,False,UT_xzjc,每10秒进入过载状态，5秒内攻击间隔降低80%，移动速度提升200%,每{0}秒进入过载状态，{1}秒内攻击间隔降低{2}%，移动速度提升{3}%,10;5;80;200
+59,试验级尖牙,,survive,5,True,180673,试验级单位,buffTechnologies,0,0,0,0,False,UT_Unstable,试验级单位无法稳定运行，战斗开始40秒后会开始自毁：每秒损失2%的生命值。,试验级单位无法稳定运行，战斗开始{0}秒后会开始自毁：每秒损失{1}%的生命值。,40;2
+59,试验级尖牙,,survive,6,True,12059,尖牙制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Bot,每30秒生产2个尖牙，生产3次,每{0}秒生产{1}个尖牙，生产{2}次,30;2;3
+60,试验级爬虫,,survive,0,True,660,超级伤害分摊,damageShareTechnologies,450,0,0,0,True,UT_Life_Link,将相邻的试验级爬虫链接在一起，生命值增加200%，并且平分受到的伤害,将相邻的试验级爬虫链接在一起，生命值增加{0}%，并且平分受到的伤害,200
+60,试验级爬虫,,survive,1,True,2660,超级潜地行动,burrowTechnologies,450,0,0,0,False,UT_Burrow,移动速度增加5，在30米内没有敌人时潜入地下，减免70%受到的伤害，在到达敌人附近时会钻出进行攻击,移动速度增加{0}，在{1}米内没有敌人时潜入地下，减免{2}%受到的伤害，在到达敌人附近时会钻出进行攻击,5;30;70
+60,试验级爬虫,,survive,2,True,2560,超级动力装甲,ignoreBuffEffectTechnologyDatas,450,0,0,0,False,UT_Speed_armor,生命值上升40%，并且无法被减速,生命值上升{0}%，并且无法被减速,40
+60,试验级爬虫,,survive,3,True,10560,超级机械狂暴,technologyDatas,450,0,0,0,False,UT_Rage,单位的移动速度提升10，攻击间隔减少0.5秒,单位的移动速度提升{0}，攻击间隔减少{1}秒,10;0.5
+60,试验级爬虫,,survive,4,True,460,爆炸钻头,splashTechnologies,450,0,0,0,False,UT_Attack_First,试验级爬虫钻头攻击将产生10米的溅射伤害，且攻击力提升200%,试验级爬虫钻头攻击将产生{0}米的溅射伤害，且攻击力提升{1}%,10;200
+61,试验级霸主,,survive,0,True,180661,试验级单位,buffTechnologies,0,0,0,0,False,UT_Unstable,试验级单位无法稳定运行，战斗开始40秒后会开始自毁：每秒损失2%的生命值。,试验级单位无法稳定运行，战斗开始{0}秒后会开始自毁：每秒损失{1}%的生命值。,40;2
+61,试验级霸主,,survive,1,True,11061,烟雾弹投射,extraWeaponTechnologies,450,0,0,1,False,UT_Rockets,每20秒发射20枚烟雾弹,每{0}秒发射{1}枚烟雾弹,20;20
+61,试验级霸主,,survive,2,True,1061,超级保护屏障,advancedEnergyShieldTechnologies,450,0,0,0,False,UT_Energy_Barrier,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加60000,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加{0},60000
+61,试验级霸主,,survive,3,True,12061,兵蜂制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Plane,每11秒生产6个兵蜂，生产8次,每{0}秒生产{1}个兵蜂，生产{2}次,11;6;8
+61,试验级霸主,,survive,4,True,12161,凤凰制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Phoenix,每8秒生产1个凤凰，生产11次,每{0}秒生产{1}个凤凰，生产{2}次,8;1;11
+61,试验级霸主,,survive,5,True,180361,超级光子投射,buffTechnologies,450,0,0,0,False,UT_Photon_Beam,开战后每45秒向周围100米范围内的友军(不包括自己)投射光子涂层，使其在20秒内受到的伤害减低30%，并且免疫电磁、引燃、酸液、退化光束效果,开战后每{0}秒向周围{1}米范围内的友军(不包括自己)投射光子涂层，使其在{2}秒内受到的伤害减低{3}%，并且免疫电磁、引燃、酸液、退化光束效果,45;100;20;30
+61,试验级霸主,,survive,6,True,110611,超级舰炮,extraWeaponTechnologies,450,0,0,1,False,UT_Shipboard_Srtillery,"为霸主加装两门超级舰炮，射程180,每3秒攻击一次，造成36000点伤害，伤害随着单位等级提高，每级增加36000点伤害","为霸主加装两门超级舰炮，射程{0},每{1}秒攻击一次，造成{2}点伤害，伤害随着单位等级提高，每级增加{2}点伤害",180;3;36000
+61,试验级霸主,,survive,7,True,10161,空中要塞,technologyDatas,450,0,0,0,False,UT_kzys,试验级霸主移动速度降低5，射程增加50，生命值增加100%,试验级霸主移动速度降低{0}，射程增加{1}，生命值增加{2}%,5;50;100
+61,试验级霸主,,survive,8,True,10261,超级射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加60,射程增加{0},60;
+61,试验级霸主,,survive,9,True,10361,超级发射器过载,technologyDatas,450,0,0,0,False,UT_Overdrive,试验级霸主的攻击间隔减少50%，射程增加20,试验级霸主的攻击间隔减少{0}%，射程增加{1},50;20
+62,试验级暴雨,,survive,0,True,180562,酸性攻击,buffTechnologies,450,0,0,0,False,UT_Corrosive_Virus,试验级暴雨的攻击会在命中点产生半径6米的酸液区域。酸液区域持续40秒，在酸液中的单位每秒损失3%的生命值，并且被攻击时受到250%的伤害。,试验级暴雨的攻击会在命中点产生半径{0}米的酸液区域。酸液区域持续{1}秒，在酸液中的单位每秒损失{2}%的生命值，并且被攻击时受到{3}%的伤害。,6;40;3;250;
+62,试验级暴雨,,survive,1,True,120621,尖牙制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Bot,每11秒生产9个尖牙，生产8次,每{0}秒生产{1}个尖牙，生产{2}次,11;9;8
+62,试验级暴雨,,survive,2,True,120622,爬虫制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Spider,每10秒生产6个爬虫，生产9次,每{0}秒生产{1}个爬虫，生产{2}次,10;6;9
+62,试验级暴雨,,survive,3,True,462,超级高爆弹药,splashTechnologies,450,0,0,0,False,UT_Splash,试验级暴雨的攻击可造成7米的溅射伤害,试验级暴雨的攻击可造成{0}米的溅射伤害,7;0
+62,试验级暴雨,,survive,4,True,10362,超级发射器过载,technologyDatas,450,0,0,0,False,UT_Overdrive,试验级暴雨的攻击间隔减少50%%,试验级暴雨的攻击间隔减少{0}%,50%;0
+63,试验级铁锤,,survive,0,True,463,超级高爆弹药,splashTechnologies,450,0,0,0,False,UT_Splash,试验级坦克的攻击可造成7米的溅射伤害,试验级坦克的攻击可造成{0}米的溅射伤害,7;0
+63,试验级铁锤,,survive,1,True,863,燃烧弹,fireIntensifyTechnologies,450,0,0,0,False,UT_Fire,单位的攻击会导致大面积地面燃烧，地面火焰持续15秒，燃烧范围11.5米，每秒造成270点伤害，对友军也会造成伤害,单位的攻击会导致大面积地面燃烧，地面火焰持续{0}秒，燃烧范围{1}米，每秒造成{2}点伤害，对友军也会造成伤害,15;11.5;270
+63,试验级铁锤,,survive,2,True,963,超级战地维修,autoRecoveryTechnologies,450,0,0,0,False,UT_Auto_Recover,生命值上升50%，受伤后每秒自动恢复最大生命值的4.5%,生命值上升{0}%，受伤后每秒自动恢复最大生命值的{1}%,50;4.5
+63,试验级铁锤,,survive,3,True,10263,超级射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加60,射程增加{0},60;
+63,试验级铁锤,,survive,4,True,1863,过载改装,buffTechnologies,450,0,0,0,False,UT_gzgz,开战后进入过载状态，30秒内攻击提升200%，攻击间隔降低50%,开战后进入过载状态，{2}秒内攻击提升{0}%，攻击间隔降低{1}%,200;50;30
+64,试验级骇客,,survive,0,True,110641,超级多重控制,extraWeaponTechnologies,450,0,0,1,False,UT_Multi-control,试验级骇客射程增加25米，同时发射5个控制光束，每个光束的控制效率是原来的17%,试验级骇客射程增加{0}米，同时发射{1}个控制光束，每个光束的控制效率是原来的{2}%,25;5;17
+64,试验级骇客,,survive,1,True,3164,防空弹药,airAttackTechnologyDatas,300,0,0,0,False,UT_Anti_Air_weapon,可以攻击空中单位,可以攻击空中单位,
+64,试验级骇客,,survive,2,True,110642,超级电磁轰炸,extraWeaponTechnologies,450,0,0,1,False,UT_EMP_Barrage,每13秒发射20枚电磁弹攻击敌人，每枚电磁弹对护盾造成4000点伤害，对命中的单位减速并且禁用科技15秒，射程200米,每{0}秒发射{1}枚电磁弹攻击敌人，每枚电磁弹对护盾造成{2}点伤害，对命中的单位减速并且禁用科技{3}秒，射程{4}米,13;20;4000;15;200
+64,试验级骇客,,survive,3,True,1064,超级保护屏障,advancedEnergyShieldTechnologies,450,0,0,0,False,UT_Energy_Barrier,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加50000,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加{0},50000
+64,试验级骇客,,survive,4,True,1764,强化控制,controllBeamLifeRecoveryTechnologies,450,0,0,0,False,UT_Control_Recovery,被试验级骇客控制的单位会立即恢复到最大生命值,被试验级骇客控制的单位会立即恢复到最大生命值,
+64,试验级骇客,,survive,5,True,1864,动能破坏,buffTechnologies,450,0,0,0,False,UT_dnph,被命中的单位动能系统瘫痪，无法移动,被命中的单位动能系统瘫痪，无法移动,
+64,试验级骇客,,survive,6,True,120641,爬虫制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Spider,每10秒生产12个爬虫，生产9次,每{0}秒生产{1}个爬虫，生产{2}次,10;12;9
+64,试验级骇客,,survive,7,True,120642,铁锤制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Sledgehammer,每8秒生产1个铁锤，生产11次,每{0}秒生产{1}个铁锤，生产{2}次,8;1;11
+65,试验级弧光,,survive,0,True,10365,蓄能激光,technologyDatas,450,0,0,0,False,UT_Charge_Shot,试验级弧光攻击间隔增加100%，溅射范围增加5，射程增加20，攻击力增加100%,试验级弧光攻击间隔增加{0}%，溅射范围增加{1}，射程增加{2}，攻击力增加{3}%,100;5;20;100
+65,试验级弧光,,survive,1,True,1865,电磁弹,buffTechnologies,450,0,0,0,False,UT_EMP,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低40%,对命中的目标形成电磁干扰，目标的单位科技将暂时失效，并且移动速度降低{0}%,40
+65,试验级弧光,,survive,2,True,180565,超级过载,buffTechnologies,450,0,0,0,False,UT_xzjc,开战30秒后，进入过载状态，攻击提升400%，并且每秒恢复4.5%最大生命值,开战{0}秒后，进入过载状态，攻击提升{1}%，并且每秒恢复{2}%最大生命值,30;400;4.5
+65,试验级弧光,,survive,3,True,3165,防空弹药,airAttackTechnologyDatas,300,0,0,0,False,UT_Anti_Air_weapon,可以攻击空中单位,可以攻击空中单位,
+65,试验级弧光,,survive,4,True,104651,狙击模式,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加80,射程增加{0},80;
+66,试验级凤凰,,survive,0,True,10466,超级发射器过载,technologyDatas,450,0,0,0,False,UT_Overdrive,试验级凤凰的攻击速度大幅增加，但射程减少20米，攻击力降低80%，,试验级凤凰的攻击速度大幅增加，但射程减少{0}米，攻击力降低80%，,20
+66,试验级凤凰,,survive,1,True,2966,超级量子重组,rebirthEffectTechologyDatas,450,0,0,0,False,UT_Rebirth,试验级凤凰被击毁后，驾驶舱会跟随在最近的己方试验级凤凰身后，并在20秒之后恢复为完整的试验级凤凰，每场战斗限3次,试验级凤凰被击毁后，驾驶舱会跟随在最近的己方试验级凤凰身后，并在{0}秒之后恢复为完整的试验级凤凰，每场战斗限{1}次,20;3
+66,试验级凤凰,,survive,2,True,266,能量护盾,energyShieldTechnologies,450,0,0,0,False,UT_Shield,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,获得一个能量护盾，护盾值等于自身的生命值，并且至少可以阻挡一次伤害,
+66,试验级凤凰,,survive,3,True,180166,寄生弹药,buffTechnologies,450,0,0,0,False,UT_jsdy,击毁敌人后，敌人的残骸上会生成为我方作战的爬虫,击毁敌人后，敌人的残骸上会生成为我方作战的爬虫,
+67,试验级战争工厂,,survive,0,True,12067,狂蝎制造,supportUnitTechnologies,450,0,0,0,False,UT_kxzz,每8.6秒生产1个狂蝎，生产10次,每{0}秒生产{1}个狂蝎，生产{2}次,8.6;1;10
+67,试验级战争工厂,,survive,1,True,12167,恶灵制造,supportUnitTechnologies,450,0,0,0,False,UT_elzz,每11秒生产1个恶灵，生产8次,每{0}秒生产{1}个恶灵，生产{2}次,11;1;8
+67,试验级战争工厂,,survive,2,True,12267,犀牛制造,supportUnitTechnologies,450,0,0,0,False,UT_xnzz,每10秒生产1个犀牛，生产9次,每{0}秒生产{1}个犀牛，生产{2}次,10;1;9
+67,试验级战争工厂,,survive,3,True,1803671,超级光子涂层,buffTechnologies,450,0,0,0,False,UT_Photon_Coating,开战后30秒内无法移动，免疫电磁、引燃、酸液、退化光束效果，每秒恢复1%最大生命值,开战后{0}秒内无法移动，免疫电磁、引燃、酸液、退化光束效果，每秒恢复{1}%最大生命值,30;1
+67,试验级战争工厂,,survive,4,True,1803672,超级过载,buffTechnologies,450,0,0,0,False,UT_xzjc,开战30秒后，进入过载状态，移动速度提升150%，攻击间隔降低50%，并且免疫电磁、引燃、酸液、退化光束效果,开战{0}秒后，进入过载状态，移动速度提升{1}%，攻击间隔降低{2}%，并且免疫电磁、引燃、酸液、退化光束效果,30;150;50
+67,试验级战争工厂,,survive,5,True,10267,超级射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加60,射程增加{0},60;
+68,试验级恶灵,,survive,0,True,180368,超级光子涂层,buffTechnologies,450,0,0,0,False,UT_Photon_Coating,全身覆盖光子涂层，在开战后的30秒内受到的伤害降低50%，并且免疫电磁、引燃、酸液、退化光束效果,全身覆盖光子涂层，在开战后的{0}秒内受到的伤害降低{1}%，并且免疫电磁、引燃、酸液、退化光束效果,30;50
+68,试验级恶灵,,survive,1,True,180468,超级退化光束,buffTechnologies,450,0,0,0,False,UT_Degenerate_Beam,向120米范围内的敌方单位发射退化光束，受影响的敌方单位移动速度下降40%，攻击力下降30%，无法使用科技，并且在受到攻击时额外承受30%的伤害。,向{0}米范围内的敌方单位发射退化光束，受影响的敌方单位移动速度下降{1}%，攻击力下降{2}%，无法使用科技，并且在受到攻击时额外承受{3}%的伤害。,120;40;30;30
+68,试验级恶灵,,survive,2,True,2368,残骸利用,wreckageRecoveryTechnologies,450,0,0,0,False,UT_Debris_Utilization,击毁敌人后，恢复与敌人生命值相等的生命值,击毁敌人后，恢复与敌人生命值相等的生命值,
+68,试验级恶灵,,survive,3,True,11068,酸液弹投射,extraWeaponTechnologies,450,0,0,1,False,UT_Rockets,每20秒发射6枚酸液弹,每{0}秒发射{1}枚酸液弹,20;6
+68,试验级恶灵,,survive,4,True,110681,浮游炮阵,extraWeaponTechnologies,450,0,0,1,False,UT_Matrix_Bombardment,试验级恶灵的浮游炮的数量从4门增加至8门。,试验级恶灵的浮游炮的数量从4门增加至{1}门。,3;8
+68,试验级恶灵,,survive,5,True,10268,超级射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加60,射程增加{0},60;
+69,试验级狂蝎,,survive,0,True,180669,试验级单位,buffTechnologies,0,0,0,0,False,UT_Unstable,试验级单位无法稳定运行，战斗开始40秒后会开始自毁：每秒损失2%的生命值。,试验级单位无法稳定运行，战斗开始{0}秒后会开始自毁：每秒损失{1}%的生命值。,40;2
+69,试验级狂蝎,,survive,1,True,1069,超级保护屏障,advancedEnergyShieldTechnologies,450,0,0,0,False,UT_Energy_Barrier,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加75000,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加{0},75000
+69,试验级狂蝎,,survive,2,True,12069,野马制造,supportUnitTechnologies,450,0,0,0,False,UT_ymzz,每13秒生产6个野马，生产7次,每{0}秒生产{1}个野马，生产{2}次,13;6;7
+69,试验级狂蝎,,survive,3,True,180569,酸性攻击,buffTechnologies,450,0,0,0,False,UT_Corrosive_Virus,试验级狂蝎的攻击会在命中点产生半径30米的酸液区域。酸液区域持续40秒，在酸液中的单位每秒损失3%的生命值，并且被攻击时受到250%的伤害。,试验级狂蝎的攻击会在命中点产生半径{0}米的酸液区域。酸液区域持续{1}秒，在酸液中的单位每秒损失{2}%的生命值，并且被攻击时受到{3}%的伤害。,30;40;3;250;
+69,试验级狂蝎,,survive,4,True,11069,超级火箭弹幕,extraWeaponTechnologies,450,0,0,1,False,UT_Rockets,每10秒发射35枚火箭弹幕攻击敌人，每枚导弹造成600点伤害，射程180米,每{0}秒发射{1}枚火箭弹幕攻击敌人，每枚导弹造成{2}点伤害，射程{3}米,10;35;600;180
+69,试验级狂蝎,,survive,5,True,10069,超级攻城模式,technologyDatas,450,0,0,0,False,UT_Projectile_Mode,试验级狂蝎进入攻城模式，射程增加100米，但无法攻击身边75米范围内的敌人。,试验级狂蝎进入攻城模式，射程增加{0}米，但无法攻击身边{2}米范围内的敌人。,100;0;75
+69,试验级狂蝎,,survive,6,True,120691,犀牛制造,supportUnitTechnologies,450,0,0,0,False,UT_xnzz,每26秒生产1个犀牛，生产4次,每{0}秒生产{1}个犀牛，生产{2}次,26;1;4
+70,试验级火獾,,survive,0,True,10270,超级射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加60,射程增加{0},60;
+70,试验级火獾,,survive,1,True,870,超级液态火,fireIntensifyTechnologies,450,0,0,0,False,UT_Fire,攻击会引燃目标周围20米的地面，地面火焰持续20秒，每秒造成270伤害。,攻击会引燃目标周围{0}米的地面，地面火焰持续{1}秒，每秒造成{2}伤害。,20;20;270
+70,试验级火獾,,survive,2,True,180270,超级引燃,buffTechnologies,450,0,0,0,False,UT_On_Fire,攻击会引燃目标单位，被引燃的单位每秒损失9%的生命值并且无法恢复生命，持续2秒,攻击会引燃目标单位，被引燃的单位每秒损失{0}%的生命值并且无法恢复生命，持续{1}秒,9;2
+70,试验级火獾,,survive,3,True,180370,超级光子涂层,buffTechnologies,450,0,0,0,False,UT_Photon_Coating,每45秒全身覆盖光子涂层，25秒内受到的伤害降低30%，并且免疫电磁、引燃、酸液、退化光束效果,每{0}秒全身覆盖光子涂层，{1}秒内受到的伤害降低{2}%，并且免疫电磁、引燃、酸液、退化光束效果,45;25;30
+70,试验级火獾,,survive,4,True,11070,防空导弹,extraWeaponTechnologies,450,0,0,1,False,UT_Rockets2,每1.4秒发射1枚导弹攻击空中目标，每枚导弹造成600伤害（单位每提升1级，伤害增加600），射程120米。,每{0}秒发射{1}枚导弹攻击空中目标，每枚导弹造成{2}伤害（单位每提升1级，伤害增加{2}），射程{3}米。,1.4;1;600;120
+71,试验级剑齿虎,,survive,0,True,10371,超级发射器过载,technologyDatas,450,0,0,0,False,UT_Overdrive,试验级剑齿虎的攻击间隔减少50%,试验级剑齿虎的攻击间隔减少{0}%,50;0
+71,试验级剑齿虎,,survive,1,True,10271,超级射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加60,射程增加{0},60;
+71,试验级剑齿虎,,survive,2,True,771,超级双发,multiAttackTechnologies,450,0,0,0,False,UT_Double_Shot,每次攻击连续发射2枚炮弹,每次攻击连续发射{0}枚炮弹,2
+71,试验级剑齿虎,,survive,3,True,10571,超级机械狂暴,technologyDatas,450,0,0,0,True,UT_Rage,单位的移动速度提升5，攻击间隔减少30%,单位的移动速度提升{0}，攻击间隔减少{1}%,5;30
+71,试验级剑齿虎,,survive,4,True,3371,超级导弹拦截,interceptMissileTechnologyDatas,450,0,0,0,False,UT_Missile_interception,尝试拦截150米内的敌方导弹（战场技能无法被拦截），拦截命中率不会下降。拦截能力与试验级剑齿虎的攻击力和等级无关。,尝试拦截{0}米内的敌方导弹（战场技能无法被拦截），拦截命中率不会下降。拦截能力与试验级剑齿虎的攻击力和等级无关。,150;
+71,试验级剑齿虎,,survive,5,True,3171,防空弹药,airAttackTechnologyDatas,300,0,0,0,False,UT_Anti_Air_weapon,可以攻击空中单位,可以攻击空中单位,
+72,试验级台风,,survive,0,True,180672,试验级单位,buffTechnologies,0,0,0,0,False,UT_Unstable,试验级单位无法稳定运行，战斗开始40秒后会开始自毁：每秒损失2%的生命值。,试验级单位无法稳定运行，战斗开始{0}秒后会开始自毁：每秒损失{1}%的生命值。,40;2
+72,试验级台风,,survive,1,True,10272,超级射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加60,射程增加{0},60;
+72,试验级台风,,survive,2,True,3272,超级防空专精,searchTargetSpecificDatas,450,0,0,0,False,UT_Anti_Air,对空中单位的攻击力增加90%，攻击空中单位时射程增加40,对空中单位的攻击力增加{0}%，攻击空中单位时射程增加{1},90;40;
+72,试验级台风,,survive,3,True,10572,超级机械狂暴,technologyDatas,450,0,0,0,False,UT_Rage,单位的移动速度提升2，攻击力增加100%,单位的移动速度提升{0}，攻击力增加{1}%,2;100
+72,试验级台风,,survive,4,True,10072,超级保护屏障,advancedEnergyShieldTechnologies,450,0,0,0,False,UT_Energy_Barrier,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加75000,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加{0},75000
+72,试验级台风,,survive,5,True,11072,超级追踪导弹,extraWeaponTechnologies,450,0,0,1,False,UT_Rockets,每4秒发射4枚追踪导弹攻击远处的敌人，每枚导弹造成675伤害（单位每提升1级，伤害增加675），最大射程180米，最小射程110米。,每{0}秒发射{1}枚追踪导弹攻击远处的敌人，每枚导弹造成{2}伤害（单位每提升1级，伤害增加{2}），最大射程{3}米，最小射程{4}米。,4;4;675;180;110
+72,试验级台风,,survive,6,True,120721,野马制造,supportUnitTechnologies,450,0,0,0,False,UT_ymzz,每10秒生产6个野马，生产9次,每{0}秒生产{1}个野马，生产{2}次,10;6;9
+72,试验级台风,,survive,7,True,120722,狂蝎制造,supportUnitTechnologies,450,0,0,0,False,UT_kxzz,每35秒生产1个狂蝎，生产3次,每{0}秒生产{1}个狂蝎，生产{2}次,35;1;3
+73,试验级沙虫,,survive,0,True,180673,试验级单位,buffTechnologies,0,0,0,0,False,UT_Unstable,试验级单位无法稳定运行，战斗开始40秒后会开始自毁：每秒损失2%的生命值。,试验级单位无法稳定运行，战斗开始{0}秒后会开始自毁：每秒损失{1}%的生命值。,40;2
+73,试验级沙虫,,survive,1,True,120173,爬虫制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Spider,每13秒生产18个爬虫，生产7次,每{0}秒生产{1}个爬虫，生产{2}次,13;18;7
+73,试验级沙虫,,survive,2,True,3173,对空,airAttackTechnologyDatas,300,0,0,0,False,UT_DuiKong,使试验级沙虫可以攻击空中目标。,使试验级沙虫可以攻击空中目标。,
+73,试验级沙虫,,survive,3,True,3673,超级复制,moveAbilitySummonTechDatas,450,0,0,0,False,UT_FuZhi,每次试验级沙虫钻出地面时，都会制造3个幼虫。,每次试验级沙虫钻出地面时，都会制造{0}个幼虫。,3
+73,试验级沙虫,,survive,4,True,3773,沙暴,moveAbilityRangeItemTechDatas,450,0,0,0,False,UT_ShaBao,沙虫钻出地面时，产生一个半径180米持续7秒的沙暴，沙暴内的单位：射程降低50%，遭到远程攻击时受到的伤害减少30%,沙虫钻出地面时，产生一个半径{0}米持续{1}秒的沙暴，沙暴内的单位：射程降低{2}%，遭到远程攻击时受到的伤害减少{3}%,180;7;50;30
+73,试验级沙虫,,survive,5,True,2373,残骸利用,wreckageRecoveryTechnologies,450,0,0,0,False,UT_Debris_Utilization,击毁敌人后，恢复与敌人生命值相等的生命值,击毁敌人后，恢复与敌人生命值相等的生命值,
+101,补给船,,survive,0,True,1051,超级保护屏障,advancedEnergyShieldTechnologies,450,0,0,0,False,UT_Energy_Barrier,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加100000,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加{0},100000
+101,补给船,,survive,1,True,3051,超级装甲强化,armorStrengthenTechnologyDatas,450,0,0,0,False,UT_Armor_Strengthen,生命值增加35%，并且在受到攻击时阻挡200点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡200点伤害。,生命值增加{1}%，并且在受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,200;35
+101,补给船,,survive,2,True,12051,弧光制造,supportUnitTechnologies,450,0,0,0,False,UT_hgzz,每8秒生产2个3级弧光，生产11次,每{0}秒生产{1}个3级弧光，生产{2}次,8;2;11
+101,补给船,,survive,3,True,11051,超级火箭弹幕,extraWeaponTechnologies,450,0,0,1,False,UT_Rockets,每10秒发射50枚火箭弹幕攻击敌人，每枚导弹造成600点伤害，射程200米,每{0}秒发射{1}枚火箭弹幕攻击敌人，每枚导弹造成{2}点伤害，射程{3}米,10;50;600;200
+101,补给船,,survive,4,True,180351,超级光子涂层,buffTechnologies,450,0,0,0,False,UT_Photon_Coating,每45秒全身覆盖光子涂层，25秒内受到的伤害降低30%，并且免疫电磁、引燃、酸液、退化光束效果,每{0}秒全身覆盖光子涂层，{1}秒内受到的伤害降低{2}%，并且免疫电磁、引燃、酸液、退化光束效果,45;25;30
+153,试验级火神B型,,survive,0,True,1806153,试验级单位,buffTechnologies,0,0,0,0,False,UT_Unstable,试验级单位无法稳定运行，战斗开始40秒后会开始自毁：每秒损失2%的生命值。,试验级单位无法稳定运行，战斗开始{0}秒后会开始自毁：每秒损失{1}%的生命值。,40;2
+153,试验级火神B型,,survive,1,True,1802153,超级引燃,buffTechnologies,450,0,0,0,False,UT_On_Fire,攻击会引燃目标单位，被引燃的单位每秒损失9%的生命值并且无法恢复生命，持续2秒,攻击会引燃目标单位，被引燃的单位每秒损失{0}%的生命值并且无法恢复生命，持续{1}秒,9;2
+153,试验级火神B型,,survive,2,True,102153,超级射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加60,射程增加{0},60;
+153,试验级火神B型,,survive,3,True,101531,超级保护屏障,advancedEnergyShieldTechnologies,450,0,0,0,False,UT_Energy_Barrier,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加100000,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加{0},100000
+153,试验级火神B型,,survive,4,True,110531,超级黏油弹,extraWeaponTechnologies,450,0,0,1,False,UT_Oil_Barrage,每10秒发射30个黏油弹，散布范围非常大,每{0}秒发射{1}个黏油弹，散布范围非常大,10;30
+153,试验级火神B型,,survive,5,True,110532,超级燃烧弹,extraWeaponTechnologies,450,0,0,1,False,UT_Flaming_Barrage,每10秒发射一批燃烧弹点燃远处敌人脚下的地面，燃烧弹的射程为180米，最小射程为40米,每{0}秒发射一批燃烧弹点燃远处敌人脚下的地面，燃烧弹的射程为{1}米，最小射程为{2}米,10;180;40
+153,试验级火神B型,,survive,6,True,31153,防空弹药,airAttackTechnologyDatas,300,0,0,0,False,UT_Anti_Air_weapon,可以攻击空中单位,可以攻击空中单位,
+153,试验级火神B型,,survive,7,True,1201531,兵蜂制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Plane,每11秒生产6个兵蜂，生产8次,每{0}秒生产{1}个兵蜂，生产{2}次,11;6;8
+153,试验级火神B型,,survive,8,True,1201532,恶灵制造,supportUnitTechnologies,450,0,0,0,False,UT_elzz,每28秒生产1个恶灵，生产3次,每{0}秒生产{1}个恶灵，生产{2}次,28;1;3
+153,试验级火神B型,,survive,9,True,1803153,超级光子涂层,buffTechnologies,450,0,0,0,False,UT_Photon_Coating,每45秒全身覆盖光子涂层，25秒内受到的伤害降低30%，并且免疫电磁、引燃、酸液、退化光束效果,每{0}秒全身覆盖光子涂层，{1}秒内受到的伤害降低{2}%，并且免疫电磁、引燃、酸液、退化光束效果,45;25;30
+167,试验级战争工厂,,survive,0,True,12067,狂蝎制造,supportUnitTechnologies,450,0,0,0,False,UT_kxzz,每8.6秒生产1个狂蝎，生产10次,每{0}秒生产{1}个狂蝎，生产{2}次,8.6;1;10
+167,试验级战争工厂,,survive,1,True,12167,恶灵制造,supportUnitTechnologies,450,0,0,0,False,UT_elzz,每11秒生产1个恶灵，生产8次,每{0}秒生产{1}个恶灵，生产{2}次,11;1;8
+167,试验级战争工厂,,survive,2,True,12267,犀牛制造,supportUnitTechnologies,450,0,0,0,False,UT_xnzz,每10秒生产1个犀牛，生产9次,每{0}秒生产{1}个犀牛，生产{2}次,10;1;9
+167,试验级战争工厂,,survive,3,True,1803671,超级光子涂层,buffTechnologies,450,0,0,0,False,UT_Photon_Coating,开战后30秒内无法移动，免疫电磁、引燃、酸液、退化光束效果，每秒恢复1%最大生命值,开战后{0}秒内无法移动，免疫电磁、引燃、酸液、退化光束效果，每秒恢复{1}%最大生命值,30;1
+167,试验级战争工厂,,survive,4,True,1803672,超级过载,buffTechnologies,450,0,0,0,False,UT_xzjc,开战30秒后，进入过载状态，移动速度提升150%，攻击间隔降低50%，并且免疫电磁、引燃、酸液、退化光束效果,开战{0}秒后，进入过载状态，移动速度提升{1}%，攻击间隔降低{2}%，并且免疫电磁、引燃、酸液、退化光束效果,30;150;50
+167,试验级战争工厂,,survive,5,True,10267,超级射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加60,射程增加{0},60;
+167,试验级战争工厂,,survive,6,True,1806167,试验级单位,buffTechnologies,0,0,0,0,False,UT_Unstable,试验级单位无法稳定运行，战斗开始40秒后会开始自毁：每秒损失2%的生命值。,试验级单位无法稳定运行，战斗开始{0}秒后会开始自毁：每秒损失{1}%的生命值。,40;2
+168,试验级恶灵,,survive,0,True,1806168,试验级单位,buffTechnologies,0,0,0,0,False,UT_Unstable,试验级单位无法稳定运行，战斗开始40秒后会开始自毁：每秒损失2%的生命值。,试验级单位无法稳定运行，战斗开始{0}秒后会开始自毁：每秒损失{1}%的生命值。,40;2
+168,试验级恶灵,,survive,1,True,102168,超级射程强化,technologyDatas,450,0,0,0,False,UT_Attack_Range_Increase,射程增加80,射程增加{0},80;
+168,试验级恶灵,,survive,2,True,110681,浮游炮阵,extraWeaponTechnologies,450,0,0,1,False,UT_Matrix_Bombardment,试验级恶灵的浮游炮的数量从4门增加至8门。,试验级恶灵的浮游炮的数量从4门增加至{1}门。,3;8
+168,试验级恶灵,,survive,3,True,1201681,爬虫制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Spider,每13秒生产12个爬虫，生产7次,每{0}秒生产{1}个爬虫，生产{2}次,13;12;7
+168,试验级恶灵,,survive,4,True,1201682,铁锤制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Sledgehammer,每4.8秒生产1个铁锤，生产17次,每{0}秒生产{1}个铁锤，生产{2}次,4.8;1;17
+168,试验级恶灵,,survive,5,True,1804168,超级退化光束,buffTechnologies,450,0,0,0,False,UT_Degenerate_Beam,向120米范围内的敌方单位发射退化光束，受影响的敌方单位移动速度下降40%，攻击力下降30%，无法使用科技，并且在受到攻击时额外承受30%的伤害。,向{0}米范围内的敌方单位发射退化光束，受影响的敌方单位移动速度下降{1}%，攻击力下降{2}%，无法使用科技，并且在受到攻击时额外承受{3}%的伤害。,120;40;30;30
+168,试验级恶灵,,survive,6,True,32168,超级防空专精,searchTargetSpecificDatas,450,0,0,0,False,UT_Anti_Air,对空中单位的攻击力增加90%，攻击空中单位时射程增加60,对空中单位的攻击力增加{0}%，攻击空中单位时射程增加{1},90;60;
+168,试验级恶灵,,survive,7,True,11068,酸液弹投射,extraWeaponTechnologies,450,0,0,1,False,UT_Rockets,每20秒发射6枚酸液弹,每{0}秒发射{1}枚酸液弹,20;6
+2001,丧钟,,special,0,True,1102001,能量散射,extraWeaponTechnologies,500,0,0,1,False,UT_Energy_Scattering,丧钟射程降低30米，但是可以发射15条射线进行攻击，每条射线造成原来6%的伤害。,丧钟射程降低{0}米，但是可以发射{1}条射线进行攻击，每条射线造成原来{2}%的伤害。,30;15;6
+2001,丧钟,,special,1,True,1022001,射程强化,technologyDatas,500,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+2001,丧钟,,special,2,True,1202001,钢球制造,supportUnitTechnologies,450,0,0,0,False,UT_Summon_Steel Ball,每6.5秒生产1个钢球，生产11次,每{0}秒生产{1}个钢球，生产{2}次,6.5;1;11
+2001,丧钟,,special,3,True,102001,保护屏障,advancedEnergyShieldTechnologies,700,0,0,0,False,UT_Energy_Barrier,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加120000,在单位身边生成一个大范围护盾，保护护盾内的所有友方，护盾生命值随着单位等级提高，每级增加{0},120000
+2001,丧钟,,special,4,True,32001,能量汲取,lifestealTechnologies,400,0,0,0,False,UT_Life_Steal,生命值上升60%，将对敌人造成的伤害转换为自身的生命值,生命值上升{0}%，将对敌人造成的伤害转换为自身的生命值,60;
+2001,丧钟,,special,5,True,11020012,电磁轰炸,extraWeaponTechnologies,500,0,0,1,False,UT_EMP_Barrage,每13秒发射30枚电磁弹攻击敌人，每枚电磁弹对护盾造成4000点伤害，对命中的单位减速并且禁用科技15秒，射程200米,每{0}秒发射{1}枚电磁弹攻击敌人，每枚电磁弹对护盾造成{2}点伤害，对命中的单位减速并且禁用科技{3}秒，射程{4}米,13;30;4000;15;200
+2002,泰山,Mountain,main,0,True,11020021,炮射火箭,extraWeaponTechnologies,400,0,0,1,False,UT_2ndweaponsB,从手臂上的巨炮发射火箭弹攻击敌人，每14秒发射一次，火箭弹的射程180米，对命中点半径15米内的敌人造成22500点伤害，伤害随着单位等级提高，每级增加22500点伤害,从手臂上的巨炮发射火箭弹攻击敌人，每{0}秒发射一次，火箭弹的射程{2}米，对命中点半径{3}米内的敌人造成{4}点伤害，伤害随着单位等级提高，每级增加{4}点伤害,14;1;180;15;22500
+2002,泰山,Mountain,main,1,True,302002,巨山装甲,armorStrengthenTechnologyDatas,400,0,0,0,False,UT_Fortress_armor,受到攻击时阻挡700点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡700点伤害。,受到攻击时阻挡{0}点伤害。伤害阻挡效果跟随等级提升，每级额外阻挡{0}点伤害。,700;0
+2002,泰山,Mountain,main,2,True,72002,饱和打击,multiAttackTechnologies,500,0,0,0,False,UT_Saturation_Attack,溅射范围增加3，每次攻击连续发射16枚炮弹，炮弹会在较大范围内散布，但是攻击间隔增加120%,溅射范围增加{2}，每次攻击连续发射{0}枚炮弹，炮弹会在较大范围内散布，但是攻击间隔增加{1}%,16;120;3
+2002,泰山,Mountain,main,3,True,1032002,增程炮弹,technologyDatas,400,0,0,0,False,UT_OTH_Strikes,射程增加160，但是攻击力下降75%,射程增加{0}，但是攻击力下降{1}%,160;75
+2002,泰山,Mountain,main,4,True,11020022,烟雾弹,extraWeaponTechnologies,350,0,0,1,False,UT_Smoke_Barrage,每25秒向敌人发射8枚烟雾弹，烟雾弹的射程为180米，最小射程为60米。在烟雾弹中的单位射程减少35%,每{0}秒向敌人发射{1}枚烟雾弹，烟雾弹的射程为{2}米，最小射程为{3}米。在烟雾弹中的单位射程减少{4}%,25;8;180;60;35
+2002,泰山,Mountain,main,5,True,18032002,光子循环,buffTechnologies,400,0,0,0,False,UT_Photon_cycle,每30秒全身覆盖光子涂层，25秒内受到的伤害降低30%，并且免疫电磁、引燃、酸液、退化光束效果,每{0}秒全身覆盖光子涂层，{1}秒内受到的伤害降低{2}%，并且免疫电磁、引燃、酸液、退化光束效果,30;25;30
+2002,泰山,Mountain,main,6,False,312002,防空弹药,airAttackTechnologyDatas,300,0,0,0,False,UT_Anti_Air_weapon,攻击力降低40%，使泰山可以攻击空中目标。,攻击力降低{0}%，使泰山可以攻击空中目标。,40
+2002,泰山,Mountain,main,7,False,1022002,射程强化,technologyDatas,500,0,0,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+4001,试验级丧钟,,special,0,True,11400101,激光试验,extraWeaponTechnologies,0,0,0,1,False,UT_Laser_Research,在丧钟的左、右、后侧分别增加1门激光武器。所有激光束造成的伤害均变为原本的25%,在丧钟的左、右、后侧分别增加{1}门激光武器。所有激光束造成的伤害均变为原本的{2}%,0;1;25
+4001,试验级丧钟,,special,1,True,1400101,射程强化,technologyDatas,0,0,11400101,0,False,UT_Attack_Range_Increase,射程增加40,射程增加{0},40;
+4001,试验级丧钟,,special,2,True,3400101,能量汲取,lifestealTechnologies,0,0,11400101,0,False,UT_Laser_LifeSteal,生命值上升100%，将对敌人造成的伤害转换为自身的生命值,生命值上升{0}%，将对敌人造成的伤害转换为自身的生命值,100;
+4001,试验级丧钟,,special,3,True,11400102,极限散射,extraWeaponTechnologies,0,0,11400101,1,False,UT_Laser_Matrix,射程降低25米，但额外发射15道激光束，每道激光束造成原本8%的伤害。,射程降低{0}米，但额外发射{1}道激光束，每道激光束造成原本{2}%的伤害。,25;15;8
+4001,试验级丧钟,,special,4,True,1400104,热能扩散,technologyDatas,0,0,11400101,0,False,UT_Laser_Splash,激光束的溅射半径增加6。,激光束的溅射半径增加{0}。,6
+4001,试验级丧钟,,special,5,True,11400103,弹幕试验,extraWeaponTechnologies,0,0,0,1,False,UT_Rockets,每15秒发射20枚导弹，导弹射程140米，溅射半径7.5米。每枚导弹造成800点伤害，该伤害随单位等级提升，每级增加800点。,每{0}秒发射{1}枚导弹，导弹射程{3}米，溅射半径{4}米。每枚导弹造成{2}点伤害，该伤害随单位等级提升，每级增加{2}点。,15;20;800;140;7.5
+4001,试验级丧钟,,special,6,True,1400103,增程导弹,technologyDatas,0,0,11400103,0,False,UT_Rocket_Range,导弹的射程增加60。,导弹的射程增加{0}。,60;
+4001,试验级丧钟,,special,7,True,1400102,快速装弹,technologyDatas,0,0,11400103,0,False,UT_Rocket_Reload,导弹的发射间隔缩短6秒。,导弹的发射间隔缩短{0}秒。,6
+4001,试验级丧钟,,special,8,True,7400201,弹舱扩容,multiAttackTechnologies,0,0,11400103,0,False,UT_Full_launch,每次发射的导弹数量增加 15。,每次发射的导弹数量增加 {0}。,15
+4001,试验级丧钟,,special,9,True,18400101,电磁弹,buffTechnologies,0,0,11400103,0,False,UT_Rocket_EMP,导弹对命中的目标造成电磁干扰，使其科技失效且移动速度降低40%，持续15秒。,导弹对命中的目标造成电磁干扰，使其科技失效且移动速度降低{0}%，持续{1}秒。,40;15
+4001,试验级丧钟,,special,10,True,10400101,护盾试验,advancedEnergyShieldTechnologies,0,0,0,0,False,UT_Energy_Barrier,在丧钟周围展开一个半径80的护盾。护盾生命值随单位等级提升，每级增加25000点。,在丧钟周围展开一个半径{0}的护盾。护盾生命值随单位等级提升，每级增加{1}点。,80;25000
+4001,试验级丧钟,,special,11,True,48400103,协同火控,advancedShieldTechnologies,0,0,10400101,0,False,UT_Barrier_Radar,护盾存在时，丧钟及护盾内的友方单位射程增加20。,护盾存在时，丧钟及护盾内的友方单位射程增加{0}。,20
+4001,试验级丧钟,,special,12,True,48400101,广域投射,advancedShieldTechnologies,0,0,10400101,0,False,UT_Barrier_Expand,护盾半径增加50，护盾生命值每级额外增加25000点。,护盾半径增加{1}，护盾生命值每级额外增加{0}点。,25000;50
+4001,试验级丧钟,,special,13,True,48400102,护盾充能,advancedShieldTechnologies,0,0,10400101,0,False,UT_Barrier_Recover,护盾每秒恢复2000点，每级额外增加2000点。,护盾每秒恢复{0}点，每级额外增加{0}点。,2000
+4001,试验级丧钟,,special,14,True,48400104,护盾重启,advancedShieldTechnologies,0,0,10400101,0,False,UT_Barrier_Recharge,护盾被击破后会在25秒后重新启动。,护盾被击破后会在{0}秒后重新启动。,25
+4001,试验级丧钟,,special,15,True,12400101,复制试验,supportUnitTechnologies,0,0,0,0,False,UT_Copy_Deathknell,战斗开始时，生成1个1级无科技的丧钟复制体。,战斗开始时，生成{0}个{1}级无科技的丧钟复制体。,1;1;0
+4001,试验级丧钟,,special,16,True,12400104,复制体增程,supportUnitTechnologies,0,0,12400101,0,False,Copy_Range,所有复制体的射程增加20,所有复制体的射程增加{0},20
+4001,试验级丧钟,,special,17,True,12400102,完美复制,supportUnitTechnologies,0,0,12400101,0,False,Copy_Perfect,复制体继承本体的等级和科技（复制类科技除外）。,复制体继承本体的等级和科技（复制类科技除外）。,
+4001,试验级丧钟,,special,18,True,12400103,批量复制,supportUnitTechnologies,0,0,12400101,0,False,Copy_More,战斗开始时，额外生成1个复制体，但所有复制体的生命值降低 50%。,战斗开始时，额外生成{0}个复制体，但所有复制体的生命值降低 {1}%。,1;50
+4001,试验级丧钟,,special,19,True,12400105,预备队,supportUnitTechnologies,0,0,12400101,0,False,UT_Copy_Extra,战斗开始30秒后，额外生成1个复制体。,战斗开始{0}秒后，额外生成{1}个复制体。,30;1
