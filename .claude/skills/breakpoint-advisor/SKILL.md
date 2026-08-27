@@ -27,11 +27,14 @@ The first run builds; later ones are instant. `--help` prints the full surface.
 | "у меня атака 1" / "I have attack 2" | `--attack 1`, `--attack 2` |
 | "у него уже хп" | `--vs-hp 1` |
 | "я на fortified" / "он на cost control" | `--fortified mine`, `--cost-control vs` |
+| "я на воздушном спеке" / "he's on air spec" | `--air-spec mine` — +13% attack and hp, air units only |
 | "покажи всё" / "дай побольше" | `-n 30`, or `--all` for the uncapped list |
 
 Two rules the tool enforces, so do not fight them:
 
 - Only the **next** buy on each ladder is advised on — Attack2 needs Attack1 first.
+- One spec to a side and one side to a spec: `--fortified`, `--cost-control` and
+  `--air-spec` cannot name the same side as each other.
 - A side with no units named is the **whole roster**, not an empty board. If the user
   names units without saying whose they are, put them on both sides with `--units`.
 
