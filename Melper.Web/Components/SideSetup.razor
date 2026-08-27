@@ -1,0 +1,324 @@
+@using System.Text.Json
+@using Melper.ViewModel
+@inject IJSRuntime JS
+
+@* The shared head of every page that calculates one side against another: which units the
+   two sides are, and the attack and hp technologies and the specs they own. Extracted so
+   the pages cannot drift apart - a page's own toggles go below this, not into it. *@
+<UnitPicker @ref="_picker" OnChanged="OnSelectionChanged"/>
+
+<button type="button" class="btn btn-outline-secondary mt-3"
+        title="Empties both halves and puts every technology and spec back to No"
+        @onclick="Reset">
+    Reset
+</button>
+
+<hr class="my-4"/>
+
+<div class="row g-4">
+    @foreach (var side in Sides)
+    {
+        @* Widths the three level buttons stay on one line at: four cards to a row needs
+           the large breakpoint, and two of them need more than a phone is wide. *@
+        <div class="col-12 col-sm-6 col-lg-3">
+            <label class="form-label fw-semibold">@side.Label</label>
+            <div class="card">
+                <div class="card-body py-2">
+                    @* One group per track rather than a tick per tier: the tiers are a ladder,
+                       so one level says what is owned and there is no prerequisite to keep
+                       in step behind the click. *@
+                    @foreach (var track in Tracks)
+                    {
+                        var current = track.Get(side.Config);
+                        <div class="mb-2">
+                            <div class="small text-body-secondary">@track.Label</div>
+                            <div class="btn-group btn-group-sm w-100" role="group"
+                                 aria-label="@side.Label @track.Label">
+                                @foreach (var level in Levels)
+                                {
+                                    <button type="button"
+                                            class="btn @(current == level ? "btn-secondary" : "btn-outline-secondary")"
+                                            @onclick="() => SetLevel(track, side.Config, level)">
+                                        @LevelLabel(level)
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @* The two specs are one control rather than two ticks: a side runs one
+                       of them at most, and no two sides run the same one - both rules are
+                       the shape of a single group of buttons instead of a check to undo
+                       after a click. *@
+                    @{
+                        var spec = Spec(side.Config);
+                    }
+                    <div class="mb-2">
+                        <div class="small text-body-secondary">Spec</div>
+                        <div class="btn-group btn-group-sm w-100 flex-wrap" role="group"
+                             aria-label="@side.Label Spec">
+                            <button type="button"
+                                    class="btn @(spec is null ? "btn-secondary" : "btn-outline-secondary")"
+                                    @onclick="() => SetSpec(side.Config, null)">
+                                No
+                            </button>
+                            @foreach (var perk in Perks)
+                            {
+                                <button type="button"
+                                        class="btn @(ReferenceEquals(spec, perk) ? "btn-secondary" : "btn-outline-secondary")"
+                                        @onclick="() => SetSpec(side.Config, perk)">
+                                    @perk.Label
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Summary is not null)
+    {
+        <div class="col-12 col-md-6">
+            @Summary
+        </div>
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// Everything the head holds, handed over as one thing: a page calculates off the
+    /// selection and the two configs together, so it is never given half of them.
+    /// </summary>
+    public sealed record State(UnitSelection Selection, BreakPointSideConfig Left, BreakPointSideConfig Right);
+
+    private sealed record Side(string Label, BreakPointSideConfig Config);
+
+    /// <summary>
+    /// A ladder of technologies read and written as one level, so the tier-2 prerequisite
+    /// rule is the shape of the control rather than something to enforce after a click.
+    /// </summary>
+    private sealed record Track(
+        string Label,
+        Func<BreakPointSideConfig, int> Get,
+        Action<BreakPointSideConfig, int> Set);
+
+    /// <summary>
+    /// One of the specs a side can run. Held one at a time and one to a spec across the
+    /// two sides, so what a side has is a choice between these rather than a tick each.
+    /// </summary>
+    private sealed record Perk(
+        string Label,
+        Func<BreakPointSideConfig, bool> Get,
+        Action<BreakPointSideConfig, bool> Set);
+
+    /// <summary>
+    /// Raised once the stored configs and patterns have been read, and after every edit
+    /// here. A page must not calculate before the first of those - what it holds until
+    /// then is the defaults, not what the user last set.
+    /// </summary>
+    [Parameter]
+    public EventCallback<State> OnChanged { get; set; }
+
+    /// <summary>
+    /// Raised by Reset before anything is stored, for a page to put its own toggles back
+    /// to their defaults: they live in the same stored config, so clearing them here means
+    /// the one save below covers them too.
+    /// </summary>
+    [Parameter]
+    public EventCallback<State> OnReset { get; set; }
+
+    /// <summary>Whatever the page has to say about the result, laid out beside the cards.</summary>
+    [Parameter]
+    public RenderFragment? Summary { get; set; }
+
+    private static readonly Track[] Tracks =
+    [
+        new("Attack",
+            side => side.Attack2 ? 2 : side.Attack1 ? 1 : 0,
+            (side, level) =>
+            {
+                side.Attack1 = level >= 1;
+                side.Attack2 = level >= 2;
+            }),
+        new("Hp",
+            side => side.Hp2 ? 2 : side.Hp1 ? 1 : 0,
+            (side, level) =>
+            {
+                side.Hp1 = level >= 1;
+                side.Hp2 = level >= 2;
+            }),
+    ];
+
+    private static readonly Perk[] Perks =
+    [
+        new("Cost control", side => side.CostControl, (side, has) => side.CostControl = has),
+        new("Fortified", side => side.Fortified, (side, has) => side.Fortified = has),
+        new("AirSpec", side => side.AirSpec, (side, has) => side.AirSpec = has),
+    ];
+
+    private static readonly int[] Levels = [0, 1, 2];
+
+    /// <summary>Shared by every page that reads a side, so what a side owns is stated once.</summary>
+    private const string LeftConfigKey = "BreakPointSideConfig:left";
+
+    private const string RightConfigKey = "BreakPointSideConfig:right";
+
+    private UnitPicker? _picker;
+
+    private BreakPointSideConfig _left = new();
+    private BreakPointSideConfig _right = new();
+    private UnitSelection _selection = UnitSelection.Everything;
+
+    // Recreated on every config load so the markup binds to the live objects.
+    private Side[] Sides => [new("Unit owns", _left), new("Vs owns", _right)];
+
+    /// <summary>
+    /// Whether the stored configs are in place. A page is never handed half-loaded state:
+    /// what it does with it is calculate, and doing that off the defaults first would put
+    /// numbers on screen that nothing on it explains.
+    /// </summary>
+    private bool _loaded;
+
+    /// <summary>A selection that arrived before the configs did, still owed to the page.</summary>
+    private bool _owed;
+
+    /// <summary>
+    /// Read before the first render, so the buttons never paint the defaults and the page
+    /// is only ever handed the stored state. Safe this early because the app is a
+    /// standalone WebAssembly one - there is no prerender pass without a browser to ask.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        _left = await LoadConfig(LeftConfigKey) ?? _left;
+        _right = await LoadConfig(RightConfigKey) ?? _right;
+        _loaded = true;
+
+        if (_owed) await Notify();
+    }
+
+    /// <summary>
+    /// The picker reads its stored patterns on the first render and says so, which is
+    /// what first hands the page a state to calculate off - configs included, since the
+    /// load above finishes first. Should the two ever land the other way round, the page
+    /// waits for the configs rather than being told twice.
+    /// </summary>
+    private Task OnSelectionChanged(UnitSelection selection)
+    {
+        _selection = selection;
+
+        if (_loaded) return Notify();
+
+        _owed = true;
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Puts every technology and spec back to No and empties both halves of the picker.
+    /// The picker's own change event is what tells the page to rebuild, so nothing is
+    /// raised here beyond the page's chance to clear its own toggles first.
+    /// </summary>
+    private async Task Reset()
+    {
+        foreach (var side in Sides)
+        {
+            foreach (var track in Tracks)
+            {
+                track.Set(side.Config, 0);
+            }
+
+            foreach (var perk in Perks)
+            {
+                perk.Set(side.Config, false);
+            }
+        }
+
+        await OnReset.InvokeAsync(Current());
+        await SaveConfigs();
+
+        if (_picker is null)
+        {
+            await Notify();
+            return;
+        }
+
+        await _picker.ResetToNone();
+    }
+
+    private static string LevelLabel(int level) => level == 0 ? "No" : $"Lvl {level}";
+
+    private Task SetLevel(Track track, BreakPointSideConfig side, int level)
+    {
+        track.Set(side, level);
+        return OnConfigChanged();
+    }
+
+    /// <summary>
+    /// What a side is running, or null for neither. A side can arrive holding both, from
+    /// an older build that wrote a tick each with no rule between them - it reads as the
+    /// first, and the next click here writes a legal state. Nothing is normalised on
+    /// load: that would rewrite stored state unasked.
+    /// </summary>
+    private static Perk? Spec(BreakPointSideConfig side) =>
+        Perks.FirstOrDefault(perk => perk.Get(side));
+
+    /// <summary>
+    /// Gives <paramref name="side"/> exactly <paramref name="perk"/>, and takes that same
+    /// perk off the other side - one spec to a side, and one side to a spec.
+    /// </summary>
+    private Task SetSpec(BreakPointSideConfig side, Perk? perk)
+    {
+        var other = ReferenceEquals(side, _left) ? _right : _left;
+
+        foreach (var candidate in Perks)
+        {
+            var picked = ReferenceEquals(candidate, perk);
+            candidate.Set(side, picked);
+
+            if (picked) candidate.Set(other, false);
+        }
+
+        return OnConfigChanged();
+    }
+
+    /// <summary>
+    /// Stores the configs and tells the page, for an edit a page made to its own toggles
+    /// on the shared config - the ones below this head, which write the same two keys.
+    /// </summary>
+    public Task NotifyConfigEdited() => OnConfigChanged();
+
+    private async Task OnConfigChanged()
+    {
+        await SaveConfigs();
+        await Notify();
+    }
+
+    private State Current() => new(_selection, _left, _right);
+
+    private Task Notify() => OnChanged.InvokeAsync(Current());
+
+    private async Task SaveConfigs()
+    {
+        await SaveConfig(LeftConfigKey, _left);
+        await SaveConfig(RightConfigKey, _right);
+    }
+
+    private async Task SaveConfig(string key, BreakPointSideConfig config) =>
+        await JS.InvokeVoidAsync("localStorage.setItem", key, JsonSerializer.Serialize(config));
+
+    private async Task<BreakPointSideConfig?> LoadConfig(string key)
+    {
+        var json = await JS.InvokeAsync<string?>("localStorage.getItem", key);
+        if (string.IsNullOrEmpty(json)) return null;
+
+        try
+        {
+            return JsonSerializer.Deserialize<BreakPointSideConfig>(json);
+        }
+        catch (JsonException)
+        {
+            // Older builds stored "[object Object]" here.
+            return null;
+        }
+    }
+}

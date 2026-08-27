@@ -1,106 +1,59 @@
 @page "/breakpoints"
-@using System.Text.Json
 @using Melper.Core
 @using Melper.Core.Buffs
-@using Melper.Core.Extensions
 @using Melper.Core.Services
 @using Melper.Data
 @using Melper.ViewModel
-@inject IJSRuntime JS
 
 <PageTitle>Breakpoints calculations</PageTitle>
 
-<div class="row">
-    <div class="col-3">
-        <p>main</p>
-        <EditForm Model="@left">
-            <label>
-                <InputCheckbox @bind-Value="left.Attack1" @bind-Value:after="OnConfigChanged"/>
-                Attack1
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="left.Attack2" @bind-Value:after="@(async () => await OnAttack2Changed(left))"/>
-                Attack2
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="left.Hp1" @bind-Value:after="OnConfigChanged"/>
-                Hp1
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="left.Hp2" @bind-Value:after="@(async () => await OnHp2Changed(left))"/>
-                Hp2
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="left.HasteModule" @bind-Value:after="OnConfigChanged"/>
-                HasteModule
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="left.HeavyArmor" @bind-Value:after="OnConfigChanged"/>
-                HeavyArmor
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="left.CostControl" @bind-Value:after="OnConfigChanged"/>
-                CostControl
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="left.Fortified" @bind-Value:after="OnConfigChanged"/>
-                Fortified
-            </label><br/>
-            <label>
-                Lvls <input type="number" class="form-control" @bind="left.Lvls" @bind:after="OnConfigChanged"/>
-            </label>
-        </EditForm>
-    </div>
-    <div class="col-3">
-        <p>vs</p>
-        <EditForm Model="@right">
-            <label>
-                <InputCheckbox @bind-Value="right.Attack1" @bind-Value:after="OnConfigChanged"/>
-                Attack1
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="right.Attack2" @bind-Value:after="@(async () => await OnAttack2Changed(right))"/>
-                Attack2
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="right.Hp1" @bind-Value:after="OnConfigChanged"/>
-                Hp1
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="right.Hp2" @bind-Value:after="@(async () => await OnHp2Changed(right))"/>
-                Hp2
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="left.HasteModule" @bind-Value:after="OnConfigChanged"/>
-                HasteModule
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="right.HeavyArmor" @bind-Value:after="OnConfigChanged"/>
-                HeavyArmor
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="right.CostControl" @bind-Value:after="OnConfigChanged"/>
-                CostControl
-            </label><br/>
-            <label>
-                <InputCheckbox @bind-Value="right.Fortified" @bind-Value:after="OnConfigChanged"/>
-                Fortified
-            </label><br/>
-            <label>
-                Lvls <input type="number" class="form-control" @bind="right.Lvls" @bind:after="OnConfigChanged"/>
-            </label>
-        </EditForm>
-    </div>
-    <div class="col-3">
-        <label class="form-label">Main filter</label>
-        <input class="form-control" @bind="mainNameFilter" @bind:event="oninput"
-               @bind:after="OnMainNameFilterChanged"/>
-        <label class="form-label">Vs filter</label>
-        <input class="form-control" @bind="vsNameFilter" @bind:event="oninput"
-               @bind:after="OnVsNameFilterChanged"/>
-        <p class="mt-2 text-muted small">@rows.Count rows</p>
-    </div>
+@* The same head as the Advisor page, down to the same component: which units the two sides
+   are, and the attack and hp technologies and the specs they own. What only this page can
+   do with a side goes below it. *@
+<SideSetup @ref="setup" OnChanged="OnSetupChanged" OnReset="OnReset">
+    <Summary>
+        <p class="mt-2 mb-0 text-body-secondary small">
+            @rows.Count rows
+        </p>
+    </Summary>
+</SideSetup>
+
+@* The rest of what a side can own here. Kept apart from the head's cards rather than added
+   to them: these move the numbers on this page only, and the Advisor deliberately leaves
+   them out of its own arithmetic. *@
+<div class="row g-4 mt-1">
+    @foreach (var side in Sides)
+    {
+        <div class="col-12 col-sm-6 col-lg-3">
+            <label class="form-label fw-semibold">@side.Label</label>
+            <div class="card">
+                <div class="card-body py-2">
+                    @foreach (var module in Modules)
+                    {
+                        var id = $"{side.Key}-{Slug(module.Label)}";
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="@id"
+                                   checked="@module.Get(side.Config)"
+                                   @onchange="e => SetModule(module, side.Config, e)"/>
+                            <label class="form-check-label" for="@id">@module.Label</label>
+                        </div>
+                    }
+
+                    @* How many levels of each unit the grid holds, which is what makes it
+                       hundreds of thousands of cells rather than thousands. *@
+                    <label class="form-label small text-body-secondary mt-2 mb-1" for="@($"{side.Key}-lvls")">
+                        Levels
+                    </label>
+                    <input type="number" min="1" class="form-control form-control-sm"
+                           id="@($"{side.Key}-lvls")"
+                           @bind="side.Config.Lvls" @bind:after="OnConfigChanged"/>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+<hr class="my-4"/>
 
 @* <table class="table table-bordered table-sm"> *@
 @*     <thead> *@
@@ -271,13 +224,31 @@
         public required BreakPointsResults[] ByBuff { get; init; }
     }
 
-    private const string LeftConfigKey = "BreakPointSideConfig:left";
-    private const string RightConfigKey = "BreakPointSideConfig:right";
+    /// <summary>One of this page's own per-side toggles, which the head knows nothing about.</summary>
+    private sealed record Module(
+        string Label,
+        Func<BreakPointSideConfig, bool> Get,
+        Action<BreakPointSideConfig, bool> Set);
+
+    private sealed record Side(string Key, string Label, BreakPointSideConfig Config);
+
+    /// <summary>A label as an id a label element can point at - ids hold no whitespace.</summary>
+    private static string Slug(string label) => label.Replace(' ', '-').ToLowerInvariant();
+
+    private static readonly Module[] Modules =
+    [
+        new("Haste module", side => side.HasteModule, (side, has) => side.HasteModule = has),
+        new("Heavy armor", side => side.HeavyArmor, (side, has) => side.HeavyArmor = has),
+    ];
+
+    SideSetup? setup;
 
     BreakPointSideConfig left = new();
     BreakPointSideConfig right = new();
-    string mainNameFilter = "";
-    string vsNameFilter = "";
+    UnitSelection selection = UnitSelection.Everything;
+
+    // Recreated on every config load so the markup binds to the live objects.
+    private Side[] Sides => [new("left", "Unit also owns", left), new("right", "Vs also owns", right)];
 
     // Sorting state
     string sortBuffKey = "";
@@ -301,17 +272,15 @@
         new AmpCoreBuff(),
     ];
 
-    protected override void OnInitialized() => Recalculate();
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    /// <summary>
+    /// Raised once the head has read the stored patterns and technologies, and after every
+    /// edit to either. Nothing is calculated before it: the grid is the whole roster
+    /// squared, so building one off the defaults first would be the expensive half of the
+    /// page thrown away.
+    /// </summary>
+    private void OnSetupChanged(SideSetup.State state)
     {
-        if (!firstRender) return;
-
-        mainNameFilter = await LoadString("mainNameFilter") ?? "";
-        vsNameFilter = await LoadString("vsNameFilter") ?? "";
-        left = await LoadConfig(LeftConfigKey) ?? left;
-        right = await LoadConfig(RightConfigKey) ?? right;
-
+        (selection, left, right) = state;
         Recalculate();
         StateHasChanged();
     }
@@ -344,6 +313,22 @@
     }
 
     /// <summary>
+    /// What a side comes to, folded once for the whole grid. Two sets of numbers rather
+    /// than one because the air specialist is the only spec that does not reach the whole
+    /// side - a row picks its half by the unit it is about.
+    /// </summary>
+    private static SideBuffs Aggregates(BreakPointSideConfig side)
+    {
+        var buffs = BuildBuffs(side);
+        var ground = BuffAggregates.From(buffs);
+
+        if (side.AirSpec == false) return SideBuffs.Flat(ground);
+
+        buffs.Add(new AirSpecBuff());
+        return new SideBuffs(ground, BuffAggregates.From(buffs));
+    }
+
+    /// <summary>
     /// What taking <paramref name="buff"/> costs the side in one step. A tier-2 buff can't
     /// be taken without its tier-1 prerequisite, so when that prerequisite isn't owned yet
     /// its increase is part of the step too — same rule <see cref="BuildBuffs"/> applies.
@@ -372,15 +357,16 @@
             .ToList();
 
         // Fold each side's buffs down once, instead of re-running the LINQ per cell.
-        var mainAggregates = BuffAggregates.From(BuildBuffs(left));
-        var vsAggregates = BuffAggregates.From(BuildBuffs(right));
+        var mainSide = Aggregates(left);
+        var vsSide = Aggregates(right);
 
         // What each column's buff actually adds on top of what main already owns —
         // folded once here, since it depends on the config and not on the unit pair.
         var candidateIncreases = buffsToShow.Select(x => CandidateIncrease(x, left)).ToArray();
 
-        var mains = ExpandLevels(mainNameFilter, left.Lvls);
-        var opponents = ExpandLevels(vsNameFilter, right.Lvls);
+        var roster = UnitsCollection.Units;
+        var mains = ExpandLevels(selection.Mains(roster), left.Lvls);
+        var opponents = ExpandLevels(selection.Opponents(roster), right.Lvls);
 
         var built = new List<RowItem>(mains.Count * opponents.Count);
         foreach (var main in mains)
@@ -388,6 +374,11 @@
             foreach (var vs in opponents)
             {
                 if (main.CanAttackAir == false && vs.IsAir) continue;
+
+                // Each side's numbers only ever meet its own unit, so the air half is
+                // picked here and the calculator stays a pair of flat aggregates.
+                var mainAggregates = mainSide.For(main);
+                var vsAggregates = vsSide.For(vs);
 
                 var byBuff = new BreakPointsResults[buffsToShow.Count];
                 for (var i = 0; i < buffsToShow.Count; i++)
@@ -413,9 +404,9 @@
         ApplySort();
     }
 
-    private static List<Unit> ExpandLevels(string nameFilter, int lvls) =>
-        UnitsCollection.Units
-            .Where(x => x.Name.PassesFilter(nameFilter))
+    /// <summary>One row per level a unit can be at, up to what the side asks for.</summary>
+    private static List<Unit> ExpandLevels(IEnumerable<Unit> units, int lvls) =>
+        units
             .SelectMany(x => Enumerable.Range(1, Math.Max(lvls, 1)).Select(lvl => x with { Level = lvl }))
             .ToList();
 
@@ -462,62 +453,33 @@
         rows = (sortDesc ? ordered.ThenByDescending(selector) : ordered.ThenBy(selector)).ToList();
     }
 
+    private Task SetModule(Module module, BreakPointSideConfig side, ChangeEventArgs e)
+    {
+        module.Set(side, e.Value is true);
+        return OnConfigChanged();
+    }
+
     /// <summary>
-    /// A tier-2 buff can't be taken without its tier-1 prerequisite, so ticking Attack2
-    /// ticks Attack1 too when it isn't owned yet. Unticking Attack1 is left alone —
-    /// <see cref="BuildBuffs"/> still adds the prerequisite to the calculation.
+    /// These toggles live in the same stored config the head owns, so it does the saving
+    /// and hands the state back - which is what recalculates the grid.
     /// </summary>
-    private async Task OnAttack2Changed(BreakPointSideConfig side)
+    private Task OnConfigChanged() => setup?.NotifyConfigEdited() ?? Task.CompletedTask;
+
+    /// <summary>
+    /// The head's Reset clears the technologies and the units; this page's own toggles are
+    /// on screen beside them, so they go back to their defaults with them. Nothing is saved
+    /// or recalculated here - the head does both once, after this.
+    /// </summary>
+    private void OnReset(SideSetup.State state)
     {
-        if (side.Attack2) side.Attack1 = true;
-        await OnConfigChanged();
-    }
-
-    /// <inheritdoc cref="OnAttack2Changed"/>
-    private async Task OnHp2Changed(BreakPointSideConfig side)
-    {
-        if (side.Hp2) side.Hp1 = true;
-        await OnConfigChanged();
-    }
-
-    private async Task OnConfigChanged()
-    {
-        await SaveConfig(LeftConfigKey, left);
-        await SaveConfig(RightConfigKey, right);
-        Recalculate();
-    }
-
-    private async Task OnMainNameFilterChanged()
-    {
-        await JS.InvokeVoidAsync("localStorage.setItem", "mainNameFilter", mainNameFilter ?? "");
-        Recalculate();
-    }
-
-    private async Task OnVsNameFilterChanged()
-    {
-        await JS.InvokeVoidAsync("localStorage.setItem", "vsNameFilter", vsNameFilter ?? "");
-        Recalculate();
-    }
-
-    private async Task<string?> LoadString(string key) =>
-        await JS.InvokeAsync<string?>("localStorage.getItem", key);
-
-    private async Task SaveConfig(string key, BreakPointSideConfig config) =>
-        await JS.InvokeVoidAsync("localStorage.setItem", key, JsonSerializer.Serialize(config));
-
-    private async Task<BreakPointSideConfig?> LoadConfig(string key)
-    {
-        var json = await LoadString(key);
-        if (string.IsNullOrEmpty(json)) return null;
-
-        try
+        foreach (var side in new[] { state.Left, state.Right })
         {
-            return JsonSerializer.Deserialize<BreakPointSideConfig>(json);
-        }
-        catch (JsonException)
-        {
-            // Older builds stored "[object Object]" here.
-            return null;
+            foreach (var module in Modules)
+            {
+                module.Set(side, false);
+            }
+
+            side.Lvls = new BreakPointSideConfig().Lvls;
         }
     }
 

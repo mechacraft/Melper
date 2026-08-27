@@ -49,10 +49,12 @@ var suggestions = BreakpointAdvisor.Suggest(
     vsUnits,
     BreakpointAdvisor.Aggregates(
         options.Attack, options.Hp,
-        options.CostControl == SpecOwner.Mine, options.Fortified == SpecOwner.Mine),
+        options.CostControl == SpecOwner.Mine, options.Fortified == SpecOwner.Mine,
+        options.AirSpec == SpecOwner.Mine),
     BreakpointAdvisor.Aggregates(
         options.VsAttack, options.VsHp,
-        options.CostControl == SpecOwner.Vs, options.Fortified == SpecOwner.Vs),
+        options.CostControl == SpecOwner.Vs, options.Fortified == SpecOwner.Vs,
+        options.AirSpec == SpecOwner.Vs),
     candidates);
 
 // The tail that only banks the technology's own percentage is dropped rather than ranked
@@ -139,7 +141,8 @@ string Json() => JsonSerializer.Serialize(
             Attack = options.Attack,
             Hp = options.Hp,
             Fortified = options.Fortified == SpecOwner.Mine,
-            CostControl = options.CostControl == SpecOwner.Mine
+            CostControl = options.CostControl == SpecOwner.Mine,
+            AirSpec = options.AirSpec == SpecOwner.Mine
         },
         Vs = new
         {
@@ -147,7 +150,8 @@ string Json() => JsonSerializer.Serialize(
             Attack = options.VsAttack,
             Hp = options.VsHp,
             Fortified = options.Fortified == SpecOwner.Vs,
-            CostControl = options.CostControl == SpecOwner.Vs
+            CostControl = options.CostControl == SpecOwner.Vs,
+            AirSpec = options.AirSpec == SpecOwner.Vs
         },
         Candidates = candidates.Select(x => new { x.Name, Kind = x.Kind.ToString(), x.Increase }),
         Total = suggestions.Count,
@@ -188,6 +192,7 @@ string Owned(int attack, int hp, SpecOwner side)
     if (hp > 0) has.Add($"hp lvl {hp}");
     if (options.Fortified == side) has.Add("fortified");
     if (options.CostControl == side) has.Add("cost control");
+    if (options.AirSpec == side) has.Add("air spec");
 
     return has.Count == 0 ? "no upgrades" : string.Join(", ", has);
 }
@@ -236,6 +241,7 @@ internal partial class Program
           --vs-hp <0|1|2>
           --fortified <mine|vs|none>      who is running the spec      (default none)
           --cost-control <mine|vs|none>   one spec to a side, and one side to a spec
+          --air-spec <mine|vs|none>       +13% attack and hp, air units only
 
         Output:
           -n, --top <count>     how many lines to print                (default 15)

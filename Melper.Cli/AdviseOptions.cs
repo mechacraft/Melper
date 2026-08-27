@@ -39,6 +39,12 @@ public sealed class AdviseOptions
     public SpecOwner CostControl { get; private set; }
 
     /// <summary>
+    /// The air specialist. Unlike the other two it only reaches a side's air units, so a
+    /// side running it is two sets of numbers rather than one.
+    /// </summary>
+    public SpecOwner AirSpec { get; private set; }
+
+    /// <summary>
     /// How many lines to read out. Fifteen is about as much as is worth hearing in one
     /// go; <see cref="All"/> lifts the cap.
     /// </summary>
@@ -134,6 +140,9 @@ public sealed class AdviseOptions
                 case "--cost-control":
                     options.CostControl = options.Owner(name, value);
                     break;
+                case "--air-spec":
+                    options.AirSpec = options.Owner(name, value);
+                    break;
 
                 case "--top" or "-n":
                     if (int.TryParse(value, out var top) && top > 0)
@@ -154,10 +163,24 @@ public sealed class AdviseOptions
         }
 
         // One spec to a side and one side to a spec, the rule the web page's controls have
-        // built into their shape. Here it has to be checked, since both flags are free.
-        if (options.Fortified != SpecOwner.None && options.Fortified == options.CostControl)
+        // built into their shape. Here it has to be checked, since every flag is free.
+        var specs = new (string Flag, SpecOwner Owner)[]
         {
-            options.Problems.Add("--fortified and --cost-control cannot both be on the same side");
+            ("--fortified", options.Fortified),
+            ("--cost-control", options.CostControl),
+            ("--air-spec", options.AirSpec)
+        };
+
+        for (var i = 0; i < specs.Length; i++)
+        {
+            for (var j = i + 1; j < specs.Length; j++)
+            {
+                if (specs[i].Owner != SpecOwner.None && specs[i].Owner == specs[j].Owner)
+                {
+                    options.Problems.Add(
+                        $"{specs[i].Flag} and {specs[j].Flag} cannot both be on the same side");
+                }
+            }
         }
 
         return options;

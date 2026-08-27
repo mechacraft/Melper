@@ -10,5 +10,8 @@ public class BreakPointSideConfig
     public bool HeavyArmor { get; set; }
     public bool CostControl { get; set; }
     public bool Fortified { get; set; }
+
+    /// <summary>The air specialist: it reaches the side's air units and nothing else.</summary>
+    public bool AirSpec { get; set; }
     public int Lvls { get; set; } = 2;
 }

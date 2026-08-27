@@ -21,6 +21,23 @@ public readonly record struct BuffAggregates(double DamageMul, int DamageIncreas
         buffs.Sum(x => x.HpIncrease));
 }
 
+/// <summary>
+/// What one side owns, in the two shapes it comes in. Every spec but the air one reaches
+/// the whole side, so the two halves are usually the same numbers; the air specialist
+/// reaches only the air half, and a unit reads whichever half it belongs to through
+/// <see cref="For"/>. Kept as a pair rather than folded per unit because the buffs never
+/// change while a grid is being built and the grid holds hundreds of thousands of cells.
+/// </summary>
+public readonly record struct SideBuffs(BuffAggregates Ground, BuffAggregates Air)
+{
+    public static readonly SideBuffs None = new(BuffAggregates.None, BuffAggregates.None);
+
+    /// <summary>The same numbers for every unit - what a side with no air specialist comes to.</summary>
+    public static SideBuffs Flat(BuffAggregates all) => new(all, all);
+
+    public BuffAggregates For(Unit unit) => unit.IsAir ? Air : Ground;
+}
+
 public class BreakPointsCalculator
 {
     public static BreakPointsResults Calculate(

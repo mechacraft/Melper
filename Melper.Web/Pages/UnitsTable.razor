@@ -51,7 +51,7 @@
                 }
                 <div class="mb-2">
                     <div class="small text-body-secondary">Spec</div>
-                    <div class="btn-group btn-group-sm w-100" role="group" aria-label="Spec">
+                    <div class="btn-group btn-group-sm w-100 flex-wrap" role="group" aria-label="Spec">
                         <button type="button"
                                 class="btn @(spec is null ? "btn-secondary" : "btn-outline-secondary")"
                                 @onclick="() => SetSpec(null)">
@@ -181,6 +181,7 @@
     [
         new("Cost control", side => side.CostControl, (side, has) => side.CostControl = has),
         new("Fortified", side => side.Fortified, (side, has) => side.Fortified = has),
+        new("AirSpec", side => side.AirSpec, (side, has) => side.AirSpec = has),
     ];
 
     private static readonly int[] Levels = [0, 1, 2];
@@ -322,7 +323,7 @@
     private void Rebuild()
     {
         var buffs = Aggregates(_config);
-        Units = UnitsCollection.Units.Select(x => new UnitViewModel(x, buffs)).ToList();
+        Units = UnitsCollection.Units.Select(x => new UnitViewModel(x, buffs.For(x))).ToList();
     }
 
     /// <summary>
@@ -330,7 +331,7 @@
     /// from the Breakpoints page; folding those in here would move the numbers with nothing
     /// on screen to explain why.
     /// </summary>
-    private static BuffAggregates Aggregates(BreakPointSideConfig side)
+    private static SideBuffs Aggregates(BreakPointSideConfig side)
     {
         var buffs = new List<IBuff>();
 
@@ -341,7 +342,14 @@
         if (side.CostControl) buffs.Add(new CostControlBuff());
         if (side.Fortified) buffs.Add(new FortifiedBuff());
 
-        return BuffAggregates.From(buffs);
+        var ground = BuffAggregates.From(buffs);
+
+        // The air specialist is the one spec that does not reach the whole side, so the
+        // rows read whichever half they belong to rather than one set of numbers.
+        if (side.AirSpec == false) return SideBuffs.Flat(ground);
+
+        buffs.Add(new AirSpecBuff());
+        return new SideBuffs(ground, BuffAggregates.From(buffs));
     }
 
     private static string LevelLabel(int level) => level == 0 ? "No" : $"Lvl {level}";

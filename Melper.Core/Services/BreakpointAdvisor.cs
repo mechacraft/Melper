@@ -145,9 +145,12 @@ public static class BreakpointAdvisor
     /// technology worth proportionally less, so it moves the order of the list as well as
     /// the counts. Cost control moves the counts alone: it is a multiplier, and a multiplier
     /// sits outside the increase the scoring divides by, so it cancels out of what a buy
-    /// is worth.
+    /// is worth. The air specialist does what Fortified does to both tracks at once, but
+    /// only to the side's air units - which is why this comes back as a
+    /// <see cref="SideBuffs"/> pair rather than one set of numbers for the whole side.
     /// </summary>
-    public static BuffAggregates Aggregates(int attackLevel, int hpLevel, bool costControl, bool fortified)
+    public static SideBuffs Aggregates(
+        int attackLevel, int hpLevel, bool costControl, bool fortified, bool airSpec = false)
     {
         var buffs = new List<IBuff>();
 
@@ -158,7 +161,12 @@ public static class BreakpointAdvisor
         if (costControl) buffs.Add(new CostControlBuff());
         if (fortified) buffs.Add(new FortifiedBuff());
 
-        return BuffAggregates.From(buffs);
+        var ground = BuffAggregates.From(buffs);
+
+        if (airSpec == false) return SideBuffs.Flat(ground);
+
+        buffs.Add(new AirSpecBuff());
+        return new SideBuffs(ground, BuffAggregates.From(buffs));
     }
 
     /// <summary>
@@ -169,8 +177,8 @@ public static class BreakpointAdvisor
     public static List<BreakpointSuggestion> Suggest(
         IEnumerable<Unit> mains,
         IReadOnlyCollection<Unit> opponents,
-        BuffAggregates mainBuffs,
-        BuffAggregates vsBuffs,
+        SideBuffs mainBuffs,
+        SideBuffs vsBuffs,
         IReadOnlyList<UpgradeCandidate> candidates)
     {
         var found = new List<BreakpointSuggestion>();
@@ -179,6 +187,13 @@ public static class BreakpointAdvisor
         {
             foreach (var vs in opponents)
             {
+                // Which half of each side's numbers this pairing is fought with. Only the
+                // air specialist ever makes the two halves differ, and each side's numbers
+                // only ever meet its own unit, so resolving here is enough for the
+                // calculator to stay a pair of flat aggregates.
+                var mainAggregates = mainBuffs.For(main);
+                var vsAggregates = vsBuffs.For(vs);
+
                 // The two kinds have their own reach test, and they are not the same one:
                 // a ground unit cannot shoot a Wasp, but the Wasp still shoots it, so its
                 // hp advice stands even though its attack advice is meaningless. The same
@@ -209,7 +224,7 @@ public static class BreakpointAdvisor
                     }
 
                     var calc = BreakPointsCalculator.Calculate(
-                        main, vs, mainBuffs, vsBuffs,
+                        main, vs, mainAggregates, vsAggregates,
                         isAttack ? candidate.Increase : 0,
                         isAttack ? 0 : candidate.Increase);
 
@@ -236,7 +251,7 @@ public static class BreakpointAdvisor
                         bestLive = after;
                     }
 
-                    var owned = isAttack ? mainBuffs.DamageIncrease : mainBuffs.HpIncrease;
+                    var owned = isAttack ? mainAggregates.DamageIncrease : mainAggregates.HpIncrease;
                     var flat = (100d + owned + candidate.Increase) / (100d + owned);
 
                     found.Add(new BreakpointSuggestion(main, vs, candidate, before, after, flat));

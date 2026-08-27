@@ -21,7 +21,7 @@ public class BreakpointAdvisorTests
         IReadOnlyCollection<Unit> mains,
         IReadOnlyCollection<Unit> opponents,
         IReadOnlyList<UpgradeCandidate> candidates) =>
-        BreakpointAdvisor.Suggest(mains, opponents, BuffAggregates.None, BuffAggregates.None, candidates);
+        BreakpointAdvisor.Suggest(mains, opponents, SideBuffs.None, SideBuffs.None, candidates);
 
     private static readonly UpgradeCandidate Attack = new("Attack1", UpgradeKind.Attack, 12);
     private static readonly UpgradeCandidate Hp = new("Hp1", UpgradeKind.Hp, 15);
@@ -159,9 +159,9 @@ public class BreakpointAdvisorTests
         var main = MakeUnit("main", damage: 100, health: 1000);
         var vs = MakeUnit("vs", damage: 0, health: 250);
 
-        var owned = new BuffAggregates(1d, 12, 1d, 0);
+        var owned = SideBuffs.Flat(new BuffAggregates(1d, 12, 1d, 0));
         var found = BreakpointAdvisor.Suggest(
-            [main], [vs], owned, BuffAggregates.None,
+            [main], [vs], owned, SideBuffs.None,
             [new UpgradeCandidate("Attack2", UpgradeKind.Attack, 24)]);
 
         var only = Assert.Single(found);
@@ -169,6 +169,49 @@ public class BreakpointAdvisorTests
         Assert.Equal(2, only.After);           // ceil(250 / 136)
         Assert.Equal(136 / 112d, only.Flat, 6);
         Assert.Equal(1.5 / (136 / 112d), only.Score, 6);
+    }
+
+    [Fact]
+    public void Aggregates_GivesTheAirSpecialistToTheAirHalfOnly()
+    {
+        var owned = BreakpointAdvisor.Aggregates(
+            attackLevel: 0, hpLevel: 0, costControl: false, fortified: false, airSpec: true);
+
+        var ground = MakeUnit("ground", damage: 100, health: 1000);
+        var air = MakeUnit("air", damage: 100, health: 1000) with { IsAir = true };
+
+        Assert.Equal(0, owned.For(ground).DamageIncrease);
+        Assert.Equal(0, owned.For(ground).HpIncrease);
+        Assert.Equal(13, owned.For(air).DamageIncrease);
+        Assert.Equal(13, owned.For(air).HpIncrease);
+    }
+
+    [Fact]
+    public void Suggest_MeasuresAnAirMainAgainstItsOwnSpecialist()
+    {
+        // The specialist has already lifted the air unit's damage to 113, so the next
+        // attack technology is worth proportionally less than it would be without it -
+        // and the ground unit beside it is untouched.
+        var ground = MakeUnit("ground", damage: 100, health: 1000);
+        var air = MakeUnit("air", damage: 100, health: 1000) with { IsAir = true, CanAttackAir = true };
+        var vs = MakeUnit("vs", damage: 0, health: 1000);
+
+        var owned = BreakpointAdvisor.Aggregates(
+            attackLevel: 0, hpLevel: 0, costControl: false, fortified: false, airSpec: true);
+
+        var found = BreakpointAdvisor.Suggest(
+            [ground, air], [vs], owned, SideBuffs.None,
+            [new UpgradeCandidate("Attack1", UpgradeKind.Attack, 12)]);
+
+        var forGround = Assert.Single(found, x => x.Main.Name == "ground");
+        Assert.Equal(10, forGround.Before);     // ceil(1000 / 100)
+        Assert.Equal(9, forGround.After);       // ceil(1000 / 112)
+        Assert.Equal(112 / 100d, forGround.Flat, 6);
+
+        var forAir = Assert.Single(found, x => x.Main.Name == "air");
+        Assert.Equal(9, forAir.Before);         // ceil(1000 / 113)
+        Assert.Equal(8, forAir.After);          // ceil(1000 / 125)
+        Assert.Equal(125 / 113d, forAir.Flat, 6);
     }
 
     [Fact]

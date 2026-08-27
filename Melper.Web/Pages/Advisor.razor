@@ -1,89 +1,16 @@
 @page "/advisor"
-@using System.Text.Json
 @using Melper.Core.Buffs
 @using Melper.Core.Services
 @using Melper.Data
 @using Melper.ViewModel
-@inject IJSRuntime JS
 
 <PageTitle>Advisor</PageTitle>
 
-<UnitPicker @ref="_picker" OnChanged="OnSelectionChanged"/>
-
-<button type="button" class="btn btn-outline-secondary mt-3"
-        title="Empties both halves and puts every technology and spec back to No"
-        @onclick="Reset">
-    Reset
-</button>
-
-<hr class="my-4"/>
-
 @* The attack and hp technologies, which the advice is about, and the specs, which move the
    stats it is measured against. The rest of the Breakpoints page's toggles are deliberately
-   not repeated here. *@
-<div class="row g-4">
-    @foreach (var side in Sides)
-    {
-        @* Widths the three level buttons stay on one line at: four cards to a row needs
-           the large breakpoint, and two of them need more than a phone is wide. *@
-        <div class="col-12 col-sm-6 col-lg-3">
-            <label class="form-label fw-semibold">@side.Label</label>
-            <div class="card">
-                <div class="card-body py-2">
-                    @* One group per track rather than a tick per tier: the tiers are a ladder,
-                       so one level says what is owned and there is no prerequisite to keep
-                       in step behind the click. *@
-                    @foreach (var track in Tracks)
-                    {
-                        var current = track.Get(side.Config);
-                        <div class="mb-2">
-                            <div class="small text-body-secondary">@track.Label</div>
-                            <div class="btn-group btn-group-sm w-100" role="group"
-                                 aria-label="@side.Label @track.Label">
-                                @foreach (var level in Levels)
-                                {
-                                    <button type="button"
-                                            class="btn @(current == level ? "btn-secondary" : "btn-outline-secondary")"
-                                            @onclick="() => SetLevel(track, side.Config, level)">
-                                        @LevelLabel(level)
-                                    </button>
-                                }
-                            </div>
-                        </div>
-                    }
-
-                    @* The two specs are one control rather than two ticks: a side runs one
-                       of them at most, and no two sides run the same one - both rules are
-                       the shape of a single group of buttons instead of a check to undo
-                       after a click. *@
-                    @{
-                        var spec = Spec(side.Config);
-                    }
-                    <div class="mb-2">
-                        <div class="small text-body-secondary">Spec</div>
-                        <div class="btn-group btn-group-sm w-100" role="group"
-                             aria-label="@side.Label Spec">
-                            <button type="button"
-                                    class="btn @(spec is null ? "btn-secondary" : "btn-outline-secondary")"
-                                    @onclick="() => SetSpec(side.Config, null)">
-                                No
-                            </button>
-                            @foreach (var perk in Perks)
-                            {
-                                <button type="button"
-                                        class="btn @(ReferenceEquals(spec, perk) ? "btn-secondary" : "btn-outline-secondary")"
-                                        @onclick="() => SetSpec(side.Config, perk)">
-                                    @perk.Label
-                                </button>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-
-    <div class="col-12 col-md-6">
+   not repeated here - the Aggregates method below says why. *@
+<SideSetup OnChanged="OnSetupChanged">
+    <Summary>
         <p class="mt-2 mb-0 text-body-secondary small">
             @if (_candidates.Count == 0)
             {
@@ -101,8 +28,8 @@
                 </text>
             }
         </p>
-    </div>
-</div>
+    </Summary>
+</SideSetup>
 
 <hr class="my-4"/>
 
@@ -170,26 +97,6 @@
 </div>
 
 @code {
-    private sealed record Side(string Label, BreakPointSideConfig Config);
-
-    /// <summary>
-    /// A ladder of technologies read and written as one level, so the tier-2 prerequisite
-    /// rule is the shape of the control rather than something to enforce after a click.
-    /// </summary>
-    private sealed record Track(
-        string Label,
-        Func<BreakPointSideConfig, int> Get,
-        Action<BreakPointSideConfig, int> Set);
-
-    /// <summary>
-    /// One of the specs a side can run. Held one at a time and one to a spec across the
-    /// two sides, so what a side has is a choice between these rather than a tick each.
-    /// </summary>
-    private sealed record Perk(
-        string Label,
-        Func<BreakPointSideConfig, bool> Get,
-        Action<BreakPointSideConfig, bool> Set);
-
     /// <param name="Items">
     /// Every pairing the unit has, best first - the halves are cut out of this, so it is
     /// what one unit's whole run of advice is ranked by.
@@ -210,45 +117,8 @@
         string Hint,
         string Badge);
 
-    private static readonly Track[] Tracks =
-    [
-        new("Attack",
-            side => side.Attack2 ? 2 : side.Attack1 ? 1 : 0,
-            (side, level) =>
-            {
-                side.Attack1 = level >= 1;
-                side.Attack2 = level >= 2;
-            }),
-        new("Hp",
-            side => side.Hp2 ? 2 : side.Hp1 ? 1 : 0,
-            (side, level) =>
-            {
-                side.Hp1 = level >= 1;
-                side.Hp2 = level >= 2;
-            }),
-    ];
-
-    private static readonly Perk[] Perks =
-    [
-        new("Cost control", side => side.CostControl, (side, has) => side.CostControl = has),
-        new("Fortified", side => side.Fortified, (side, has) => side.Fortified = has),
-    ];
-
-    private static readonly int[] Levels = [0, 1, 2];
-
-    /// <summary>Shared with the Breakpoints page, so what a side owns is stated once.</summary>
-    private const string LeftConfigKey = "BreakPointSideConfig:left";
-
-    private const string RightConfigKey = "BreakPointSideConfig:right";
-
-    private UnitPicker? _picker;
-
     private BreakPointSideConfig _left = new();
     private BreakPointSideConfig _right = new();
-
-    // Recreated on every config load so the markup binds to the live objects.
-    private Side[] Sides => [new("Unit owns", _left), new("Vs owns", _right)];
-
     private UnitSelection _selection = UnitSelection.Everything;
 
     private IReadOnlyList<UpgradeCandidate> _candidates = [];
@@ -272,59 +142,15 @@
     // means anyway.
     protected override void OnInitialized() => Rebuild();
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    /// <summary>
+    /// Raised once the head has read the stored patterns and technologies, which happens
+    /// after this page's own first render - so this is what fills the list.
+    /// </summary>
+    private void OnSetupChanged(SideSetup.State setup)
     {
-        if (firstRender == false) return;
-
-        _left = await LoadConfig(LeftConfigKey) ?? _left;
-        _right = await LoadConfig(RightConfigKey) ?? _right;
-
+        (_selection, _left, _right) = setup;
         Rebuild();
         StateHasChanged();
-    }
-
-    /// <summary>
-    /// Also raised once the picker has read the stored patterns, which happens after this
-    /// page's own first render - so this, not OnAfterRenderAsync, is what fills the list.
-    /// </summary>
-    private void OnSelectionChanged(UnitSelection selection)
-    {
-        _selection = selection;
-        Rebuild();
-        StateHasChanged();
-    }
-
-    /// <summary>
-    /// Empties both halves of the picker and puts every technology and spec back to No. The
-    /// technologies are stored, so they have to be saved before the picker's OnChanged
-    /// rebuilds off them - that event is what refreshes the list, so nothing rebuilds here.
-    /// Only what this page shows is cleared: the rest of the shared config belongs to the
-    /// Breakpoints page and has nothing on screen here.
-    /// </summary>
-    private async Task Reset()
-    {
-        foreach (var side in Sides)
-        {
-            foreach (var track in Tracks)
-            {
-                track.Set(side.Config, 0);
-            }
-
-            foreach (var perk in Perks)
-            {
-                perk.Set(side.Config, false);
-            }
-        }
-
-        await SaveConfigs();
-
-        if (_picker is null)
-        {
-            Rebuild();
-            return;
-        }
-
-        await _picker.ResetToNone();
     }
 
     private void Rebuild()
@@ -395,60 +221,13 @@
     /// on screen to explain why. What the levels and specs come to is
     /// <see cref="BreakpointAdvisor.Aggregates"/>, shared with the console tool.
     /// </summary>
-    private static BuffAggregates Aggregates(BreakPointSideConfig side) =>
+    private static SideBuffs Aggregates(BreakPointSideConfig side) =>
         BreakpointAdvisor.Aggregates(
             side.Attack2 ? 2 : side.Attack1 ? 1 : 0,
             side.Hp2 ? 2 : side.Hp1 ? 1 : 0,
             side.CostControl,
-            side.Fortified);
-
-    private static string LevelLabel(int level) => level == 0 ? "No" : $"Lvl {level}";
-
-    private Task SetLevel(Track track, BreakPointSideConfig side, int level)
-    {
-        track.Set(side, level);
-        return OnConfigChanged();
-    }
-
-    /// <summary>
-    /// What a side is running, or null for neither. The Breakpoints page writes the same
-    /// stored config with a tick each and no rule between them, so a side can arrive here
-    /// holding both - it reads as the first, and the next click here writes a legal state.
-    /// Nothing is normalised on load: that would rewrite the other page's state unasked.
-    /// </summary>
-    private static Perk? Spec(BreakPointSideConfig side) =>
-        Perks.FirstOrDefault(perk => perk.Get(side));
-
-    /// <summary>
-    /// Gives <paramref name="side"/> exactly <paramref name="perk"/>, and takes that same
-    /// perk off the other side - one spec to a side, and one side to a spec.
-    /// </summary>
-    private Task SetSpec(BreakPointSideConfig side, Perk? perk)
-    {
-        var other = ReferenceEquals(side, _left) ? _right : _left;
-
-        foreach (var candidate in Perks)
-        {
-            var picked = ReferenceEquals(candidate, perk);
-            candidate.Set(side, picked);
-
-            if (picked) candidate.Set(other, false);
-        }
-
-        return OnConfigChanged();
-    }
-
-    private async Task OnConfigChanged()
-    {
-        await SaveConfigs();
-        Rebuild();
-    }
-
-    private async Task SaveConfigs()
-    {
-        await SaveConfig(LeftConfigKey, _left);
-        await SaveConfig(RightConfigKey, _right);
-    }
+            side.Fortified,
+            side.AirSpec);
 
     /// <summary>
     /// Colours a pairing by how far it moves rather than by which half it is in - the
@@ -469,23 +248,4 @@
     private static string Explain(BreakpointSuggestion item) =>
         $"×{Multiplier(item.Ratio)} better for a buy worth ×{Multiplier(item.Flat)}"
         + $" - the crossing is {Multiplier(item.Score)} times what the stats alone paid for";
-
-    private async Task SaveConfig(string key, BreakPointSideConfig config) =>
-        await JS.InvokeVoidAsync("localStorage.setItem", key, JsonSerializer.Serialize(config));
-
-    private async Task<BreakPointSideConfig?> LoadConfig(string key)
-    {
-        var json = await JS.InvokeAsync<string?>("localStorage.getItem", key);
-        if (string.IsNullOrEmpty(json)) return null;
-
-        try
-        {
-            return JsonSerializer.Deserialize<BreakPointSideConfig>(json);
-        }
-        catch (JsonException)
-        {
-            // Older builds stored "[object Object]" here.
-            return null;
-        }
-    }
 }
