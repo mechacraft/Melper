@@ -432,6 +432,18 @@
       "Health": 7425,
       "Range": 85,
       "Speed": 8
+    },
+    {
+      "Id": 32,
+      "Name": "Centurion",
+      "Cost": 300,
+      "CountInPack": 1,
+      "Damage": 1401,
+      "ReloadTime": 0.8,
+      "Health": 15000,
+      "Range": 110,
+      "CanAttackAir": true,
+      "Speed": 10
     }
   ]
 }
