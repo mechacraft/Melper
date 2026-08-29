@@ -23,7 +23,7 @@ public class UnitsJsonTests
     }
 
     /// <summary>
-    /// The two units the roster flags out of the damage calculations, and nothing else.
+    /// The units the roster flags out of the damage calculations, and nothing else.
     /// The flag is only reachable through the Data page's tick, so a typo in the JSON key
     /// would read back as false and quietly put their damage back into every page.
     /// </summary>
@@ -31,7 +31,7 @@ public class UnitsJsonTests
     public void EmbeddedRoster_SkipsDamageForTheStatedUnits()
     {
         Assert.Equal(
-            ["Melting Point", "Steel Ball"],
+            ["Abyss", "Melting Point", "Steel Ball"],
             UnitsCollection.Defaults()
                 .Where(u => u.SkipDamageCalculations)
                 .Select(u => u.Name)
