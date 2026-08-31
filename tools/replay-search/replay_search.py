@@ -5,6 +5,7 @@ single XML <BattleRecord> string, plus a DateTime right after it. Both are read
 here without any dependencies -- stdlib only, no venv.
 
   python replay_search.py --player MakTpaxep --unit Fortress --min 4 --last 15
+  python replay_search.py --player MakTpaxep --tech "Heavy Missile"
 """
 
 import argparse
@@ -19,10 +20,9 @@ import xml.etree.ElementTree as ET
 
 GAME = r"D:\SteamLibrary\steamapps\common\Mechabellum"
 REPLAY_DIR = os.path.join(GAME, "ProjectDatas", "Replay")
-UNITS_JSON = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    "..", "..", "Melper.Core", "Data", "units.json",
-)
+HERE = os.path.dirname(os.path.abspath(__file__))
+UNITS_JSON = os.path.join(HERE, "..", "..", "Melper.Core", "Data", "units.json")
+TECHS_JSON = os.path.join(HERE, "..", "mechabellum-extract", "data", "technologies.json")
 
 XSI_TYPE = "{http://www.w3.org/2001/XMLSchema-instance}type"
 END_TAG = b"</BattleRecord>"
@@ -139,6 +139,96 @@ def resolve_unit(query, names):
     sys.exit(f"ambiguous unit {query!r}: {', '.join(names[m] for m in matches)}")
 
 
+# --- technologies -----------------------------------------------------------
+
+def technologies(required=True):
+    """Rows from mechabellum-extract's dump: the only place tech names live.
+
+    A numeric TechID needs no names, so there the dump is a nicety (it labels
+    the hit) and its absence is not fatal.
+    """
+    try:
+        with open(TECHS_JSON, encoding="utf-8") as fh:
+            return json.load(fh)
+    except FileNotFoundError:
+        if not required:
+            return []
+        sys.exit(f"no {TECHS_JSON}. Run tools/mechabellum-extract/run.ps1 to make "
+                 f"it, or pass --tech as a numeric TechID.")
+
+
+def tech_label(entry):
+    """'Heavy Missile' out of iconName 'UT_Heavy_Missile' -- the only Latin name."""
+    return entry["iconName"].removeprefix("UT_").replace("_", " ")
+
+
+def tech_ids(entry):
+    """Every TechID this tech is written as in a replay.
+
+    Old replays store the plain id from the game data. Since client 2276 unit
+    ids carry a +5000 offset, and a TechID is <prefix><unit id>, so does the
+    tail of the TechID: Vortex' 180931 is written 18095031. For the 81 techs
+    whose id does not end in their unit id there is nothing to shift, so only
+    the plain form is matched.
+    """
+    tech, unit = str(entry["techId"]), str(entry["unitId"])
+    ids = {tech}
+    if tech.endswith(unit):
+        ids.add(tech[:-len(unit)] + str(5000 + entry["unitId"]))
+    return ids
+
+
+def resolve_tech(query, techs):
+    """(label, {TechID: unit name}).
+
+    One name usually covers several units -- Attack Range Increase is 48 rows,
+    one per unit -- so all of their ids count, and the unit is reported per hit
+    rather than crammed into the label.
+    """
+    if query.isdigit():
+        hits = [t for t in techs if str(t["techId"]) == query]
+        if not hits:
+            return query, {query: "?"}
+        return tech_label(hits[0]), _owners(hits)
+
+    def pick(test):
+        return [t for t in techs if test(t)]
+
+    wanted = query.lower()
+    hits = pick(lambda t: tech_label(t).lower() == wanted or t["name"] == query)
+    if not hits:
+        hits = pick(lambda t: wanted in tech_label(t).lower() or query in t["name"])
+    if not hits:
+        known = sorted({tech_label(t) for t in techs})
+        sys.exit(f"unknown technology {query!r}. Known: {', '.join(known)}")
+
+    labels = sorted({tech_label(t) for t in hits})
+    if len(labels) > 1:
+        sys.exit(f"ambiguous technology {query!r}: {', '.join(labels)}")
+    return labels[0], _owners(hits)
+
+
+def _owners(hits):
+    return {tech: hit["unitName"] for hit in hits for tech in tech_ids(hit)}
+
+
+def bought_tech(rounds, ids):
+    """[(round number, TechID)] over the whole match, in play order.
+
+    Techs are permanent, so unlike a unit count this is a property of the match
+    and not of one round -- --round and --min do not apply to it.
+    """
+    out = []
+    for record in rounds:
+        for action in (record.find("actionRecords") or []):
+            if action.get(XSI_TYPE) != "PAD_UpgradeTechnology":
+                continue
+            tech = action.findtext("TechID")
+            if tech in ids:
+                out.append((record.findtext("round"), tech))
+    return out
+
+
 # --- main -------------------------------------------------------------------
 
 def main():
@@ -146,17 +236,26 @@ def main():
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--dir", default=REPLAY_DIR, help="replay folder (default: %(default)s)")
     ap.add_argument("--player", required=True, help="whose side to look at")
-    ap.add_argument("--unit", required=True, help="unit name or id, e.g. Fortress or 1")
+    ap.add_argument("--unit", help="unit name or id, e.g. Fortress or 1")
+    ap.add_argument("--tech", help="technology name or TechID, e.g. \"Heavy Missile\" or 10912")
     ap.add_argument("--min", type=int, default=1, help="report armies with at least this many (default: %(default)s)")
     ap.add_argument("--last", type=int, metavar="N", help="only the N most recent matches")
     ap.add_argument("--round", choices=("last", "any"), default="last",
                     help="which round to count in (default: %(default)s)")
     ap.add_argument("-v", "--verbose", action="store_true", help="print the full army of every hit")
     args = ap.parse_args()
+    if not args.unit and not args.tech:
+        ap.error("nothing to look for: pass --unit, --tech, or both")
 
     names = unit_names()
-    unit_id = str(resolve_unit(args.unit, names))
-    unit_label = names.get(int(unit_id), unit_id)
+    unit_id = unit_label = None
+    if args.unit:
+        unit_id = str(resolve_unit(args.unit, names))
+        unit_label = names.get(int(unit_id), unit_id)
+    tech_label_, tech_owners = (None, None)
+    if args.tech:
+        tech_label_, tech_owners = resolve_tech(
+            args.tech, technologies(required=not args.tech.isdigit()))
 
     paths = glob.glob(os.path.join(args.dir, "*.grbr"))
     if not paths:
@@ -178,6 +277,21 @@ def main():
         players = replay.players()
         seen_players.update(players)
         rounds = players.get(args.player, [])
+
+        techs = bought_tech(rounds, tech_owners) if tech_owners else []
+        if tech_owners and not techs:
+            continue
+        bought_by = ", ".join(f"{tech_owners[tech]} round {rnd}" for rnd, tech in techs)
+        tech_note = f"  [{tech_label_}: {bought_by}]" if techs else ""
+
+        if unit_id is None:
+            hits += 1
+            print(f"{replay.date:%Y-%m-%d %H:%M}  {tech_label_} bought by "
+                  f"{bought_by}  {replay.name}")
+            if args.verbose:
+                _print_army(fought_with(rounds, len(rounds) - 1)[0], names)
+            continue
+
         wanted = range(len(rounds)) if args.round == "any" else range(len(rounds) - 1, len(rounds))
         for i in wanted:
             if i < 0:
@@ -191,7 +305,7 @@ def main():
             if not list(record.find("actionRecords") or []):
                 note += " (round has no actions -- recorded but never played?)"
             print(f"{replay.date:%Y-%m-%d %H:%M}  round {record.findtext('round'):>2}  "
-                  f"{unit_label} {field[unit_id]}{note}  {replay.name}")
+                  f"{unit_label} {field[unit_id]}{note}  {replay.name}{tech_note}")
             if args.verbose:
                 _print_army(field, names)
 
