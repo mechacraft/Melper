@@ -6,6 +6,7 @@ here without any dependencies -- stdlib only, no venv.
 
   python replay_search.py --player MakTpaxep --unit Fortress --min 4 --last 15
   python replay_search.py --player MakTpaxep --tech "Heavy Missile"
+  python replay_search.py --player MakTpaxep --side opponent --spell Storm --spell Ion
 """
 
 import argparse
@@ -23,6 +24,7 @@ REPLAY_DIR = os.path.join(GAME, "ProjectDatas", "Replay")
 HERE = os.path.dirname(os.path.abspath(__file__))
 UNITS_JSON = os.path.join(HERE, "..", "..", "Melper.Core", "Data", "units.json")
 TECHS_JSON = os.path.join(HERE, "..", "mechabellum-extract", "data", "technologies.json")
+CONFIG_RAW = os.path.join(HERE, "..", "mechabellum-extract", "data", "config_raw.json")
 
 XSI_TYPE = "{http://www.w3.org/2001/XMLSchema-instance}type"
 END_TAG = b"</BattleRecord>"
@@ -229,6 +231,129 @@ def bought_tech(rounds, ids):
     return out
 
 
+# --- commander skills (spells) ----------------------------------------------
+
+def commander_skills(required=True):
+    """{skill id: {"label", "name"}} straight out of the client dump.
+
+    There is no derived spells.json to read the way --tech reads
+    technologies.json: config_raw.json is committed, so --spell works with no
+    extractor run, while a new make_spells.py would gate it behind uv and an
+    installed game. Every list in CommanderSkillGroupData is a
+    CommanderSkillData subclass over one shared id space -- the same shape
+    make_techs.py leans on for technologies.
+    """
+    try:
+        with open(CONFIG_RAW, encoding="utf-8") as fh:
+            groups = json.load(fh)["CommanderSkillGroupData"]
+    except FileNotFoundError:
+        if not required:
+            return {}
+        sys.exit(f"no {CONFIG_RAW}. Run tools/mechabellum-extract/run.ps1 to "
+                 f"make it, or pass --spell as a numeric skill id.")
+
+    out = {}
+    for group in groups.values():
+        if not isinstance(group, list):
+            continue
+        for skill in group:
+            if isinstance(skill, dict) and "id" in skill:
+                out[str(skill["id"])] = {"label": spell_label(skill),
+                                         "name": skill.get("name")}
+    return out
+
+
+def spell_label(skill):
+    """'Thunder Storm' out of iconName 'SW_Thunder_Storm' -- the only Latin name.
+
+    It is the internal name and not always the in-game one (SW_Ion is Ion
+    Bombardment), which is why the match below is a substring one.
+    """
+    return skill["iconName"].removeprefix("SW_").replace("_", " ")
+
+
+def resolve_spell(query, skills):
+    """(label, {skill id}).
+
+    One spell is several ids -- a tier or a rework gets its own entry, so
+    Lightning Storm is both 300005 and 300009 -- and all of them count, exactly
+    as one technology name covers one id per unit.
+    """
+    if query.isdigit():
+        known = skills.get(query)
+        return (known["label"] if known else query), {query}
+
+    wanted = query.lower()
+    ids = {i for i, s in skills.items()
+           if s["label"].lower() == wanted or s["name"] == query}
+    if not ids:
+        ids = {i for i, s in skills.items()
+               if wanted in s["label"].lower() or query in (s["name"] or "")}
+    if not ids:
+        known = sorted({s["label"] for s in skills.values()})
+        sys.exit(f"unknown spell {query!r}. Known: {', '.join(known)}")
+
+    labels = sorted({skills[i]["label"] for i in ids})
+    if len(labels) > 1:
+        sys.exit(f"ambiguous spell {query!r}: {', '.join(labels)}")
+    return labels[0], ids
+
+
+def released(rounds):
+    """[(round number, skill id or None)] -- every spell this side cast.
+
+    Two quirks of the format, and ignoring either one turns an opponent's whole
+    spell log into silence rather than into an error:
+
+    * <ID> is filled in only for the side that recorded the replay. Everyone
+      else's actions carry <ID>0</ID>, and only <SkillIndex> means anything --
+      an opponent's spell has to be looked up in their commanderSkills snapshot.
+    * That snapshot lags a round: a skill bought in round N first appears in the
+      list in round N+1. So a cast in round N is read against the slots known by
+      round N+1 and no later, which is all the game itself had recorded by then.
+
+    Looking further ahead would resolve a few more casts and get some of them
+    wrong: in replays whose snapshot only starts appearing mid-match, a late
+    slot list does not describe the early rounds. Measured against the 889 casts
+    that do carry an <ID> of their own, the round N+1 rule agrees 842 times,
+    disagrees 0 and leaves 47 unnamed; borrowing later snapshots turns 4 of
+    those into wrong answers. Unnamed casts are reported, never dropped.
+
+    Skill ids are not touched by the +5000 unit id offset of client 2276+:
+    over every replay in the directory, none of them is 5-prefixed.
+    """
+    known, by_round = {}, []
+    for record in rounds:
+        for skill in (record.find("playerData/commanderSkills") or []):
+            known[skill.findtext("index")] = skill.findtext("id")
+        by_round.append(dict(known))
+
+    out = []
+    for i, record in enumerate(rounds):
+        slots = by_round[min(i + 1, len(by_round) - 1)]
+        for action in (record.find("actionRecords") or []):
+            if action.get(XSI_TYPE) != "PAD_ReleaseCommanderSkill":
+                continue
+            skill = action.findtext("ID")
+            if skill == "0":
+                skill = slots.get(action.findtext("SkillIndex"))
+            out.append((record.findtext("round"), skill))
+    return out
+
+
+def sides(players, player, side):
+    """[(name, rounds)] the search applies to: one player's, or their enemies'.
+
+    --player always says which matches to look at; --side says whose army,
+    technologies and spells to look at inside them.
+    """
+    if player not in players:
+        return []
+    if side == "player":
+        return [(player, players[player])]
+    return [(name, rounds) for name, rounds in players.items() if name != player]
+
+
 # --- main -------------------------------------------------------------------
 
 def main():
@@ -238,14 +363,20 @@ def main():
     ap.add_argument("--player", required=True, help="whose side to look at")
     ap.add_argument("--unit", help="unit name or id, e.g. Fortress or 1")
     ap.add_argument("--tech", help="technology name or TechID, e.g. \"Heavy Missile\" or 10912")
+    ap.add_argument("--spell", action="append", metavar="NAME", default=[],
+                    help="commander skill name or id, e.g. Ion or 300006; repeat to "
+                         "require every one of them in the same match")
+    ap.add_argument("--side", choices=("player", "opponent"), default="player",
+                    help="whose army/techs/spells to match -- --player's own, or "
+                         "everyone else's in the same match (default: %(default)s)")
     ap.add_argument("--min", type=int, default=1, help="report armies with at least this many (default: %(default)s)")
     ap.add_argument("--last", type=int, metavar="N", help="only the N most recent matches")
     ap.add_argument("--round", choices=("last", "any"), default="last",
                     help="which round to count in (default: %(default)s)")
     ap.add_argument("-v", "--verbose", action="store_true", help="print the full army of every hit")
     args = ap.parse_args()
-    if not args.unit and not args.tech:
-        ap.error("nothing to look for: pass --unit, --tech, or both")
+    if not args.unit and not args.tech and not args.spell:
+        ap.error("nothing to look for: pass --unit, --tech or --spell")
 
     names = unit_names()
     unit_id = unit_label = None
@@ -256,6 +387,9 @@ def main():
     if args.tech:
         tech_label_, tech_owners = resolve_tech(
             args.tech, technologies(required=not args.tech.isdigit()))
+    skills = commander_skills(
+        required=not all(s.isdigit() for s in args.spell)) if args.spell else {}
+    wanted_spells = [resolve_spell(s, skills) for s in args.spell]
 
     paths = glob.glob(os.path.join(args.dir, "*.grbr"))
     if not paths:
@@ -276,38 +410,48 @@ def main():
     for replay in scanned:
         players = replay.players()
         seen_players.update(players)
-        rounds = players.get(args.player, [])
 
-        techs = bought_tech(rounds, tech_owners) if tech_owners else []
-        if tech_owners and not techs:
-            continue
-        bought_by = ", ".join(f"{tech_owners[tech]} round {rnd}" for rnd, tech in techs)
-        tech_note = f"  [{tech_label_}: {bought_by}]" if techs else ""
+        for side, rounds in sides(players, args.player, args.side):
+            whose = f"{side}: " if args.side == "opponent" else ""
 
-        if unit_id is None:
-            hits += 1
-            print(f"{replay.date:%Y-%m-%d %H:%M}  {tech_label_} bought by "
-                  f"{bought_by}  {replay.name}")
-            if args.verbose:
-                _print_army(fought_with(rounds, len(rounds) - 1)[0], names)
-            continue
-
-        wanted = range(len(rounds)) if args.round == "any" else range(len(rounds) - 1, len(rounds))
-        for i in wanted:
-            if i < 0:
+            techs = bought_tech(rounds, tech_owners) if tech_owners else []
+            if tech_owners and not techs:
                 continue
-            record = rounds[i]
-            field, exact = fought_with(rounds, i)
-            if field[unit_id] < args.min:
+            bought_by = ", ".join(f"{tech_owners[tech]} round {rnd}" for rnd, tech in techs)
+            tech_note = f"  [{tech_label_}: {bought_by}]" if techs else ""
+
+            casts = released(rounds) if wanted_spells else []
+            cast_note = _cast_note(casts, wanted_spells)
+            if wanted_spells and cast_note is None:
                 continue
-            hits += 1
-            note = "" if exact else " (at least; final round)"
-            if not list(record.find("actionRecords") or []):
-                note += " (round has no actions -- recorded but never played?)"
-            print(f"{replay.date:%Y-%m-%d %H:%M}  round {record.findtext('round'):>2}  "
-                  f"{unit_label} {field[unit_id]}{note}  {replay.name}{tech_note}")
-            if args.verbose:
-                _print_army(field, names)
+
+            if unit_id is None:
+                hits += 1
+                summary = " ".join(part for part in (
+                    f"{tech_label_} bought by {bought_by}" if techs else "",
+                    (cast_note or "").strip()) if part)
+                print(f"{replay.date:%Y-%m-%d %H:%M}  {whose}{summary}  {replay.name}")
+                if args.verbose:
+                    _print_army(fought_with(rounds, len(rounds) - 1)[0], names)
+                continue
+
+            wanted = range(len(rounds)) if args.round == "any" else range(len(rounds) - 1, len(rounds))
+            for i in wanted:
+                if i < 0:
+                    continue
+                record = rounds[i]
+                field, exact = fought_with(rounds, i)
+                if field[unit_id] < args.min:
+                    continue
+                hits += 1
+                note = "" if exact else " (at least; final round)"
+                if not list(record.find("actionRecords") or []):
+                    note += " (round has no actions -- recorded but never played?)"
+                print(f"{replay.date:%Y-%m-%d %H:%M}  round {record.findtext('round'):>2}  "
+                      f"{whose}{unit_label} {field[unit_id]}{note}  {replay.name}"
+                      f"{tech_note}{cast_note or ''}")
+                if args.verbose:
+                    _print_army(field, names)
 
     for name, exc in skipped:
         print(f"SKIP {name}: {exc}", file=sys.stderr)
@@ -315,6 +459,28 @@ def main():
         sys.exit(f"player {args.player!r} appears in none of the {len(scanned)} replays scanned")
     print(f"\n{hits} match(es) in {len(scanned)} replay(s)"
           f"{f', {len(skipped)} skipped' if skipped else ''}")
+
+
+def _cast_note(casts, wanted):
+    """'[Storm round 8; Ion round 4,8]' -- or None if a wanted spell is missing.
+
+    Spells are counted over the whole match, like technologies and unlike a
+    unit count, so --round and --min do not apply to them. Casts that released
+    could not name are reported rather than dropped -- see its docstring for
+    when that happens.
+    """
+    if not wanted:
+        return ""
+    parts = []
+    for label, ids in wanted:
+        rnds = [rnd for rnd, skill in casts if skill in ids]
+        if not rnds:
+            return None
+        parts.append(f"{label} round {','.join(rnds)}")
+    unnamed = sum(1 for _, skill in casts if skill is None)
+    if unnamed:
+        parts.append(f"+{unnamed} cast(s) no snapshot names yet")
+    return f"  [{'; '.join(parts)}]"
 
 
 def _print_army(field, names):
