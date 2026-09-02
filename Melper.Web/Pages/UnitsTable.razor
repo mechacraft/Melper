@@ -111,15 +111,11 @@
                 DpsEff @SortGlyph(nameof(UnitViewModel.DpsPerCost))
                 @* The hint sits inside the sortable header, so it swallows the click
                    rather than resorting the table when it is only being read. *@
-                <span class="badge rounded-pill text-bg-secondary"
-                      title="How much DPS this unit buys for 100 supplies"
-                      @onclick:stopPropagation="true">?</span>
+                <Hint Text="How much DPS the pack buys for 100 supplies"/>
             </th>
             <th role="button" @onclick='() => SortBy(nameof(UnitViewModel.HealthPerCost))'>
                 HealthEff @SortGlyph(nameof(UnitViewModel.HealthPerCost))
-                <span class="badge rounded-pill text-bg-secondary"
-                      title="How much health this unit buys for 100 supplies"
-                      @onclick:stopPropagation="true">?</span>
+                <Hint Text="How much health the pack buys for 100 supplies"/>
             </th>
         </tr>
         </thead>

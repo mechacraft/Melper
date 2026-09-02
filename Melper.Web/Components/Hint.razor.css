@@ -1,0 +1,42 @@
+/* The bubble is positioned against this, and the wrapper stays hovered while the
+   pointer is over the bubble - so the two must not have a gap between them. */
+.melper-hint {
+    position: relative;
+    display: inline-block;
+}
+
+.melper-hint-button {
+    cursor: help;
+    padding: 0.2em 0.5em;
+    font-size: 0.75rem;
+    line-height: 1.2;
+}
+
+/* Bootstrap's own tooltip colours, which invert the body - it has no stylesheet
+   for the tooltip itself without its JavaScript to build one. */
+.melper-hint-bubble {
+    position: absolute;
+    top: 100%;
+    /* Right-anchored: these hints sit in the last columns of a wide table, where a
+       centred bubble would run off the edge. */
+    right: 0;
+    z-index: 1080;
+    display: none;
+    width: max-content;
+    max-width: 15rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.375rem;
+    background-color: var(--bs-emphasis-color);
+    color: var(--bs-body-bg);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.3);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    text-align: start;
+    white-space: normal;
+    cursor: default;
+}
+
+.melper-hint:hover > .melper-hint-bubble,
+.melper-hint-open > .melper-hint-bubble {
+    display: block;
+}

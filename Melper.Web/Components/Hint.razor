@@ -1,0 +1,31 @@
+@* A hint that opens on hover and on a click, because the native title attribute does
+   neither on touch and needs a second of stillness on a 20px target elsewhere. The
+   click state is what closes it again: showing the bubble on :focus-within instead
+   would leave a second click unable to put it away, the button still holding focus. *@
+<span class="melper-hint @(_open ? "melper-hint-open" : "")">
+    <button type="button" class="badge rounded-pill text-bg-secondary border-0 melper-hint-button"
+            aria-describedby="@_bubbleId" aria-expanded="@(_open ? "true" : "false")"
+            aria-label="Show hint"
+            @onclick="Toggle" @onclick:stopPropagation="true"
+            @onfocusout="Close">?</button>
+    @* The bubble closes on its own click too: on iOS a tap leaves the button unfocused,
+       so focusout is not there to close what the tap opened. *@
+    <span class="melper-hint-bubble" id="@_bubbleId" role="tooltip"
+          @onclick="Close" @onclick:stopPropagation="true">@Text</span>
+</span>
+
+@code {
+    /// <summary>What the bubble says. One sentence: it is read in passing.</summary>
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = "";
+
+    /// <summary>Held open by a click; hovering shows the bubble without touching this.</summary>
+    private bool _open;
+
+    /// <summary>What aria-describedby points at, so the bubble is read as the button's description.</summary>
+    private readonly string _bubbleId = $"hint-{Guid.NewGuid():N}";
+
+    private void Toggle() => _open = !_open;
+
+    private void Close() => _open = false;
+}
