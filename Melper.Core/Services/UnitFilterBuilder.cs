@@ -63,6 +63,30 @@ public static class UnitFilterBuilder
     }
 
     /// <summary>
+    /// Whether a pattern is one the roster can be filtered by at all. An empty one is:
+    /// it means no filter. A half-written one - "cra(" on the way to "cra(b|w)" - is
+    /// not, and a box being typed into has to be told which it holds, so that it can
+    /// say the pattern is unfinished rather than quietly empty or widen the page.
+    /// </summary>
+    public static bool Compiles(string? pattern)
+    {
+        if (string.IsNullOrWhiteSpace(pattern))
+        {
+            return true;
+        }
+
+        try
+        {
+            _ = "".RegMatch(pattern);
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
     /// The units a stored pattern lets through. An empty pattern - and a
     /// half-typed one that does not compile - passes everything, matching how the
     /// pages behave.

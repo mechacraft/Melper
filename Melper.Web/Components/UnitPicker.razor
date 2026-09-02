@@ -15,14 +15,26 @@
 
     @foreach (var target in Targets)
     {
+        var broken = _broken.Contains(target.Key);
         @* Grows to share whatever the button leaves, down to a width a pattern is still
            readable at - below that the two wrap under it rather than onto each other. *@
         <div class="input-group" style="flex: 1 1 18rem; width: auto">
             <span class="input-group-text">@target.Label</span>
-            <input class="form-control font-monospace" readonly value="@_pattern[target.Key]"
-                   placeholder="empty - no filter, every unit passes"/>
-            <span class="input-group-text text-body-secondary">
-                @_selected[target.Key].Count/@AllUnits.Count
+            @* Typed into as readily as it is generated: the box holds the pattern itself,
+               so a hand-written one goes straight in and the ticks below follow it. Read
+               back on every keystroke, the way the roster's own name box is. *@
+            <input class="form-control font-monospace @(broken ? "is-invalid" : "")"
+                   value="@_pattern[target.Key]"
+                   @oninput="e => TypePattern(target.Key, e.Value as string)"
+                   aria-label="@target.Label name pattern"
+                   aria-invalid="@(broken ? "true" : "false")"
+                   autocomplete="off" spellcheck="false"
+                   title="The names to keep, as a regular expression - cra|fang. Empty keeps every unit."
+                   placeholder="cra|fang - empty is no filter"/>
+            @* Says the box is mid-word rather than showing a count that belongs to the
+               pattern before it: while it does not compile, nothing behind it moved. *@
+            <span class="input-group-text @(broken ? "text-danger" : "text-body-secondary")">
+                @(broken ? "half-written" : $"{_selected[target.Key].Count}/{AllUnits.Count}")
             </span>
         </div>
     }
@@ -163,7 +175,24 @@
     private readonly Dictionary<string, HashSet<string>> _selected =
         Targets.ToDictionary(x => x.Key, _ => new HashSet<string>(StringComparer.OrdinalIgnoreCase));
 
+    /// <summary>What each box shows - a generated pattern, or whatever was typed over it.</summary>
     private readonly Dictionary<string, string> _pattern = Targets.ToDictionary(x => x.Key, _ => "");
+
+    /// <summary>
+    /// The pattern each target is actually filtered by: what is stored, what the ticks
+    /// are read off, and what <see cref="Notify"/> hands out. Separate from the box so
+    /// that a half-written one stops there - the pair is handed over whole, so it would
+    /// otherwise ride out on the other half's edit. Nothing typed or clicked lands here
+    /// unless it compiles; a stored pattern is taken as it stands, as it was before.
+    /// </summary>
+    private readonly Dictionary<string, string> _applied = Targets.ToDictionary(x => x.Key, _ => "");
+
+    /// <summary>
+    /// The targets whose box does not compile. What was applied last stays applied while
+    /// one does not: blanking the page mid-word, or widening it back to the whole roster,
+    /// both read as the filter having been understood, and it has not been yet.
+    /// </summary>
+    private readonly HashSet<string> _broken = new(StringComparer.Ordinal);
 
     /// <summary>Whether the controls are unfolded. Folded is the state a page opens in.</summary>
     private bool _open;
@@ -216,7 +245,47 @@
     {
         var pattern = await JS.InvokeAsync<string>("localStorage.getItem", key) ?? "";
         _pattern[key] = pattern;
+        _applied[key] = pattern;
 
+        // A stored pattern is only ever half-written if something else wrote it, but it
+        // is still the box that has to own up to it.
+        if (UnitFilterBuilder.Compiles(pattern) == false)
+        {
+            _broken.Add(key);
+        }
+
+        SelectByPattern(key, pattern);
+    }
+
+    /// <summary>
+    /// A pattern typed into the box. It is the storage format itself, so it is kept as
+    /// written rather than regenerated off the ticks it turns on: the shape of a
+    /// hand-written "cra(b|w)" survives the round trip only if nothing rewrites it.
+    /// </summary>
+    private async Task TypePattern(string key, string? text)
+    {
+        var pattern = text ?? "";
+        _pattern[key] = pattern;
+
+        if (UnitFilterBuilder.Compiles(pattern) == false)
+        {
+            _broken.Add(key);
+            return;
+        }
+
+        _broken.Remove(key);
+
+        // Whitespace on its own is read as no filter here but as a pattern by the pages,
+        // which would tick the whole roster over a table showing the two-word names only.
+        var applied = string.IsNullOrWhiteSpace(pattern) ? "" : pattern;
+        SelectByPattern(key, applied);
+        await Write(key, applied);
+        await Notify();
+    }
+
+    /// <summary>Ticks exactly the units a pattern lets through, dropping the rest.</summary>
+    private void SelectByPattern(string key, string pattern)
+    {
         var selected = _selected[key];
         selected.Clear();
         foreach (var unit in UnitFilterBuilder.SelectMatching(pattern, AllUnits))
@@ -316,13 +385,25 @@
         await Notify();
     }
 
+    /// <summary>
+    /// Writes back what the ticks now say. A click is an edit of the selection rather
+    /// than of the text, so the pattern is generated afresh and whatever half-written
+    /// thing was in the box goes with it.
+    /// </summary>
     private async Task Store(string key)
     {
+        _broken.Remove(key);
         var pattern = UnitFilterBuilder.Build(AllUnits.Where(x => _selected[key].Contains(x.Name)), AllUnits);
         _pattern[key] = pattern;
+        await Write(key, pattern);
+    }
+
+    private async Task Write(string key, string pattern)
+    {
+        _applied[key] = pattern;
         await JS.InvokeVoidAsync("localStorage.setItem", key, pattern);
     }
 
     private Task Notify() =>
-        OnChanged.InvokeAsync(new UnitSelection(_pattern[UnitSelection.MainKey], _pattern[UnitSelection.VsKey]));
+        OnChanged.InvokeAsync(new UnitSelection(_applied[UnitSelection.MainKey], _applied[UnitSelection.VsKey]));
 }

@@ -101,6 +101,27 @@ public class UnitFilterBuilderTests
     }
 
     [Fact]
+    public void OnlyAFinishedPatternCompiles()
+    {
+        // Nothing to filter by is something the picker's box may hold and the pages
+        // understand, so it is not the unfinished kind.
+        Assert.True(UnitFilterBuilder.Compiles(""));
+        Assert.True(UnitFilterBuilder.Compiles(null));
+        Assert.True(UnitFilterBuilder.Compiles("cra|fang"));
+        Assert.True(UnitFilterBuilder.Compiles(UnitFilterBuilder.MatchNothing));
+
+        // An unclosed brace is literal text to .NET rather than an error, so a pattern
+        // being typed towards "fang{2}" filters on the letters it holds so far.
+        Assert.True(UnitFilterBuilder.Compiles("fang{2"));
+
+        // Typed on the way to "cra(b|w)" and "cra[bw]" - the box says so rather than
+        // passing either on as a filter.
+        Assert.False(UnitFilterBuilder.Compiles("cra("));
+        Assert.False(UnitFilterBuilder.Compiles("cra["));
+        Assert.False(UnitFilterBuilder.Compiles("cra)"));
+    }
+
+    [Fact]
     public void HandWrittenPattern_SelectsTheSameUnitsItRegenerates()
     {
         var selected = UnitFilterBuilder.SelectMatching("cra|fang|tara|sle|must|mark|steel|saber|hound|storm|arc|vort|badg", All);
