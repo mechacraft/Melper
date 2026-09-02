@@ -103,14 +103,16 @@
             </th>
             <th role="button" @onclick='() => SortBy(nameof(UnitViewModel.DpsPerUnit))'>
                 DPS per unit @SortGlyph(nameof(UnitViewModel.DpsPerUnit))
+                @* The hint sits inside the sortable header, so it swallows the click
+                   rather than resorting the table when it is only being read. *@
+                <Hint Text="How much damage one unit deals per second"/>
             </th>
             <th role="button" @onclick='() => SortBy(nameof(UnitViewModel.TotalDps))'>
                 Total DPS @SortGlyph(nameof(UnitViewModel.TotalDps))
+                <Hint Text="How much damage the whole pack deals per second"/>
             </th>
             <th role="button" @onclick='() => SortBy(nameof(UnitViewModel.DpsPerCost))'>
                 DpsEff @SortGlyph(nameof(UnitViewModel.DpsPerCost))
-                @* The hint sits inside the sortable header, so it swallows the click
-                   rather than resorting the table when it is only being read. *@
                 <Hint Text="How much DPS the pack buys for 100 supplies"/>
             </th>
             <th role="button" @onclick='() => SortBy(nameof(UnitViewModel.HealthPerCost))'>
