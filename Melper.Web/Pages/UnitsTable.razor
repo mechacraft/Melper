@@ -137,8 +137,10 @@
                 <td class="text-end">@unit.Splash.ToString("0.##")</td>
                 <td class="text-end">@unit.DpsPerUnit.ToString("0.##")</td>
                 <td class="text-end">@unit.TotalDps.ToString("0.##")</td>
-                <td class="text-end">@unit.DpsPerCost.ToString("0.##")</td>
-                <td class="text-end">@unit.HealthPerCost.ToString("0.##")</td>
+                @* Floored, not rounded: the fraction of a supply point is noise next to
+                   the whole number these two columns are read for. *@
+                <td class="text-end">@((long)Math.Floor(unit.DpsPerCost))</td>
+                <td class="text-end">@((long)Math.Floor(unit.HealthPerCost))</td>
             </tr>
         }
         </tbody>
