@@ -57,8 +57,8 @@ public class UnitViewModel
         TotalHealth = (int)GetTotalHealth();
         DpsPerUnit = GetDpsPerUnit();
         TotalDps = GetTotalDps();
-        DpsPerCost = GetDpsRel1KPer100Cost();
-        HealthPerCost = GetHealthRel1KPer100Cost();
+        DpsPerCost = GetDpsPer100Cost();
+        HealthPerCost = GetHealthPer100Cost();
     }
 
     /// <summary>
@@ -82,9 +82,10 @@ public class UnitViewModel
         return GetDpsPerUnit() * CountInPack;
     }
 
-    private double GetDpsRel1KPer100Cost()
+    /// <summary>How much DPS the pack buys for 100 supplies.</summary>
+    private double GetDpsPer100Cost()
     {
-        return Cost > 0 ? GetTotalDps() / 1000d / Cost * 100d : 0;
+        return Cost > 0 ? GetTotalDps() / Cost * 100d : 0;
     }
 
     private double GetTotalHealth()
@@ -92,8 +93,9 @@ public class UnitViewModel
         return (double)Health * CountInPack;
     }
 
-    private double GetHealthRel1KPer100Cost()
+    /// <summary>How much health the pack buys for 100 supplies.</summary>
+    private double GetHealthPer100Cost()
     {
-        return Cost > 0 ? (GetTotalHealth() / 1000d) / Cost * 100d : 0;
+        return Cost > 0 ? GetTotalHealth() / Cost * 100d : 0;
     }
 }

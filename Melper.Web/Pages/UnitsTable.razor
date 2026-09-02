@@ -9,13 +9,11 @@
 
 <PageTitle>Units</PageTitle>
 
-<div class="row g-4 mb-3">
-    <div class="col-12 col-sm-6 col-lg-4">
-        <label class="form-label">Filter</label>
-        <input class="form-control" @bind="mainNameFilter" @bind:event="oninput"
-               @bind:after="OnMainNameFilterChanged"/>
-    </div>
+@* Which units the table lists. The picker is the only way in - it writes the pattern
+   the rows are filtered by, and states it on its own header row. *@
+<UnitPicker OnChanged="OnSelectionChanged"/>
 
+<div class="row g-4 mb-3">
     @* The same technologies and specs the Advisor page offers, in the same controls and
        off the same stored config - the table below states what a unit is worth, and what
        it is worth depends on what the side owns. *@
@@ -111,9 +109,17 @@
             </th>
             <th role="button" @onclick='() => SortBy(nameof(UnitViewModel.DpsPerCost))'>
                 DpsEff @SortGlyph(nameof(UnitViewModel.DpsPerCost))
+                @* The hint sits inside the sortable header, so it swallows the click
+                   rather than resorting the table when it is only being read. *@
+                <span class="badge rounded-pill text-bg-secondary"
+                      title="How much DPS this unit buys for 100 supplies"
+                      @onclick:stopPropagation="true">?</span>
             </th>
             <th role="button" @onclick='() => SortBy(nameof(UnitViewModel.HealthPerCost))'>
                 HealthEff @SortGlyph(nameof(UnitViewModel.HealthPerCost))
+                <span class="badge rounded-pill text-bg-secondary"
+                      title="How much health this unit buys for 100 supplies"
+                      @onclick:stopPropagation="true">?</span>
             </th>
         </tr>
         </thead>
@@ -195,7 +201,8 @@
     private BreakPointSideConfig _config = new();
 
     private List<UnitViewModel> Units = [];
-    string mainNameFilter = "";
+    /// <summary>The picker's pattern, which is the whole of what narrows the table down.</summary>
+    private string mainNameFilter = "";
 
     private string? _sortColumn;
     private bool _sortAsc = true;
@@ -308,7 +315,8 @@
     {
         if (firstRender)
         {
-            mainNameFilter = await JS.InvokeAsync<string>("localStorage.getItem", "mainNameFilter") ?? "";
+            // mainNameFilter is not read here: the picker reads the same stored pattern on
+            // its own first render and hands it over, and that render lands before this.
             _config = await LoadConfig(ConfigKey) ?? _config;
 
             Rebuild();
@@ -384,10 +392,12 @@
         Rebuild();
     }
 
-    private async Task OnMainNameFilterChanged()
-    {
-        await JS.InvokeVoidAsync("localStorage.setItem", "mainNameFilter", mainNameFilter ?? "");
-    }
+    /// <summary>
+    /// The picker's own edit, and the first sight of the stored pattern. Only the main
+    /// half is used - this page states what one unit is worth, with nothing to measure
+    /// it against.
+    /// </summary>
+    private void OnSelectionChanged(UnitSelection selection) => mainNameFilter = selection.MainPattern;
 
     private async Task<BreakPointSideConfig?> LoadConfig(string key)
     {

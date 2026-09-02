@@ -2,20 +2,12 @@
 @using Melper.Core
 @using Melper.Data
 @using Melper.Services
-@inject IJSRuntime JS
 
 <PageTitle>Damage calculations</PageTitle>
 
-<div class="row mb-3">
-    <div class="col-4">
-        <label class="form-label">Main filter</label>
-        <input class="form-control" @bind="mainNameFilter" @bind:event="oninput"
-               @bind:after="OnMainNameFilterChanged"/>
-        <label class="form-label">Vs filter</label>
-        <input class="form-control" @bind="vsNameFilter" @bind:event="oninput"
-               @bind:after="OnVsNameFilterChanged"/>
-    </div>
-</div>
+@* Which pairings the table lists. The picker is the only way in - it writes the two
+   patterns the rows are filtered by, and states them on its own header row. *@
+<UnitPicker OnChanged="OnSelectionChanged"/>
 
 <div class="rounded">
     <table class="table table-hover table-striped table-bordered align-middle">
@@ -87,8 +79,10 @@
 </div>
 
 @code {
-    string mainNameFilter = "";
-    string vsNameFilter = "";
+    /// <summary>The picker's two patterns, which are the whole of what narrows the table down.</summary>
+    private string mainNameFilter = "";
+
+    private string vsNameFilter = "";
 
     string? sortColumn;
     bool sortAscending = true;
@@ -156,24 +150,11 @@
         };
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    /// <summary>The picker's own edit, and the first sight of the two stored patterns.</summary>
+    private void OnSelectionChanged(UnitSelection selection)
     {
-        if (firstRender)
-        {
-            mainNameFilter = await JS.InvokeAsync<string>("localStorage.getItem", "mainNameFilter") ?? "";
-            vsNameFilter = await JS.InvokeAsync<string>("localStorage.getItem", "vsNameFilter") ?? "";
-            StateHasChanged();
-        }
-    }
-
-    private async Task OnMainNameFilterChanged()
-    {
-        await JS.InvokeVoidAsync("localStorage.setItem", "mainNameFilter", mainNameFilter ?? "");
-    }
-
-    private async Task OnVsNameFilterChanged()
-    {
-        await JS.InvokeVoidAsync("localStorage.setItem", "vsNameFilter", vsNameFilter ?? "");
+        mainNameFilter = selection.MainPattern;
+        vsNameFilter = selection.VsPattern;
     }
 
 }

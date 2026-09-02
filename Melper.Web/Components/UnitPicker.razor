@@ -2,21 +2,46 @@
 @using Melper.Data
 @inject IJSRuntime JS
 
+@* Folded away by default: on the pages that only filter their rows with it the picker
+   is taller than what it filters, so unfolding is what asks for the controls. The two
+   patterns stay on this row either way - folded, they are the whole of what the picker
+   has to say, and a page whose rows are narrowed down must show why on screen. *@
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2"
+            aria-expanded="@_open" @onclick="() => _open = !_open">
+        <span>@(_open ? "▾" : "▸")</span>
+        <span class="fw-semibold">Unit filter</span>
+    </button>
+
+    @foreach (var target in Targets)
+    {
+        @* Grows to share whatever the button leaves, down to a width a pattern is still
+           readable at - below that the two wrap under it rather than onto each other. *@
+        <div class="input-group" style="flex: 1 1 18rem; width: auto">
+            <span class="input-group-text">@target.Label</span>
+            <input class="form-control font-monospace" readonly value="@_pattern[target.Key]"
+                   placeholder="empty - no filter, every unit passes"/>
+            <span class="input-group-text text-body-secondary">
+                @_selected[target.Key].Count/@AllUnits.Count
+            </span>
+        </div>
+    }
+</div>
+
 @* One half per target: a column owns its pattern, its quick picks and its own
    copy of the roster, so nothing about the two selections shares a control. *@
-<div class="row g-4">
+<div class="row g-4 @(_open ? "" : "d-none")">
     @foreach (var target in Targets)
     {
         <div class="col-12 col-lg-6">
-            <label class="form-label fw-semibold">
+            @* Blocked: the quick picks below are an inline group, and the pattern box that
+               used to break the line moved up to the fold row. *@
+            <label class="form-label fw-semibold d-block">
                 @target.Label
                 <span class="text-body-secondary small fw-normal">
                     (@_selected[target.Key].Count of @AllUnits.Count units)
                 </span>
             </label>
-            <input class="form-control font-monospace mb-3" readonly value="@_pattern[target.Key]"
-                   placeholder="empty - no filter, every unit passes"/>
-
             <div class="btn-group mb-3" role="group">
                 <button type="button" class="btn btn-outline-secondary"
                         @onclick="() => SelectAll(target.Key)">
@@ -139,6 +164,9 @@
         Targets.ToDictionary(x => x.Key, _ => new HashSet<string>(StringComparer.OrdinalIgnoreCase));
 
     private readonly Dictionary<string, string> _pattern = Targets.ToDictionary(x => x.Key, _ => "");
+
+    /// <summary>Whether the controls are unfolded. Folded is the state a page opens in.</summary>
+    private bool _open;
 
     private static List<Group> BuildGroups()
     {
