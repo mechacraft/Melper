@@ -1,5 +1,5 @@
 {
-  "Date": "2026-08-01",
+  "Date": "2026-09-26",
   "Units": [
     {
       "Id": 10,
@@ -8,7 +8,7 @@
       "CountInPack": 24,
       "Damage": 79,
       "ReloadTime": 0.6,
-      "Health": 263,
+      "Health": 250,
       "Speed": 16
     },
     {
@@ -40,9 +40,9 @@
       "Name": "Void eye",
       "Cost": 100,
       "CountInPack": 3,
-      "Damage": 995,
+      "Damage": 1144,
       "ReloadTime": 3.3,
-      "Health": 1522,
+      "Health": 1370,
       "Range": 100,
       "CanAttackAirWithTech": true,
       "Speed": 8,
@@ -132,7 +132,7 @@
       "CountInPack": 1,
       "Damage": 496,
       "ReloadTime": 0.6,
-      "Health": 14773,
+      "Health": 14034,
       "Range": 80,
       "CanAttackAirWithTech": true,
       "Speed": 8,
@@ -143,9 +143,9 @@
       "Name": "Sabertooth",
       "Cost": 200,
       "CountInPack": 1,
-      "Damage": 6881,
+      "Damage": 6537,
       "ReloadTime": 3.2,
-      "Health": 14886,
+      "Health": 14142,
       "Range": 95,
       "Speed": 8,
       "Splash": 5
@@ -427,11 +427,24 @@
       "Name": "Vortex",
       "Cost": 100,
       "CountInPack": 1,
-      "Damage": 1309,
-      "ReloadTime": 1.5,
-      "Health": 7425,
+      "Damage": 1570,
+      "ReloadTime": 1.8,
+      "Health": 8538,
       "Range": 85,
       "Speed": 8
+    },
+    {
+      "Id": 32,
+      "Name": "Centurion",
+      "Cost": 300,
+      "UnlockCost": 50,
+      "CountInPack": 1,
+      "Damage": 1500,
+      "ReloadTime": 0.8,
+      "Health": 15000,
+      "Range": 110,
+      "CanAttackAir": true,
+      "Speed": 10
     }
   ]
 }

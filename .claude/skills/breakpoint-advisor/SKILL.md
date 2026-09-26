@@ -64,6 +64,7 @@ Russian is **not** matched by the tool. Translate first:
 | хакер | Hacker | | васп, оса | Wasp |
 | феникс | Phoenix | | фантом (рэй), скат | Phantom Ray |
 | рейф, врайт | Wraith | | скорпион | Scorpion |
+| центурион, центур | Centurion | | | |
 
 Dictated names arrive mangled — "сайбер тус" is Sabertooth. Take the nearest unit rather
 than stalling, but if two are genuinely plausible, ask which one instead of picking.
