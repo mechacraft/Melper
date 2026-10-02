@@ -341,6 +341,7 @@ public class BreakPointsCalculatorTests
         IBuff[] candidates =
         [
             new Attack1Buff(), new Attack2Buff(), new Hp1Buff(), new Hp2Buff(),
+            new SmallFireControlBuff(), new SmallHeavyArmorBuff(),
             new SmallAmpCoreBuff(), new ImpFireControlBuff(), new HasteModuleBuff(),
             new HeavyArmorBuff(), new AmpCoreBuff(),
         ];

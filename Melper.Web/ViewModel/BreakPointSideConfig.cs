@@ -6,6 +6,8 @@ public class BreakPointSideConfig
     public bool Attack2 { get; set; }
     public bool Hp1 { get; set; }
     public bool Hp2 { get; set; }
+    public bool SmallFireControl { get; set; }
+    public bool SmallHeavyArmor { get; set; }
     public bool HasteModule { get; set; }
     public bool HeavyArmor { get; set; }
     public bool CostControl { get; set; }

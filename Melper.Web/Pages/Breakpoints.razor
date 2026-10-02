@@ -87,35 +87,28 @@
 <table class="table table-hover table-striped table-bordered align-middle">
     <thead class="table-dark text-center sticky-top">
     <tr>
-        <th>Unit</th>
-        <th>Vs unit</th>
-        @for (var i = 0; i < buffsToShow.Count; i++)
+        <th rowspan="2">Unit</th>
+        <th rowspan="2">Vs unit</th>
+        @if (damageColumns > 0)
         {
-            var buff = buffsToShow[i];
-            var key = BuffKey(buff);
-            if (buff.DamageIncrease > 0)
-            {
-                <th>
-                    <button type="button"
-                            class="btn btn-sm btn-link text-white"
-                            @onclick="@(() => SetSort(key, true))"
-                            title="Sort by ShotsToKillWinPercents">
-                        @buff.Name @(" ShotsToKill")
-                    </button>
-                </th>
-            }
-
-            if (buff.HpIncrease > 0)
-            {
-                <th>
-                    <button type="button"
-                            class="btn btn-sm btn-link text-white"
-                            @onclick="@(() => SetSort(key, false))"
-                            title="Sort by ShotsToLiveWinPercents">
-                        @buff.Name @(" ShotsToLive")
-                    </button>
-                </th>
-            }
+            <th colspan="@damageColumns">Damage</th>
+        }
+        @if (columns.Count > damageColumns)
+        {
+            <th colspan="@(columns.Count - damageColumns)">HP</th>
+        }
+    </tr>
+    <tr>
+        @foreach (var column in columns)
+        {
+            <th>
+                <button type="button"
+                        class="btn btn-sm btn-link text-white"
+                        @onclick="@(() => SetSort(column))"
+                        title="@(column.IsDamage ? "Sort by ShotsToKillWinPercents" : "Sort by ShotsToLiveWinPercents")">
+                    +@(column.Percent)%
+                </button>
+            </th>
         }
     </tr>
     </thead>
@@ -139,12 +132,12 @@
                 }
             </td>
 
-            @for (var i = 0; i < buffsToShow.Count; i++)
+            @for (var i = 0; i < columns.Count; i++)
             {
-                var buff = buffsToShow[i];
-                var calc = row.ByBuff[i];
+                var column = columns[i];
+                var calc = row.ByColumn[i];
 
-                if (buff.DamageIncrease > 0)
+                if (column.IsDamage)
                 {
                     <td>
                         @if (HasKillValue(row, calc))
@@ -167,7 +160,7 @@
                     </td>
                 }
 
-                if (buff.HpIncrease > 0)
+                else
                 {
                     <td>
                         @if (HasLiveValue(row, calc))
@@ -220,13 +213,25 @@
         /// <inheritdoc cref="MainDealsDamage"/>
         public required bool VsDealsDamage { get; init; }
 
-        /// <summary>Results positionally aligned with <see cref="buffsToShow"/>.</summary>
-        public required BreakPointsResults[] ByBuff { get; init; }
+        /// <summary>Results positionally aligned with <see cref="columns"/>.</summary>
+        public required BreakPointsResults[] ByColumn { get; init; }
     }
 
-    /// <summary>One of this page's own per-side toggles, which the head knows nothing about.</summary>
+    /// <summary>
+    /// A column is just how much one step adds, to damage or to hp. Different buffs that
+    /// come to the same number (Hp2 on top of Hp1 and the small heavy armor are both +30%)
+    /// make the same column, so it is shown once.
+    /// </summary>
+    private sealed record Column(bool IsDamage, int Percent);
+
+    /// <summary>
+    /// One of this page's own per-side toggles, which the head knows nothing about: an
+    /// item the side already holds. Holding it counts toward the side's numbers, and on
+    /// the main side it also drops the item's own column - it is no longer a candidate.
+    /// </summary>
     private sealed record Module(
         string Label,
+        IBuff Buff,
         Func<BreakPointSideConfig, bool> Get,
         Action<BreakPointSideConfig, bool> Set);
 
@@ -237,8 +242,10 @@
 
     private static readonly Module[] Modules =
     [
-        new("Haste module", side => side.HasteModule, (side, has) => side.HasteModule = has),
-        new("Heavy armor", side => side.HeavyArmor, (side, has) => side.HeavyArmor = has),
+        new("Small fire control", new SmallFireControlBuff(), side => side.SmallFireControl, (side, has) => side.SmallFireControl = has),
+        new("Small heavy armor", new SmallHeavyArmorBuff(), side => side.SmallHeavyArmor, (side, has) => side.SmallHeavyArmor = has),
+        new("Haste module", new HasteModuleBuff(), side => side.HasteModule, (side, has) => side.HasteModule = has),
+        new("Heavy armor", new HeavyArmorBuff(), side => side.HeavyArmor, (side, has) => side.HeavyArmor = has),
     ];
 
     SideSetup? setup;
@@ -251,25 +258,28 @@
     private Side[] Sides => [new("left", "Unit also owns", left), new("right", "Vs also owns", right)];
 
     // Sorting state
-    string sortBuffKey = "";
-    bool sortByKillPerc = true; // true => ShotsToKillWinPercents, false => ShotsToLiveWinPercents
+    Column? sortColumn;
     bool sortDesc = true;
 
     // Everything below is rebuilt only by Recalculate(), never during a render pass.
-    List<IBuff> buffsToShow = [];
+    // Damage columns come first, so the first damageColumns of them are the damage group.
+    List<Column> columns = [];
+    int damageColumns;
     List<RowItem> rows = [];
 
+    // Only buffs that add to one of damage or hp: one that adds to both, like the amp
+    // cores, would be a column that is neither.
     IBuff[] buffsList =
     [
         new Attack1Buff(),
         new Attack2Buff(),
         new Hp1Buff(),
         new Hp2Buff(),
-        new SmallAmpCoreBuff(),
+        new SmallFireControlBuff(),
+        new SmallHeavyArmorBuff(),
         new ImpFireControlBuff(),
         new HasteModuleBuff(),
         new HeavyArmorBuff(),
-        new AmpCoreBuff(),
     ];
 
     /// <summary>
@@ -305,7 +315,7 @@
             buffs.Add(new Hp2Buff());
         }
 
-        if (side.HeavyArmor) buffs.Add(new HeavyArmorBuff());
+        buffs.AddRange(Modules.Where(x => x.Get(side)).Select(x => x.Buff));
         if (side.CostControl) buffs.Add(new CostControlBuff());
         if (side.Fortified) buffs.Add(new FortifiedBuff());
 
@@ -347,22 +357,26 @@
     /// </summary>
     private void Recalculate()
     {
-        buffsToShow = buffsList
-            .Where(x => left.HeavyArmor == false || x.GetType() != typeof(HeavyArmorBuff))
-            .Where(x => left.HasteModule == false || x.GetType() != typeof(HasteModuleBuff))
+        // What each buff main can still take actually adds on top of what it already owns,
+        // as a number - folded once here, since it depends on the config and not on the
+        // unit pair.
+        columns = buffsList
+            .Where(x => Modules.Any(m => m.Get(left) && m.Buff.GetType() == x.GetType()) == false)
             .Where(x => left.Attack1 == false || x.GetType() != typeof(Attack1Buff))
             .Where(x => left.Attack2 == false || (x.GetType() != typeof(Attack2Buff) && x.GetType() != typeof(Attack1Buff)))
             .Where(x => left.Hp1 == false || x.GetType() != typeof(Hp1Buff))
             .Where(x => left.Hp2 == false || (x.GetType() != typeof(Hp2Buff) && x.GetType() != typeof(Hp1Buff)))
+            .Select(x => CandidateIncrease(x, left))
+            .Select(x => x.Damage > 0 ? new Column(true, x.Damage) : new Column(false, x.Hp))
+            .Distinct()
+            .OrderByDescending(x => x.IsDamage)
+            .ThenBy(x => x.Percent)
             .ToList();
+        damageColumns = columns.Count(x => x.IsDamage);
 
         // Fold each side's buffs down once, instead of re-running the LINQ per cell.
         var mainSide = Aggregates(left);
         var vsSide = Aggregates(right);
-
-        // What each column's buff actually adds on top of what main already owns —
-        // folded once here, since it depends on the config and not on the unit pair.
-        var candidateIncreases = buffsToShow.Select(x => CandidateIncrease(x, left)).ToArray();
 
         var roster = UnitsCollection.Units;
         var mains = ExpandLevels(selection.Mains(roster), left.Lvls);
@@ -380,12 +394,14 @@
                 var mainAggregates = mainSide.For(main);
                 var vsAggregates = vsSide.For(vs);
 
-                var byBuff = new BreakPointsResults[buffsToShow.Count];
-                for (var i = 0; i < buffsToShow.Count; i++)
+                var byColumn = new BreakPointsResults[columns.Count];
+                for (var i = 0; i < columns.Count; i++)
                 {
-                    var (damageIncrease, hpIncrease) = candidateIncreases[i];
-                    byBuff[i] = BreakPointsCalculator.Calculate(
-                        main, vs, mainAggregates, vsAggregates, damageIncrease, hpIncrease);
+                    var column = columns[i];
+                    byColumn[i] = BreakPointsCalculator.Calculate(
+                        main, vs, mainAggregates, vsAggregates,
+                        column.IsDamage ? column.Percent : 0,
+                        column.IsDamage ? 0 : column.Percent);
                 }
 
                 built.Add(new RowItem
@@ -395,7 +411,7 @@
                     VsCanHitMain = main.IsAir == false || vs.CanEverAttackAir,
                     MainDealsDamage = main.SkipDamageCalculations == false,
                     VsDealsDamage = vs.SkipDamageCalculations == false,
-                    ByBuff = byBuff
+                    ByColumn = byColumn
                 });
             }
         }
@@ -429,25 +445,26 @@
     /// <summary>Reorders the already-computed rows in place; never recalculates.</summary>
     private void ApplySort()
     {
-        if (string.IsNullOrEmpty(sortBuffKey)) return;
+        if (sortColumn is null) return;
 
-        var index = buffsToShow.FindIndex(b => BuffKey(b) == sortBuffKey);
+        var index = columns.IndexOf(sortColumn);
         if (index < 0)
         {
             // The column disappeared with the last config change.
-            sortBuffKey = "";
+            sortColumn = null;
             return;
         }
 
-        Func<RowItem, double> selector = sortByKillPerc
-            ? r => r.ByBuff[index].ShotsToKillWinPercents
-            : r => r.ByBuff[index].ShotsToLiveWinPercents;
+        var byKill = sortColumn.IsDamage;
+        Func<RowItem, double> selector = byKill
+            ? r => r.ByColumn[index].ShotsToKillWinPercents
+            : r => r.ByColumn[index].ShotsToLiveWinPercents;
 
         // Blank cells sort to the bottom whichever way the column is pointing, so they
         // never break up the run of real numbers the sort was asked for.
-        Func<RowItem, bool> hasValue = sortByKillPerc
-            ? r => HasKillValue(r, r.ByBuff[index])
-            : r => HasLiveValue(r, r.ByBuff[index]);
+        Func<RowItem, bool> hasValue = byKill
+            ? r => HasKillValue(r, r.ByColumn[index])
+            : r => HasLiveValue(r, r.ByColumn[index]);
 
         var ordered = rows.OrderByDescending(hasValue);
         rows = (sortDesc ? ordered.ThenByDescending(selector) : ordered.ThenBy(selector)).ToList();
@@ -483,19 +500,16 @@
         }
     }
 
-    private static string BuffKey(IBuff buff) => buff.GetType().FullName ?? buff.GetType().Name;
-
-    private void SetSort(string key, bool byKill)
+    private void SetSort(Column column)
     {
-        if (sortBuffKey == key && sortByKillPerc == byKill)
+        if (column == sortColumn)
         {
             // toggle direction
             sortDesc = !sortDesc;
         }
         else
         {
-            sortBuffKey = key;
-            sortByKillPerc = byKill;
+            sortColumn = column;
             sortDesc = true; // default to desc on new column
         }
 
