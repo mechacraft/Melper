@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>MelperCamera</AssemblyName>
+    <RootNamespace>MelperCamera</RootNamespace>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <GameRoot Condition="'$(GameRoot)' == ''">D:\SteamLibrary\steamapps\common\Mechabellum</GameRoot>
+    <MlDir>$(GameRoot)\MelonLoader\net6</MlDir>
+    <Il2CppDir>$(GameRoot)\MelonLoader\Il2CppAssemblies</Il2CppDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="$(MlDir)\MelonLoader.dll" Private="false" />
+    <Reference Include="$(MlDir)\0Harmony.dll" Private="false" />
+    <Reference Include="$(MlDir)\Il2CppInterop.Runtime.dll" Private="false" />
+    <Reference Include="$(Il2CppDir)\Il2Cppmscorlib.dll" Private="false" />
+    <Reference Include="$(Il2CppDir)\Il2CppGRClient.dll" Private="false" />
+    <Reference Include="$(Il2CppDir)\Il2CppCinemachine.dll" Private="false" />
+    <Reference Include="$(Il2CppDir)\UnityEngine.CoreModule.dll" Private="false" />
+    <Reference Include="$(Il2CppDir)\UnityEngine.InputLegacyModule.dll" Private="false" />
+  </ItemGroup>
+
+  <!-- dotnet build -p:Deploy=true copies the DLL into the game's Mods folder. -->
+  <Target Name="DeployToGame" AfterTargets="Build" Condition="'$(Deploy)' == 'true'">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GameRoot)\Mods" />
+  </Target>
+
+</Project>
