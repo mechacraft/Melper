@@ -7,7 +7,7 @@
   "m_Enabled": 1,
   "m_Script": {
    "m_FileID": 1,
-   "m_PathID": 1838
+   "m_PathID": 1840
   },
   "m_Name": "",
   "configFileFolder": "constraptionDatas",
@@ -3276,7 +3276,7 @@
    },
    {
     "fileName": "Card",
-    "md5Value": "328c966be19a70e6a77d2336c5e62384"
+    "md5Value": "21a21c84555d59dadbad8376b5de670c"
    },
    {
     "fileName": "CommanderSkill",
@@ -3308,7 +3308,7 @@
    },
    {
     "fileName": "DlcGiveItems",
-    "md5Value": "aaba4728fec815ba25c2aac2cf50f547"
+    "md5Value": "ed29e76e84442d3cb1122d1a953adeb2"
    },
    {
     "fileName": "DropList",
@@ -3428,7 +3428,7 @@
    },
    {
     "fileName": "TDCommonParm",
-    "md5Value": "86f1e134c095e87d2fb22e514287c604"
+    "md5Value": "b4e0fa288788b706e510ed0c7e76d88a"
    },
    {
     "fileName": "TDDevice",
@@ -3436,7 +3436,7 @@
    },
    {
     "fileName": "TDHandCard",
-    "md5Value": "6dfce7b4a3d538408b6260e9f4c0a713"
+    "md5Value": "8ae8917e9aa8788d686d109c5c5735bd"
    },
    {
     "fileName": "TDMMR",
@@ -3452,7 +3452,7 @@
    },
    {
     "fileName": "Technology",
-    "md5Value": "e51fe2d18c608568307fa5a0afef71ca"
+    "md5Value": "795aa188c0a581feaf63cc1000280469"
    },
    {
     "fileName": "Territory",
@@ -9071,7 +9071,7 @@
     "defaultUnlockType": 1,
     "canTechUnlockNonManual": 1,
     "manualUnlockTeches": [
-     305013
+     1065013
     ]
    },
    {
@@ -12498,8 +12498,8 @@
      105486,
      105487
     ],
-    "life": 15000,
-    "damage": 1500,
+    "life": 16500,
+    "damage": 1395,
     "moveSpeed": 10,
     "isFly": 0,
     "attackAngle": 10.0,
@@ -13071,7 +13071,7 @@
     "prefabName": "Mech_Default_5022",
     "scuffleAISkinID": [],
     "life": 11434,
-    "damage": 102,
+    "damage": 112,
     "moveSpeed": 9,
     "isFly": 0,
     "attackAngle": 20.0,
@@ -13226,7 +13226,7 @@
     "isTestData": 0,
     "prefabName": "Mech_Default_5028",
     "scuffleAISkinID": [],
-    "life": 1213,
+    "life": 1455,
     "damage": 367,
     "moveSpeed": 10,
     "isFly": 0,
@@ -13304,7 +13304,7 @@
     "isTestData": 0,
     "prefabName": "Mech_Default_5031",
     "scuffleAISkinID": [],
-    "life": 8839,
+    "life": 9723,
     "damage": 1856,
     "moveSpeed": 8,
     "isFly": 0,
@@ -32019,6 +32019,13 @@
     "isTestData": 0,
     "key": "loadingscreen__equipment_limit",
     "value": "10"
+   },
+   {
+    "id": 0,
+    "name": "",
+    "isTestData": 0,
+    "key": "bundle_dlc_ids",
+    "value": "27;28"
    }
   ],
   "asyncCommonParm": [
@@ -32194,13 +32201,6 @@
     "id": 0,
     "name": "",
     "isTestData": 0,
-    "key": "额外分 =A*max(0, (自己的积分 − B)/（排行榜第200位的积分 − B）)^C；0 < 额外分 < A;,其中C是百分比，排行榜第200位的积分小于D时，使用D作为排行榜第200位的积分。",
-    "value": ""
-   },
-   {
-    "id": 0,
-    "name": "",
-    "isTestData": 0,
     "key": "catch_up_points",
     "value": "8;100;1;10;30;2000;35000"
    },
@@ -32258,21 +32258,21 @@
     "name": "",
     "isTestData": 0,
     "key": "snap_select_mmax",
-    "value": "4;17;33;50;67;100"
+    "value": "13;17;20;23;27;30;33;37;40;43;47;50;53;57;60;63;67;70;73;77;80;83;87;90;93;100"
    },
    {
     "id": 0,
     "name": "",
     "isTestData": 0,
     "key": "snap_select_times_win",
-    "value": "1;1;1;2;2;3"
+    "value": "91;128;165;202;240;277;314;351;388;426;463;500;537;574;612;649;686;723;760;798;835;872;909;946;984;1000"
    },
    {
     "id": 0,
     "name": "",
     "isTestData": 0,
     "key": "snap_select_times_lose",
-    "value": "4;3;2;2;1;1"
+    "value": "909;872;835;798;760;723;686;649;612;574;537;500;463;426;388;351;314;277;240;202;165;128;91;54;16;0"
    },
    {
     "id": 0,
@@ -32314,14 +32314,21 @@
     "name": "",
     "isTestData": 0,
     "key": "mmr_point_params",
-    "value": "40;85;3000;5;4;1;90;1;50"
+    "value": "3000;100;40;1;400;130;-45;2600;400;5;4;1;90;1;50"
    },
    {
     "id": 0,
     "name": "",
     "isTestData": 0,
     "key": "enemy_pool_size",
-    "value": "20"
+    "value": "30"
+   },
+   {
+    "id": 0,
+    "name": "",
+    "isTestData": 0,
+    "key": "mirror_weaken_params",
+    "value": "100;30;200;20;300;19;400;18;500;17;600;16;700;14;800;12;900;10;1000;8;1100;6;1200;4;1300;2"
    }
   ],
   "guiderConfigDatas": [
@@ -405432,7 +405439,7 @@
   "dlcGiveItems": [
    {
     "id": 1,
-    "name": "",
+    "name": "DreamHack LAN线下-Steam",
     "isTestData": 0,
     "appId": "3009940",
     "offerId": "",
@@ -405475,7 +405482,7 @@
    },
    {
     "id": 2,
-    "name": "",
+    "name": "先锋测试奖励-Steam",
     "isTestData": 0,
     "appId": "3202380",
     "offerId": "",
@@ -405494,7 +405501,7 @@
    },
    {
     "id": 3,
-    "name": "",
+    "name": "机动部队皮肤包-Steam",
     "isTestData": 0,
     "appId": "3241600",
     "offerId": "",
@@ -405518,7 +405525,7 @@
    },
    {
     "id": 4,
-    "name": "",
+    "name": "钢铁皮肤包-Steam",
     "isTestData": 0,
     "appId": "3241610",
     "offerId": "",
@@ -405540,7 +405547,7 @@
    },
    {
     "id": 5,
-    "name": "",
+    "name": "鎏金沙虫皮肤包-Steam",
     "isTestData": 0,
     "appId": "3241620",
     "offerId": "",
@@ -405558,7 +405565,7 @@
    },
    {
     "id": 6,
-    "name": "",
+    "name": "豪华版表情、头像、头像框-Steam",
     "isTestData": 0,
     "appId": "3241640",
     "offerId": "",
@@ -405582,7 +405589,7 @@
    },
    {
     "id": 7,
-    "name": "",
+    "name": "先锋测试奖励-WeGame",
     "isTestData": 0,
     "appId": "2002294",
     "offerId": "",
@@ -405601,7 +405608,7 @@
    },
    {
     "id": 8,
-    "name": "",
+    "name": "机动部队皮肤包-WeGame",
     "isTestData": 0,
     "appId": "2002297",
     "offerId": "",
@@ -405625,7 +405632,7 @@
    },
    {
     "id": 9,
-    "name": "",
+    "name": "钢铁皮肤包-WeGame",
     "isTestData": 0,
     "appId": "2002295",
     "offerId": "",
@@ -405647,7 +405654,7 @@
    },
    {
     "id": 10,
-    "name": "",
+    "name": "鎏金沙虫皮肤包-WeGame",
     "isTestData": 0,
     "appId": "2002296",
     "offerId": "",
@@ -405665,7 +405672,7 @@
    },
    {
     "id": 11,
-    "name": "",
+    "name": "豪华版表情、头像、头像框-WeGame",
     "isTestData": 0,
     "appId": "2002298",
     "offerId": "",
@@ -405689,7 +405696,7 @@
    },
    {
     "id": 12,
-    "name": "",
+    "name": "机动部队皮肤包-Epic",
     "isTestData": 0,
     "appId": "d5bdad08e4fa4e73a6bea32613380ffb",
     "offerId": "",
@@ -405713,7 +405720,7 @@
    },
    {
     "id": 13,
-    "name": "",
+    "name": "钢铁皮肤包-Epic",
     "isTestData": 0,
     "appId": "6dc5877f529649e687043aaeef717e20",
     "offerId": "",
@@ -405735,7 +405742,7 @@
    },
    {
     "id": 14,
-    "name": "",
+    "name": "鎏金沙虫皮肤包-Epic",
     "isTestData": 0,
     "appId": "994bed9cba4748cf808f2029493a9d54",
     "offerId": "",
@@ -405753,7 +405760,7 @@
    },
    {
     "id": 15,
-    "name": "",
+    "name": "豪华版表情、头像、头像框-Epic",
     "isTestData": 0,
     "appId": "74a327c6b926442ba0d50f62faad5f08",
     "offerId": "",
@@ -405777,7 +405784,7 @@
    },
    {
     "id": 16,
-    "name": "",
+    "name": "柴油朋克钢球-Steam",
     "isTestData": 0,
     "appId": "5052470",
     "offerId": "",
@@ -405795,7 +405802,7 @@
    },
    {
     "id": 17,
-    "name": "",
+    "name": "柴油朋克霸主-Steam",
     "isTestData": 0,
     "appId": "5052490",
     "offerId": "",
@@ -405813,7 +405820,7 @@
    },
    {
     "id": 18,
-    "name": "",
+    "name": "皇家凤凰-Steam",
     "isTestData": 0,
     "appId": "5052500",
     "offerId": "",
@@ -405831,7 +405838,7 @@
    },
    {
     "id": 19,
-    "name": "",
+    "name": "皇家剑齿虎-Steam",
     "isTestData": 0,
     "appId": "5052510",
     "offerId": "",
@@ -405849,7 +405856,7 @@
    },
    {
     "id": 20,
-    "name": "",
+    "name": "柴油朋克钢球-Epic",
     "isTestData": 0,
     "appId": "096cb26a7af94ba78c1408ed628c3948",
     "offerId": "f35816e4bb824dc6b69d2689e4f17880",
@@ -405867,7 +405874,7 @@
    },
    {
     "id": 21,
-    "name": "",
+    "name": "柴油朋克霸主-Epic",
     "isTestData": 0,
     "appId": "b431856d11e240a0b09aae63d37c65ea",
     "offerId": "59270513b87145f1a31533dd8216fa98",
@@ -405885,7 +405892,7 @@
    },
    {
     "id": 22,
-    "name": "",
+    "name": "皇家凤凰-Epic",
     "isTestData": 0,
     "appId": "14c9c7b7937e4ef292479dd4ef337027",
     "offerId": "7a3a34ce16424d9bbc466d28d3f8ba24",
@@ -405903,7 +405910,7 @@
    },
    {
     "id": 23,
-    "name": "",
+    "name": "皇家剑齿虎-Epic",
     "isTestData": 0,
     "appId": "093656076fee43dfbe2324a7337e8e6e",
     "offerId": "812f5f951e3d4287a3f6d279c8dd8608",
@@ -405921,7 +405928,7 @@
    },
    {
     "id": 24,
-    "name": "",
+    "name": "完整版奖励-Steam",
     "isTestData": 0,
     "appId": "5038000",
     "offerId": "",
@@ -405940,7 +405947,7 @@
    },
    {
     "id": 25,
-    "name": "",
+    "name": "完整版奖励-WeGame",
     "isTestData": 0,
     "appId": "2008299",
     "offerId": "",
@@ -405959,7 +405966,7 @@
    },
    {
     "id": 26,
-    "name": "",
+    "name": "完整版奖励-Epic",
     "isTestData": 0,
     "appId": "e625b34a4e5547f6bb83ceecf21b0dea",
     "offerId": "6d99eae44d724baf84d6261a7a0f05d2",
@@ -405971,6 +405978,34 @@
      101173,
      107008
     ],
+    "eaReward": 2,
+    "currency": "",
+    "price": "",
+    "priceBefore": ""
+   },
+   {
+    "id": 27,
+    "name": "黄金时代4合1捆绑包-Steam",
+    "isTestData": 0,
+    "appId": "84687",
+    "offerId": "",
+    "platform": 1,
+    "startTime": "",
+    "itemsId": [],
+    "eaReward": 2,
+    "currency": "",
+    "price": "",
+    "priceBefore": ""
+   },
+   {
+    "id": 28,
+    "name": "黄金时代4合1捆绑包-Epic",
+    "isTestData": 0,
+    "appId": "21bce1e8c05c488b8ba27aeba985204a",
+    "offerId": "918bab6c72d34f859532194788f4714b",
+    "platform": 4,
+    "startTime": "",
+    "itemsId": [],
     "eaReward": 2,
     "currency": "",
     "price": "",
@@ -423392,7 +423427,7 @@
     "targetID": 5013,
     "roundLimit_min": 0,
     "roundLimit_max": 999,
-    "isInShop": 1,
+    "isInShop": 0,
     "shopPrice": 0
    },
    {
@@ -425843,7 +425878,7 @@
     "targetID": 5013,
     "roundLimit_min": 0,
     "roundLimit_max": 999,
-    "isInShop": 0,
+    "isInShop": 1,
     "shopPrice": 0
    },
    {
@@ -432174,7 +432209,7 @@
     "name": "孤胆尖兵",
     "isTestData": 0,
     "iconName": "TD_204_GuDanJianBing_SBUI",
-    "description": "同类兵种只有一队的单位，攻击值+{0}%，生命值+{1}%（泰坦无效）",
+    "description": "如果某兵种在场上只有一队，则该部队攻击力+{0}%，生命值+{1}%。（此效果对泰坦无效）",
     "descParams": "30;30",
     "story": "",
     "limitedScene": [
@@ -433171,7 +433206,7 @@
     "name": "最后防线",
     "isTestData": 0,
     "iconName": "TD_210_ZuiHouFangXian_SBUI",
-    "description": "拥有单位不超过{0}队时，所有单位攻击力+{1}%，生命值+{2}%",
+    "description": "己方场上部署的部队不超过 {0} 队时，所有己方单位攻击力+{1}%，生命值+{2}%。",
     "descParams": "10;50;50",
     "story": "",
     "limitedScene": [
@@ -433220,7 +433255,7 @@
     "name": "孤胆尖兵",
     "isTestData": 0,
     "iconName": "TD_204_GuDanJianBing_SBUI",
-    "description": "同类兵种只有一队的单位，攻击值+{0}%，生命值+{1}%（泰坦无效）",
+    "description": "如果某兵种在场上只有一队，则该部队攻击力+{0}%，生命值+{1}%。（此效果对泰坦无效）",
     "descParams": "20;20",
     "story": "",
     "limitedScene": [
@@ -433557,7 +433592,7 @@
   "m_Enabled": 1,
   "m_Script": {
    "m_FileID": 1,
-   "m_PathID": 3226
+   "m_PathID": 3228
   },
   "m_Name": "",
   "configFileFolder": "shipWeaponDatas",
@@ -444295,21 +444330,21 @@
     "weaponCountPerSkill": 1,
     "useDefaultRotationSearchTarget": 0,
     "damage": [
-     800
+     2000
     ],
     "damageRate": 0.0,
-    "minAttackRange": 60.0,
+    "minAttackRange": 45.0,
     "attackRange": 160.0,
     "canAttackAngle": 0.0,
     "attackDuration": 5.0,
     "attackDurationRandomValue": 0.0,
     "useSelfSplash": 0,
-    "splashRange": 7.0,
+    "splashRange": 5.0,
     "isDiffusion": 0,
     "diffusionInteval": 0.0,
     "diffusionSpeed": 0.0,
     "canAttackGround": 1,
-    "canAttackAir": 0,
+    "canAttackAir": 1,
     "isLockTarget": 1,
     "initialCoolDownTime": 0.0,
     "prepareTime": 0.0,
@@ -444336,9 +444371,9 @@
     "sideArmSearchRange": 0.0,
     "sideArmFireDelay": 0.0,
     "ignoreEquipmentEffect": 0,
-    "projectileCount": 4,
+    "projectileCount": 2,
     "projectileDuration": 0.25,
-    "randomTargetRange": 20.0,
+    "randomTargetRange": 0.0,
     "isEvenlyAllocated": 0,
     "extraSearchRange": 0.0,
     "bulletSpeed": 200.0,
@@ -445723,7 +445758,7 @@
     "weaponCountPerSkill": 2,
     "useDefaultRotationSearchTarget": 0,
     "damage": [
-     1080
+     1620
     ],
     "damageRate": 0.0,
     "minAttackRange": 0.0,
@@ -447455,29 +447490,29 @@
     "weaponCountPerSkill": 1,
     "useDefaultRotationSearchTarget": 0,
     "damage": [
-     800,
-     1600,
-     2400,
-     3200,
+     2000,
      4000,
-     4800,
-     5600,
-     6400,
-     7200
+     6000,
+     8000,
+     10000,
+     12000,
+     14000,
+     16000,
+     18000
     ],
     "damageRate": 0.0,
-    "minAttackRange": 70.0,
+    "minAttackRange": 45.0,
     "attackRange": 160.0,
     "canAttackAngle": 0.0,
     "attackDuration": 5.0,
     "attackDurationRandomValue": 0.0,
     "useSelfSplash": 0,
-    "splashRange": 7.0,
+    "splashRange": 5.0,
     "isDiffusion": 0,
     "diffusionInteval": 0.0,
     "diffusionSpeed": 0.0,
     "canAttackGround": 1,
-    "canAttackAir": 0,
+    "canAttackAir": 1,
     "isLockTarget": 1,
     "initialCoolDownTime": 0.0,
     "prepareTime": 0.0,
@@ -447504,9 +447539,9 @@
     "sideArmSearchRange": 0.0,
     "sideArmFireDelay": 0.0,
     "ignoreEquipmentEffect": 0,
-    "projectileCount": 4,
+    "projectileCount": 2,
     "projectileDuration": 0.25,
-    "randomTargetRange": 20.0,
+    "randomTargetRange": 0.0,
     "isEvenlyAllocated": 0,
     "extraSearchRange": 0.0,
     "bulletSpeed": 200.0,
@@ -458428,7 +458463,7 @@
     "isTestData": 0,
     "iconName": "UT_Piercing_Bullet",
     "description": "攻击力上升{0}%，攻击间隔增加{1}%",
-    "descParams": "250;20",
+    "descParams": "300;20",
     "story": "",
     "limitedScene": [],
     "targetSkillID": 0,
@@ -458442,7 +458477,7 @@
      0.0
     ],
     "damageChangeRate": [
-     2.5
+     3.0
     ],
     "speedChangeValue": [
      0
@@ -465080,7 +465115,7 @@
     "mainSkillEffect": 1,
     "extraSkillEffect": 0,
     "extraSkillNumericalEffect": 1,
-    "supply": 200,
+    "supply": 100,
     "previousTechID": 0,
     "activeLevel": 0,
     "lifeChangeRate": [],
@@ -467704,7 +467739,7 @@
     "mainSkillEffect": 1,
     "extraSkillEffect": 0,
     "extraSkillNumericalEffect": 1,
-    "supply": 200,
+    "supply": 150,
     "previousTechID": 0,
     "activeLevel": 0,
     "lifeChangeRate": [],
@@ -469713,7 +469748,7 @@
     "mainSkillEffect": 1,
     "extraSkillEffect": 0,
     "extraSkillNumericalEffect": 1,
-    "supply": 200,
+    "supply": 150,
     "previousTechID": 0,
     "activeLevel": 0,
     "lifeChangeRate": [],
@@ -470949,7 +470984,7 @@
     "mainSkillEffect": 1,
     "extraSkillEffect": 0,
     "extraSkillNumericalEffect": 1,
-    "supply": 200,
+    "supply": 100,
     "previousTechID": 0,
     "activeLevel": 0,
     "lifeChangeRate": [],
@@ -475675,15 +475710,15 @@
     "name": "追踪导弹",
     "isTestData": 0,
     "iconName": "UT_Rockets",
-    "description": "每 {0} 秒发射 {1} 枚追踪导弹打击远处的敌方地面目标，每枚造成 {2} 点伤害。导弹最大射程 {3} 米，最小射程 {4} 米。",
-    "descParams": "5;4;800;160;60",
+    "description": "每 {0} 秒发射 {1} 枚追踪导弹打击远处的敌人。导弹的最大射程为 {3} 米，最小射程为 {4} 米，每枚造成 {2} 点伤害，爆炸半径为 {5}米。",
+    "descParams": "5;2;2000;160;45;5",
     "story": "",
     "limitedScene": [],
     "targetSkillID": 0,
     "mainSkillEffect": 1,
     "extraSkillEffect": 0,
     "extraSkillNumericalEffect": 1,
-    "supply": 200,
+    "supply": 250,
     "previousTechID": 0,
     "activeLevel": 1,
     "lifeChangeRate": [],
@@ -475764,7 +475799,7 @@
     "isTestData": 0,
     "iconName": "UT_Rockets2",
     "description": "每{0}秒发射{1}枚防空弹幕攻击敌人，弹幕只对空中单位造成伤害，每枚导弹造成{2}点伤害，射程{3}米",
-    "descParams": "10;16;1080;170",
+    "descParams": "10;16;1620;170",
     "story": "",
     "limitedScene": [],
     "targetSkillID": 0,
@@ -476443,7 +476478,7 @@
     "mainSkillEffect": 1,
     "extraSkillEffect": 0,
     "extraSkillNumericalEffect": 1,
-    "supply": 200,
+    "supply": 150,
     "previousTechID": 0,
     "activeLevel": 1,
     "lifeChangeRate": [],
@@ -476833,8 +476868,8 @@
     "name": "追踪导弹",
     "isTestData": 0,
     "iconName": "UT_Rockets",
-    "description": "每 {0} 秒发射 {1} 枚追踪导弹打击远处的敌方地面目标，每枚造成 {2} 点伤害。导弹最大射程 {3} 米，最小射程 {4} 米。",
-    "descParams": "5;4;800;160;70",
+    "description": "每 {0} 秒发射 {1} 枚追踪导弹打击远处的敌人。导弹的最大射程为 {3} 米，最小射程为 {4} 米，每枚造成 {2} 点伤害（单位每提升1级，伤害增加{2}），爆炸半径为 {5}米。",
+    "descParams": "5;2;2000;160;45;5",
     "story": "",
     "limitedScene": [],
     "targetSkillID": 0,
@@ -482296,7 +482331,7 @@
     "mainSkillEffect": 1,
     "extraSkillEffect": 0,
     "extraSkillNumericalEffect": 1,
-    "supply": 150,
+    "supply": 50,
     "previousTechID": 0,
     "activeLevel": 0,
     "lifeChangeRate": [],
@@ -484993,8 +485028,8 @@
     "name": "对空",
     "isTestData": 0,
     "iconName": "UT_DuiKong",
-    "description": "射程增加{0}，使沙虫可以攻击空中目标。",
-    "descParams": "20",
+    "description": "攻击力增加{0}%，使沙虫可以攻击空中目标。",
+    "descParams": "30",
     "story": "",
     "limitedScene": [],
     "targetSkillID": 0,
@@ -485005,12 +485040,12 @@
     "previousTechID": 0,
     "activeLevel": 0,
     "lifeChangeRate": [],
-    "damageChangeRate": [],
+    "damageChangeRate": [
+     0.3
+    ],
     "speedChangeValue": [],
     "minAttackRangeChangeValue": [],
-    "attackRangeChangeValue": [
-     20.0
-    ],
+    "attackRangeChangeValue": [],
     "attackRangeChangeRate": [],
     "attackIntervalChangeValue": [],
     "attackIntervalChangeRate": [],
@@ -485270,7 +485305,7 @@
     "isTestData": 0,
     "iconName": "UT_Rifle_grenade",
     "description": "尖牙改为使用榴弹发射器，射程增加{1}米，对目标周围{0}米范围内的敌人造成溅射伤害，但是无法对空。",
-    "descParams": "7;10",
+    "descParams": "7;20",
     "story": "",
     "limitedScene": [],
     "targetSkillID": 0,
@@ -485285,7 +485320,7 @@
     "speedChangeValue": [],
     "minAttackRangeChangeValue": [],
     "attackRangeChangeValue": [
-     10.0
+     20.0
     ],
     "attackRangeChangeRate": [],
     "attackIntervalChangeValue": [],
@@ -487431,7 +487466,7 @@
     "mainSkillEffect": 1,
     "extraSkillEffect": 1,
     "extraSkillNumericalEffect": 1,
-    "supply": 300,
+    "supply": 200,
     "previousTechID": 0,
     "activeLevel": 0,
     "lifeChangeRate": [],
@@ -488596,7 +488631,7 @@
   "m_Enabled": 1,
   "m_Script": {
    "m_FileID": 1,
-   "m_PathID": 5968
+   "m_PathID": 5970
   },
   "m_Name": "",
   "configFileFolder": "equipmentDatas",

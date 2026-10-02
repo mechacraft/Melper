@@ -3295,9 +3295,9 @@
   "activeLevel": 0,
   "isTestData": false,
   "iconName": "UT_DuiKong",
-  "text": "射程增加20，使沙虫可以攻击空中目标。",
-  "description": "射程增加{0}，使沙虫可以攻击空中目标。",
-  "descParams": "20"
+  "text": "攻击力增加30%，使沙虫可以攻击空中目标。",
+  "description": "攻击力增加{0}%，使沙虫可以攻击空中目标。",
+  "descParams": "30"
  },
  {
   "unitId": 23,
@@ -4542,7 +4542,7 @@
  {
   "unitId": 32,
   "unitNameCn": "百夫长",
-  "unitName": "",
+  "unitName": "Centurion",
   "roster": "main",
   "order": 0,
   "inDefaultList": true,
@@ -4562,7 +4562,7 @@
  {
   "unitId": 32,
   "unitNameCn": "百夫长",
-  "unitName": "",
+  "unitName": "Centurion",
   "roster": "main",
   "order": 1,
   "inDefaultList": true,
@@ -4582,7 +4582,7 @@
  {
   "unitId": 32,
   "unitNameCn": "百夫长",
-  "unitName": "",
+  "unitName": "Centurion",
   "roster": "main",
   "order": 2,
   "inDefaultList": true,
@@ -4602,7 +4602,7 @@
  {
   "unitId": 32,
   "unitNameCn": "百夫长",
-  "unitName": "",
+  "unitName": "Centurion",
   "roster": "main",
   "order": 3,
   "inDefaultList": true,
@@ -4622,27 +4622,27 @@
  {
   "unitId": 32,
   "unitNameCn": "百夫长",
-  "unitName": "",
+  "unitName": "Centurion",
   "roster": "main",
   "order": 4,
   "inDefaultList": false,
   "techId": 110322,
   "name": "追踪导弹",
   "category": "extraWeaponTechnologies",
-  "supply": 200,
+  "supply": 250,
   "unlockCost": 0,
   "previousTechID": 0,
   "activeLevel": 1,
   "isTestData": false,
   "iconName": "UT_Rockets",
-  "text": "每 5 秒发射 4 枚追踪导弹打击远处的敌方地面目标，每枚造成 800 点伤害。导弹最大射程 160 米，最小射程 60 米。",
-  "description": "每 {0} 秒发射 {1} 枚追踪导弹打击远处的敌方地面目标，每枚造成 {2} 点伤害。导弹最大射程 {3} 米，最小射程 {4} 米。",
-  "descParams": "5;4;800;160;60"
+  "text": "每 5 秒发射 2 枚追踪导弹打击远处的敌人。导弹的最大射程为 160 米，最小射程为 45 米，每枚造成 2000 点伤害，爆炸半径为 5米。",
+  "description": "每 {0} 秒发射 {1} 枚追踪导弹打击远处的敌人。导弹的最大射程为 {3} 米，最小射程为 {4} 米，每枚造成 {2} 点伤害，爆炸半径为 {5}米。",
+  "descParams": "5;2;2000;160;45;5"
  },
  {
   "unitId": 32,
   "unitNameCn": "百夫长",
-  "unitName": "",
+  "unitName": "Centurion",
   "roster": "main",
   "order": 5,
   "inDefaultList": false,
@@ -8915,9 +8915,9 @@
   "activeLevel": 1,
   "isTestData": false,
   "iconName": "UT_Rockets2",
-  "text": "每10秒发射16枚防空弹幕攻击敌人，弹幕只对空中单位造成伤害，每枚导弹造成1080点伤害，射程170米",
+  "text": "每10秒发射16枚防空弹幕攻击敌人，弹幕只对空中单位造成伤害，每枚导弹造成1620点伤害，射程170米",
   "description": "每{0}秒发射{1}枚防空弹幕攻击敌人，弹幕只对空中单位造成伤害，每枚导弹造成{2}点伤害，射程{3}米",
-  "descParams": "10;16;1080;170"
+  "descParams": "10;16;1620;170"
  },
  {
   "unitId": 5001,
@@ -9509,7 +9509,7 @@
   "techId": 18035005,
   "name": "光子涂层",
   "category": "buffTechnologies",
-  "supply": 200,
+  "supply": 100,
   "unlockCost": 0,
   "previousTechID": 0,
   "activeLevel": 0,
@@ -10195,9 +10195,9 @@
   "activeLevel": 0,
   "isTestData": false,
   "iconName": "UT_Rifle_grenade",
-  "text": "尖牙改为使用榴弹发射器，射程增加10米，对目标周围7米范围内的敌人造成溅射伤害，但是无法对空。",
+  "text": "尖牙改为使用榴弹发射器，射程增加20米，对目标周围7米范围内的敌人造成溅射伤害，但是无法对空。",
   "description": "尖牙改为使用榴弹发射器，射程增加{1}米，对目标周围{0}米范围内的敌人造成溅射伤害，但是无法对空。",
-  "descParams": "7;10"
+  "descParams": "7;20"
  },
  {
   "unitId": 5010,
@@ -10269,7 +10269,7 @@
   "techId": 275010,
   "name": "酸性爆炸",
   "category": "deadAcidRangeItemTechnologyDatas",
-  "supply": 150,
+  "supply": 50,
   "unlockCost": 0,
   "previousTechID": 0,
   "activeLevel": 0,
@@ -10509,7 +10509,7 @@
   "techId": 85012,
   "name": "燃烧弹",
   "category": "fireIntensifyTechnologies",
-  "supply": 200,
+  "supply": 100,
   "unlockCost": 0,
   "previousTechID": 0,
   "activeLevel": 0,
@@ -10735,9 +10735,9 @@
   "activeLevel": 0,
   "isTestData": false,
   "iconName": "UT_Piercing_Bullet",
-  "text": "攻击力上升250%，攻击间隔增加20%",
+  "text": "攻击力上升300%，攻击间隔增加20%",
   "description": "攻击力上升{0}%，攻击间隔增加{1}%",
-  "descParams": "250;20"
+  "descParams": "300;20"
  },
  {
   "unitId": 5013,
@@ -11469,7 +11469,7 @@
   "techId": 445018,
   "name": "地面巡航",
   "category": "flyTechDatas",
-  "supply": 300,
+  "supply": 200,
   "unlockCost": 0,
   "previousTechID": 0,
   "activeLevel": 0,
@@ -11849,7 +11849,7 @@
   "techId": 11015021,
   "name": "防空导弹",
   "category": "extraWeaponTechnologies",
-  "supply": 200,
+  "supply": 150,
   "unlockCost": 0,
   "previousTechID": 0,
   "activeLevel": 1,
@@ -12309,7 +12309,7 @@
   "techId": 45024,
   "name": "高爆弹药",
   "category": "splashTechnologies",
-  "supply": 200,
+  "supply": 150,
   "unlockCost": 0,
   "previousTechID": 0,
   "activeLevel": 0,
@@ -13209,7 +13209,7 @@
   "techId": 65031,
   "name": "并网",
   "category": "damageShareTechnologies",
-  "supply": 200,
+  "supply": 150,
   "unlockCost": 0,
   "previousTechID": 0,
   "activeLevel": 0,
@@ -13355,9 +13355,9 @@
   "activeLevel": 1,
   "isTestData": false,
   "iconName": "UT_Rockets",
-  "text": "每 5 秒发射 4 枚追踪导弹打击远处的敌方地面目标，每枚造成 800 点伤害。导弹最大射程 160 米，最小射程 70 米。",
-  "description": "每 {0} 秒发射 {1} 枚追踪导弹打击远处的敌方地面目标，每枚造成 {2} 点伤害。导弹最大射程 {3} 米，最小射程 {4} 米。",
-  "descParams": "5;4;800;160;70"
+  "text": "每 5 秒发射 2 枚追踪导弹打击远处的敌人。导弹的最大射程为 160 米，最小射程为 45 米，每枚造成 2000 点伤害（单位每提升1级，伤害增加2000），爆炸半径为 5米。",
+  "description": "每 {0} 秒发射 {1} 枚追踪导弹打击远处的敌人。导弹的最大射程为 {3} 米，最小射程为 {4} 米，每枚造成 {2} 点伤害（单位每提升1级，伤害增加{2}），爆炸半径为 {5}米。",
+  "descParams": "5;2;2000;160;45;5"
  },
  {
   "unitId": 5032,
