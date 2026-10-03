@@ -120,7 +120,7 @@ static class ScoutCanvas
         background.color = new Color(0f, 0f, 0f, 0.72f);
         background.raycastTarget = false;
 
-        string title = $"Раунд {snapshot.Round}: армии на начало боя{(snapshot.HasDamage ? " и урон" : "")}   (F9 — скрыть)";
+        string title = $"Round {snapshot.Round}: armies at fight start{(snapshot.HasDamage ? " and damage" : "")}   (F9 to hide)";
         AddText(panelRect, title, 13, Color.white, TextAnchor.MiddleLeft, Padding, Padding * 0.5f, width - Padding * 2, LineHeight);
 
         // One scale for both columns, so the bars compare across teams too.
@@ -153,7 +153,7 @@ static class ScoutCanvas
         var rows = team.Damage.Take(MaxDamageRows - 1).ToList();
         rows.Add(new UnitDamageInfo
         {
-            Name = $"ещё {rest.Count}",
+            Name = $"{rest.Count} more",
             Damage = rest.Sum(d => d.Damage),
             Kills = rest.Sum(d => d.Kills),
             Taken = rest.Sum(d => d.Taken),
@@ -165,13 +165,13 @@ static class ScoutCanvas
     {
         y += Padding;
         long total = team.Damage.Sum(d => d.Damage);
-        AddText(parent, $"Урон в бою: {total:N0}", 13, new Color(1f, 0.85f, 0.45f), TextAnchor.MiddleLeft, x, y, ColumnWidth, LineHeight);
+        AddText(parent, $"Fight damage: {total:N0}", 13, new Color(1f, 0.85f, 0.45f), TextAnchor.MiddleLeft, x, y, ColumnWidth, LineHeight);
         y += LineHeight;
 
         var rows = DamageRows(team);
         if (rows.Count == 0)
         {
-            AddText(parent, "нет данных", 12, Color.gray, TextAnchor.MiddleLeft, x, y, ColumnWidth, DamageRowHeight);
+            AddText(parent, "no data", 12, Color.gray, TextAnchor.MiddleLeft, x, y, ColumnWidth, DamageRowHeight);
             return;
         }
 
@@ -188,12 +188,12 @@ static class ScoutCanvas
             float fill = maxDamage > 0 ? barWidth * row.Damage / maxDamage : 0f;
             if (fill >= 1f)
                 AddBar(parent, barX, y + 3f, fill, DamageRowHeight - 6f, barColor);
-            string label = row.Kills > 0 ? $"{row.Damage:N0}  ·  {row.Kills} уб." : row.Damage.ToString("N0");
+            string label = row.Kills > 0 ? $"{row.Damage:N0}  ·  {row.Kills} kills" : row.Damage.ToString("N0");
             if (row.IconCandidates.Length == 0)
                 label = $"{row.Name}: {label}";
             var text = AddText(parent, label, 12, Color.white, TextAnchor.MiddleLeft, barX + 4f, y, barWidth - 4f, DamageRowHeight);
 
-            string hover = $"{row.Name}: урон {row.Damage:N0}, убито {row.Kills}, получено урона {row.Taken:N0}";
+            string hover = $"{row.Name}: dealt {row.Damage:N0}, killed {row.Kills}, took {row.Taken:N0}";
             HoverTargets.Add((icon, hover));
             HoverTargets.Add((text, hover));
             y += DamageRowHeight;
@@ -212,14 +212,14 @@ static class ScoutCanvas
     // Returns where the column's army part ends.
     static float BuildTeam(RectTransform parent, TeamSnapshot team, float x, float y)
     {
-        string who = team.IsLocal ? "Вы" : "Соперник";
-        AddText(parent, $"{who} (команда {team.TeamIndex + 1})", 15, new Color(1f, 0.85f, 0.45f), TextAnchor.MiddleLeft, x, y, ColumnWidth, HeaderHeight, bold: true);
+        string who = team.IsLocal ? "You" : "Opponent";
+        AddText(parent, $"{who} (team {team.TeamIndex + 1})", 15, new Color(1f, 0.85f, 0.45f), TextAnchor.MiddleLeft, x, y, ColumnWidth, HeaderHeight, bold: true);
         y += HeaderHeight;
 
         string value = team.ValueComplete ? team.Value.ToString("N0") : $"≈{team.Value:N0}";
-        AddText(parent, $"Армия: {value}", 13, Color.white, TextAnchor.MiddleLeft, x, y, ColumnWidth, LineHeight);
+        AddText(parent, $"Army: {value}", 13, Color.white, TextAnchor.MiddleLeft, x, y, ColumnWidth, LineHeight);
         y += LineHeight;
-        AddText(parent, $"Здоровье: {team.MaxHealth:N0}", 13, Color.white, TextAnchor.MiddleLeft, x, y, ColumnWidth, LineHeight);
+        AddText(parent, $"Health: {team.MaxHealth:N0}", 13, Color.white, TextAnchor.MiddleLeft, x, y, ColumnWidth, LineHeight);
         y += LineHeight;
 
         for (int i = 0; i < team.Units.Count; i++)
@@ -228,8 +228,8 @@ static class ScoutCanvas
             float ux = x + (i % UnitsPerRow) * UnitCell;
             float uy = y + (i / UnitsPerRow) * (UnitSize + UnitLabelHeight);
             var rect = AddIcon(parent, unit.IconCandidates, unit.Name, ux, uy, UnitSize);
-            AddText(parent, $"×{unit.Cards} ур.{unit.MaxLevel}", 11, Color.white, TextAnchor.MiddleCenter, ux - 4f, uy + UnitSize, UnitCell, UnitLabelHeight);
-            HoverTargets.Add((rect, $"{unit.Name}: {unit.Cards} отр., {unit.Mechs} шт., макс. уровень {unit.MaxLevel}"));
+            AddText(parent, $"×{unit.Cards} Lv{unit.MaxLevel}", 11, Color.white, TextAnchor.MiddleCenter, ux - 4f, uy + UnitSize, UnitCell, UnitLabelHeight);
+            HoverTargets.Add((rect, $"{unit.Name}: {unit.Cards} squads, {unit.Mechs} units, max level {unit.MaxLevel}"));
         }
         int unitRows = Math.Max(1, (team.Units.Count + UnitsPerRow - 1) / UnitsPerRow);
         return y + unitRows * (UnitSize + UnitLabelHeight);

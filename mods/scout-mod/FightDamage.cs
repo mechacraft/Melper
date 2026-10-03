@@ -73,7 +73,7 @@ static class FightDamageReader
                 info = new UnitDamageInfo
                 {
                     MechTypeId = mechTypeId,
-                    Name = mechTypeId == 0 ? "Постройки" : unit?.Name ?? $"#{mechTypeId}",
+                    Name = mechTypeId == 0 ? "Buildings" : unit?.Name ?? $"#{mechTypeId}",
                     IconCandidates = mechTypeId == 0 ? Array.Empty<string>() : unit?.IconCandidates ?? new[] { $"Mech_Default_{mechTypeId}_1" },
                 };
                 byType.Add(mechTypeId, info);

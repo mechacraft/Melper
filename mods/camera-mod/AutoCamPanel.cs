@@ -157,7 +157,7 @@ static class AutoCamPanel
 
         if (_toggleText != null)
         {
-            string toggle = AutoCamPatches.Enabled ? "Правки: вкл" : "Правки: выкл (игра)";
+            string toggle = AutoCamPatches.Enabled ? "Tweaks: on" : "Tweaks: off (game)";
             if (_toggleText.text != toggle)
                 _toggleText.text = toggle;
         }
@@ -165,9 +165,9 @@ static class AutoCamPanel
         if (_live != null)
         {
             var p = AutoCamPatches.ViewProbe.LastAt >= 0f && Time.unscaledTime - AutoCamPatches.ViewProbe.LastAt < 1f
-                ? $"Сейчас: наклон {AutoCamPatches.ViewProbe.LastPitch:0.0}°, курс {AutoCamPatches.ViewProbe.LastHeading:0}°, " +
-                  $"до юнитов {AutoCamPatches.ViewProbe.LastDistance:0}"
-                : "Сейчас: auto-камера не активна";
+                ? $"Now: tilt {AutoCamPatches.ViewProbe.LastPitch:0.0}°, heading {AutoCamPatches.ViewProbe.LastHeading:0}°, " +
+                  $"distance to units {AutoCamPatches.ViewProbe.LastDistance:0}"
+                : "Now: auto camera inactive";
             if (_live.text != p)
                 _live.text = p;
         }
@@ -205,7 +205,7 @@ static class AutoCamPanel
         background.raycastTarget = true;
 
         float y = Pad;
-        AddText(_panel, "Auto-камера   (F6 — закрыть, Shift — шаг ×5)", 14, new Color(1f, 0.85f, 0.45f), TextAnchor.MiddleLeft, Pad, y, Width - Pad * 2, RowHeight, bold: true);
+        AddText(_panel, "Auto camera   (F6 to close, Shift: step ×5)", 14, new Color(1f, 0.85f, 0.45f), TextAnchor.MiddleLeft, Pad, y, Width - Pad * 2, RowHeight, bold: true);
         y += RowHeight;
 
         foreach (var setting in settings)
@@ -227,7 +227,7 @@ static class AutoCamPanel
         y += RowHeight + 4f;
 
         float half = (Width - Pad * 3) / 2;
-        AddButton(_panel, "Сбросить (•)", Pad, y, half, ButtonSize, AutoCamSettings.ResetToDefaults, repeats: false);
+        AddButton(_panel, "Reset (•)", Pad, y, half, ButtonSize, AutoCamSettings.ResetToDefaults, repeats: false);
         _toggleText = AddButton(_panel, "", Pad * 2 + half, y, half, ButtonSize, AutoCamPatches.Toggle, repeats: false);
         return true;
     }

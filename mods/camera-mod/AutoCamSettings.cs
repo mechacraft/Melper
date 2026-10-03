@@ -6,7 +6,7 @@ namespace MelperCamera;
 
 // Settings for the Auto ("Aerial") battle camera, GROverAllAutoCam / OverAll_Auto_Cam.
 // F6 in game opens a panel to change them live; changes are saved to UserData\MelonPreferences.cfg,
-// section [MelperCameraAuto], and that file wins over the defaults below. The panel's "Сбросить" button
+// section [MelperCameraAuto], and that file wins over the defaults below. The panel's "Reset" button
 // goes back to these defaults. Ctrl+Shift+A switches all of them off and back on, to compare with the game.
 // The game's own values are printed once per launch in MelonLoader\Latest.log as "auto cam defaults: ...".
 static class AutoCamSettings
@@ -46,41 +46,41 @@ static class AutoCamSettings
 
     // ---- Defaults. Edit here, or live with F6 in game. ----
 
-    // How the camera fits the units into the frame. Game: "наезд, потом зум" (it "breathes" with zoom).
-    internal static readonly Setting Adjustment = new("AdjustmentMode", "Подгонка кадра",
-        (int)CinemachineGroupComposer.AdjustmentMode.DollyOnly, "только зум", "только наезд", "наезд, потом зум");
+    // How the camera fits the units into the frame. Game: "dolly, then zoom" (it "breathes" with zoom).
+    internal static readonly Setting Adjustment = new("AdjustmentMode", "Framing",
+        (int)CinemachineGroupComposer.AdjustmentMode.DollyOnly, "zoom only", "dolly only", "dolly, then zoom");
 
     // Pitch above the horizon: 90 = straight down. Game: 39.4.
-    internal static readonly Setting Tilt = new("TiltDegrees", "Наклон, °", 70f, 30f, MaxTiltDegrees, 1f);
+    internal static readonly Setting Tilt = new("TiltDegrees", "Tilt, °", 70f, 30f, MaxTiltDegrees, 1f);
 
     // Turn around the vertical axis from straight along the field. Positive = clockwise seen from above.
-    internal static readonly Setting Yaw = new("YawDegrees", "Поворот, °", 0f, -180f, 180f, 5f);
+    internal static readonly Setting Yaw = new("YawDegrees", "Yaw, °", 0f, -180f, 180f, 5f);
 
     // Look straight along the battlefield from your side, ignoring which way the units face.
     // Off = game: about 16 degrees to the side and swaying with the units' facing.
-    internal static readonly Setting Align = new("AlignToMap", "Вдоль поля", 1, "нет (как в игре)", "да");
+    internal static readonly Setting Align = new("AlignToMap", "Align to map", 1, "no (as in game)", "yes");
 
     // Never turn the camera: it only slides after the units and moves closer/further.
-    internal static readonly Setting Lock = new("LockViewAngle", "Жёсткий угол", 1, "нет (как в игре)", "да");
+    internal static readonly Setting Lock = new("LockViewAngle", "Lock angle", 1, "no (as in game)", "yes");
 
     // Closest and farthest the camera may get to the units, in world units. Game: 1 and 1500.
-    internal static readonly Setting MinDist = new("MinDistance", "Мин. дистанция", 200f, 100f, 3000f, 50f);
-    internal static readonly Setting MaxDist = new("MaxDistance", "Макс. дистанция", 2000f, 500f, 6000f, 100f);
+    internal static readonly Setting MinDist = new("MinDistance", "Min distance", 200f, 100f, 3000f, 50f);
+    internal static readonly Setting MaxDist = new("MaxDistance", "Max distance", 2000f, 500f, 6000f, 100f);
 
     // Extra empty space around the units on each side. 0 = game (the units fill 80% of the frame).
-    internal static readonly Setting Padding = new("FramingPaddingPerSide", "Запас по краям", 0f, 0f, 0.3f, 0.01f, percent: true);
+    internal static readonly Setting Padding = new("FramingPaddingPerSide", "Edge padding", 0f, 0f, 0.3f, 0.01f, percent: true);
 
     // Smoothing: bigger = calmer, but lags behind the units more. 0 = repeats every step of the units. Game: 4.
-    internal static readonly Setting FrameDamp = new("FrameDamping", "Плавность дистанции", 4f, 0f, 20f, 0.5f);
-    internal static readonly Setting FollowDamp = new("FollowDamping", "Плавность движения", 4f, 0f, 20f, 0.5f);
-    internal static readonly Setting AimDamp = new("AimDamping", "Плавность взгляда", 4f, 0f, 20f, 0.5f);
+    internal static readonly Setting FrameDamp = new("FrameDamping", "Distance damping", 4f, 0f, 20f, 0.5f);
+    internal static readonly Setting FollowDamp = new("FollowDamping", "Follow damping", 4f, 0f, 20f, 0.5f);
+    internal static readonly Setting AimDamp = new("AimDamping", "Aim damping", 4f, 0f, 20f, 0.5f);
 
     // Lens angle limits for the zoom modes, in degrees. Game: 5 and 90; the lens itself is 20.
-    internal static readonly Setting FovMin = new("MinFov", "Мин. FOV (зум)", 15f, 1f, 90f, 1f);
-    internal static readonly Setting FovMax = new("MaxFov", "Макс. FOV (зум)", 90f, 1f, 120f, 1f);
+    internal static readonly Setting FovMin = new("MinFov", "Min FOV (zoom)", 15f, 1f, 90f, 1f);
+    internal static readonly Setting FovMax = new("MaxFov", "Max FOV (zoom)", 90f, 1f, 120f, 1f);
 
     // Transition into the Auto camera, seconds. Game: 3 s. 0 = instant cut.
-    internal static readonly Setting Blend = new("SwitchBlendSeconds", "Переход в auto, с", 1f, 0f, 3f, 0.1f);
+    internal static readonly Setting Blend = new("SwitchBlendSeconds", "Blend to auto, s", 1f, 0f, 3f, 0.1f);
 
     internal static readonly Setting[] All =
         { Adjustment, Tilt, Yaw, Align, Lock, MinDist, MaxDist, Padding, FrameDamp, FollowDamp, AimDamp, FovMin, FovMax, Blend };
