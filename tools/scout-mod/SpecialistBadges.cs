@@ -10,7 +10,8 @@ using Object = UnityEngine.Object;
 
 namespace MelperScout;
 
-// Small specialist portraits right under each player's avatar in the game's own top panel.
+// Small specialist portraits beside each player's avatar in the game's own top panel: on the side where
+// the name and HP bar are, top edge right under the HP bar, side edge against the avatar.
 // The game itself shows each player's specialist count there, so this is public information.
 static class SpecialistBadges
 {
@@ -37,7 +38,8 @@ static class SpecialistBadges
                 continue;
             seen.Add(image!.Pointer);
             byTeam.TryGetValue(controller!.GetTeamIndex(), out var team);
-            Attach(image, team?.Specialists ?? new List<SpecialistInfo>());
+            var slider = Alive(panel.lifeSlider) ? panel.lifeSlider.GetComponent<RectTransform>() : null;
+            Attach(image, slider, team?.Specialists ?? new List<SpecialistInfo>());
         }
 
         foreach (var key in Rows.Keys.Where(k => !seen.Contains(k)).ToList())
@@ -56,7 +58,7 @@ static class SpecialistBadges
         Rows.Clear();
     }
 
-    static void Attach(GRImage avatar, List<SpecialistInfo> specialists)
+    static void Attach(GRImage avatar, RectTransform? hpBar, List<SpecialistInfo> specialists)
     {
         string key = string.Join(",", specialists.Select(s => s.Id));
         if (Rows.TryGetValue(avatar.Pointer, out var existing) && Alive(existing.Row))
@@ -70,18 +72,36 @@ static class SpecialistBadges
             return;
 
         var avatarRect = avatar.rectTransform;
-        float size = Math.Max(16f, avatarRect.rect.height * SizeOfAvatar);
+        var box = avatarRect.rect;
+        // The HP bar in the avatar's own coordinates: which side it is on, and where its bottom edge is.
+        bool toRight = true;
+        float top = box.yMax;
+        if (hpBar != null)
+        {
+            var corners = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<Vector3>(4);
+            hpBar.GetWorldCorners(corners);
+            float minX = float.MaxValue, maxX = float.MinValue, minY = float.MaxValue;
+            for (int c = 0; c < 4; c++)
+            {
+                var local = avatarRect.InverseTransformPoint(corners[c]);
+                minX = Math.Min(minX, local.x);
+                maxX = Math.Max(maxX, local.x);
+                minY = Math.Min(minY, local.y);
+            }
+            toRight = (minX + maxX) / 2f >= box.center.x;
+            top = minY;
+        }
+        float room = top - box.yMin;
+        float size = Math.Max(16f, Math.Min(box.height * SizeOfAvatar, room > 16f ? room : float.MaxValue));
+        MelperScoutMod.Log.Msg($"specialists by avatar: {(toRight ? "right" : "left")} side, top {top - box.yMax:F0} from avatar top, size {size:F0}");
 
         var row = new GameObject(BadgeName, Types<RectTransform>());
         row.transform.SetParent(avatarRect, false);
         var rowRect = row.GetComponent<RectTransform>();
-        // Just under the avatar, starting at its left edge. On the left player's avatar a game badge sits
-        // there, so that row starts one portrait further right.
-        bool leftSide = avatarRect.position.x < Screen.width / 2f;
-        rowRect.anchorMin = rowRect.anchorMax = new Vector2(0f, 0f);
-        rowRect.pivot = new Vector2(0f, 1f);
-        rowRect.anchoredPosition = new Vector2(leftSide ? size + Gap : 0f, -Gap);
-        rowRect.sizeDelta = new Vector2(specialists.Count * (size + Gap), size);
+        rowRect.anchorMin = rowRect.anchorMax = rowRect.pivot = new Vector2(toRight ? 0f : 1f, 1f);
+        rowRect.sizeDelta = new Vector2(specialists.Count * (size + Gap) - Gap, size);
+        // Anchored to the avatar's pivot-relative coordinates via localPosition, so top lands exactly on the bar.
+        rowRect.localPosition = new Vector3(toRight ? box.xMax : box.xMin, top, 0f);
 
         for (int i = 0; i < specialists.Count; i++)
         {
@@ -92,8 +112,9 @@ static class SpecialistBadges
             var icon = new GameObject("Face", Types<RectTransform>());
             icon.transform.SetParent(rowRect, false);
             var rect = icon.GetComponent<RectTransform>();
-            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0f, 1f);
-            rect.anchoredPosition = new Vector2(i * (size + Gap), 0f);
+            // Fill outward from the avatar: left to right on its right side, right to left on its left side.
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(toRight ? 0f : 1f, 1f);
+            rect.anchoredPosition = new Vector2((toRight ? 1f : -1f) * i * (size + Gap), 0f);
             rect.sizeDelta = new Vector2(size, size);
             var img = icon.AddComponent<Image>();
             img.sprite = sprite;
