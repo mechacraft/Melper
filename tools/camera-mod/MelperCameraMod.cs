@@ -40,6 +40,7 @@ public sealed class MelperCameraMod : MelonMod
         _zoomOutMultiplier = _prefs.CreateEntry("ZoomOutMultiplier", 1.5f, description: "Max camera distance = game's own max * this (1..4). Ctrl+= / Ctrl+- change it in game.");
         _disableCameraNoise = _prefs.CreateEntry("DisableCameraNoise", true, description: "Turn off the handheld-style Perlin noise that sways some camera modes.");
         _disableImpulseShake = _prefs.CreateEntry("DisableImpulseShake", true, description: "Turn off camera shake from explosions and impacts.");
+        AutoCamSettings.Init();
         Log.Msg($"loaded: HideCameraTips={HideCameraTips} ZoomOutMultiplier={ZoomOutMultiplier} " +
                 $"DisableCameraNoise={DisableCameraNoise} DisableImpulseShake={DisableImpulseShake}");
     }
@@ -48,6 +49,10 @@ public sealed class MelperCameraMod : MelonMod
 
     public override void OnUpdate()
     {
+        if (Input.GetKeyDown(KeyCode.F7))
+            AutoCamPanel.Toggle();
+        AutoCamPanel.Update();
+
         if (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl))
             return;
 

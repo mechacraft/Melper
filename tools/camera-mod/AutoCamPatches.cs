@@ -38,6 +38,7 @@ static class AutoCamPatches
 
     // Ctrl+Shift+A flips this, to compare the game's own camera with the tuned one in the same battle.
     static bool _enabled = true;
+    internal static bool Enabled => _enabled;
 
     // Blend shortening for the switch into this camera.
     static CinemachineBrain? _brain;
@@ -206,14 +207,12 @@ static class AutoCamPatches
             // A dead zone over the whole screen: the composer aims once when the camera starts and never turns
             // it after that. The camera sits at a fixed offset from the same target group it looks at, so the
             // units stay in the middle anyway.
-            if (AutoCamSettings.LockViewAngle)
-            {
-                Tune(state, "soft zone width", composer.m_SoftZoneWidth, _ => 2f, v => composer.m_SoftZoneWidth = v);
-                Tune(state, "soft zone height", composer.m_SoftZoneHeight, _ => 2f, v => composer.m_SoftZoneHeight = v);
-                Tune(state, "dead zone width", composer.m_DeadZoneWidth, _ => 2f, v => composer.m_DeadZoneWidth = v);
-                Tune(state, "dead zone height", composer.m_DeadZoneHeight, _ => 2f, v => composer.m_DeadZoneHeight = v);
-                Tune(state, "lookahead", composer.m_LookaheadTime, _ => 0f, v => composer.m_LookaheadTime = v);
-            }
+            bool locked = AutoCamSettings.LockViewAngle;
+            Tune(state, "soft zone width", composer.m_SoftZoneWidth, game => locked ? 2f : game, v => composer.m_SoftZoneWidth = v);
+            Tune(state, "soft zone height", composer.m_SoftZoneHeight, game => locked ? 2f : game, v => composer.m_SoftZoneHeight = v);
+            Tune(state, "dead zone width", composer.m_DeadZoneWidth, game => locked ? 2f : game, v => composer.m_DeadZoneWidth = v);
+            Tune(state, "dead zone height", composer.m_DeadZoneHeight, game => locked ? 2f : game, v => composer.m_DeadZoneHeight = v);
+            Tune(state, "lookahead", composer.m_LookaheadTime, game => locked ? 0f : game, v => composer.m_LookaheadTime = v);
             Tune(state, "aim damping h", composer.m_HorizontalDamping, _ => AutoCamSettings.AimDamping, v => composer.m_HorizontalDamping = v);
             Tune(state, "aim damping v", composer.m_VerticalDamping, _ => AutoCamSettings.AimDamping, v => composer.m_VerticalDamping = v);
         }
@@ -221,9 +220,9 @@ static class AutoCamPatches
         if (transposer != null)
         {
             // World space: the offset no longer turns with the target group's rotation (the units' facing).
-            if (AutoCamSettings.AlignToMap)
-                Tune(state, "binding mode", (int)transposer.m_BindingMode, _ => (int)CinemachineTransposer.BindingMode.WorldSpace,
-                    v => transposer.m_BindingMode = (CinemachineTransposer.BindingMode)(int)v);
+            bool aligned = AutoCamSettings.AlignToMap;
+            Tune(state, "binding mode", (int)transposer.m_BindingMode, game => aligned ? (int)CinemachineTransposer.BindingMode.WorldSpace : game,
+                v => transposer.m_BindingMode = (CinemachineTransposer.BindingMode)(int)v);
             Tune(state, "follow damping x", transposer.m_XDamping, _ => AutoCamSettings.FollowDamping, v => transposer.m_XDamping = v);
             Tune(state, "follow damping y", transposer.m_YDamping, _ => AutoCamSettings.FollowDamping, v => transposer.m_YDamping = v);
             Tune(state, "follow damping z", transposer.m_ZDamping, _ => AutoCamSettings.FollowDamping, v => transposer.m_ZDamping = v);
@@ -292,7 +291,22 @@ static class AutoCamPatches
             try
             {
                 if (__instance.IsBlending)
+                {
+                    // Steer the blend's rotation toward ours instead of the composer's own aim, so there is
+                    // nothing left to snap when the blend ends.
+                    var blend = __instance.ActiveBlend;
+                    var a = blend?.CamA;
+                    var b = blend?.CamB;
+                    if (blend == null || a == null || b == null)
+                        return;
+                    bool aOurs = a.Name == LockedCamName, bOurs = b.Name == LockedCamName;
+                    if (!aOurs && !bOurs)
+                        return;
+                    var from = aOurs ? LockedRotation : a.State.FinalOrientation;
+                    var to = bOurs ? LockedRotation : b.State.FinalOrientation;
+                    __instance.transform.rotation = Quaternion.Slerp(from, to, blend.BlendWeight);
                     return;
+                }
                 var live = __instance.ActiveVirtualCamera;
                 if (live == null || live.Name != LockedCamName)
                     return;
@@ -311,7 +325,16 @@ static class AutoCamPatches
             state.Knobs[name] = knob = new Knob();
         knob.Set = set;
         if (current == knob.Ours)
+        {
+            // Still ours; the setting may have changed since (F7 panel).
+            float wanted = target(knob.Game);
+            if (wanted != knob.Ours)
+            {
+                knob.Ours = wanted;
+                set(wanted);
+            }
             return;
+        }
         knob.Game = current;
         knob.Ours = target(current);
         set(knob.Ours);
@@ -354,8 +377,11 @@ static class AutoCamPatches
     }
 
     // Diagnostics: how much the camera's view angle and distance actually wander, summed up every 10 s.
-    static class ViewProbe
+    internal static class ViewProbe
     {
+        // Latest sample, shown live in the F7 panel.
+        internal static float LastPitch, LastHeading, LastDistance, LastAt = -1f;
+
         const float Window = 10f;
         static float _start = -1f, _heading0;
         static float _pitchMin, _pitchMax, _headMin, _headMax, _distMin, _distMax;
@@ -370,6 +396,7 @@ static class AutoCamPatches
             float heading = t.eulerAngles.y;
             float dist = cam.LookAt != null ? Vector3.Distance(t.position, cam.LookAt.position) : float.NaN;
             float now = Time.unscaledTime;
+            LastPitch = pitch; LastHeading = heading; LastDistance = dist; LastAt = now;
 
             if (_start < 0f)
             {
