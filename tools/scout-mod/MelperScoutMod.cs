@@ -23,13 +23,11 @@ public sealed class MelperScoutMod : MelonMod
     static MelonPreferences_Entry<float> _offsetRight = null!;
     static MelonPreferences_Entry<float> _offsetTop = null!;
     static MelonPreferences_Entry<bool> _showSpecialists = null!;
-    static MelonPreferences_Entry<bool> _dumpSprites = null!;
 
     internal static bool ShowOwnTeam => _showOwnTeam.Value;
     internal static float Scale => Math.Clamp(_scale.Value, 0.5f, 3f);
     internal static float OffsetRight => _offsetRight.Value;
     internal static float OffsetTop => _offsetTop.Value;
-    internal static bool DumpSprites => _dumpSprites.Value;
 
     internal static MelonLogger.Instance Log = null!;
 
@@ -64,7 +62,6 @@ public sealed class MelperScoutMod : MelonMod
         _offsetRight = _prefs.CreateEntry("OffsetRight", 24f, description: "Distance from the right edge of the screen, in pixels.");
         _offsetTop = _prefs.CreateEntry("OffsetTop", 150f, description: "Distance from the top of the screen, in pixels.");
         _showSpecialists = _prefs.CreateEntry("ShowSpecialists", true, description: "Small specialist portraits under each player's avatar.");
-        _dumpSprites = _prefs.CreateEntry("DumpSprites", true, description: "Diagnostics: save each specialist's candidate pictures to UserData/MelperScout/sprites.");
         Log.Msg($"loaded: ShowOverlay={_showOverlay.Value} ShowOwnTeam={ShowOwnTeam} Scale={Scale}");
     }
 

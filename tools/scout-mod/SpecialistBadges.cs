@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Il2CppGameRiver;
 using Il2CppGameRiver.Client;
 using Il2CppInterop.Runtime;
-using MelonLoader.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -22,7 +20,6 @@ static class SpecialistBadges
 
     // Avatar image pointer -> the badge row we attached to it and the specialists it shows.
     static readonly Dictionary<IntPtr, (GameObject Row, string Key)> Rows = new();
-    static readonly HashSet<string> Dumped = new(StringComparer.Ordinal);
 
     internal static void Refresh(MatchSnapshot? live)
     {
@@ -78,16 +75,17 @@ static class SpecialistBadges
         var row = new GameObject(BadgeName, Types<RectTransform>());
         row.transform.SetParent(avatarRect, false);
         var rowRect = row.GetComponent<RectTransform>();
-        // Just under the avatar, starting at its left edge.
+        // Just under the avatar, starting at its left edge. On the left player's avatar a game badge sits
+        // there, so that row starts one portrait further right.
+        bool leftSide = avatarRect.position.x < Screen.width / 2f;
         rowRect.anchorMin = rowRect.anchorMax = new Vector2(0f, 0f);
         rowRect.pivot = new Vector2(0f, 1f);
-        rowRect.anchoredPosition = new Vector2(0f, -Gap);
+        rowRect.anchoredPosition = new Vector2(leftSide ? size + Gap : 0f, -Gap);
         rowRect.sizeDelta = new Vector2(specialists.Count * (size + Gap), size);
 
         for (int i = 0; i < specialists.Count; i++)
         {
             var specialist = specialists[i];
-            DumpCandidates(specialist);
             var sprite = FaceSprite(specialist);
             if (sprite == null)
                 continue;
@@ -113,7 +111,7 @@ static class SpecialistBadges
         return null;
     }
 
-    // Every way the game might name a specialist's picture, in order of preference.
+    // Ways the game names a specialist's picture; the first is the face-only 128x128 square.
     static IEnumerable<(string Label, Sprite? Sprite)> Candidates(SpecialistInfo s)
     {
         var manager = GRSingletonMonoStatic<GRUIManager>.Instance?.GetSpriteManager();
@@ -136,58 +134,6 @@ static class SpecialistBadges
         catch
         {
             return null;
-        }
-    }
-
-    // Diagnostics: save every candidate picture once, to pick the one that is just the face.
-    static void DumpCandidates(SpecialistInfo specialist)
-    {
-        if (!MelperScoutMod.DumpSprites || !Dumped.Add(specialist.IconName))
-            return;
-        string dir = Path.Combine(MelonEnvironment.UserDataDirectory, "MelperScout", "sprites");
-        Directory.CreateDirectory(dir);
-        foreach (var (label, sprite) in Candidates(specialist))
-        {
-            if (sprite == null)
-            {
-                MelperScoutMod.Log.Msg($"sprite {label}: none");
-                continue;
-            }
-            try
-            {
-                var r = sprite.textureRect;
-                string file = Path.Combine(dir, $"{specialist.Id}_{label}.png");
-                File.WriteAllBytes(file, ToPng(sprite));
-                MelperScoutMod.Log.Msg($"sprite {label}: '{sprite.name}' {r.width}x{r.height} -> {file}");
-            }
-            catch (Exception e)
-            {
-                MelperScoutMod.Log.Msg($"sprite {label}: '{sprite.name}' not saved: {e.Message}");
-            }
-        }
-    }
-
-    static byte[] ToPng(Sprite sprite)
-    {
-        var texture = sprite.texture;
-        var r = sprite.textureRect;
-        var rt = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
-        var previous = RenderTexture.active;
-        try
-        {
-            Graphics.Blit(texture, rt);
-            RenderTexture.active = rt;
-            var copy = new Texture2D((int)r.width, (int)r.height, TextureFormat.RGBA32, false);
-            copy.ReadPixels(new Rect(r.x, r.y, r.width, r.height), 0, 0);
-            copy.Apply();
-            byte[] png = ImageConversion.EncodeToPNG(copy);
-            Object.Destroy(copy);
-            return png;
-        }
-        finally
-        {
-            RenderTexture.active = previous;
-            RenderTexture.ReleaseTemporary(rt);
         }
     }
 

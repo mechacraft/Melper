@@ -26,9 +26,7 @@ MelonLoader-мод для Mechabellum. Работает в обычной игр
 `<игра>\UserData\MelonPreferences.cfg`, раздел `[MelperScout]`:
 `ShowOverlay`, `ShowOwnTeam` (показывать ли свою армию рядом с армией
 соперника), `Scale`, `OffsetRight`, `OffsetTop`, `ShowSpecialists`
-(портреты у аватарок). `DumpSprites` — диагностика: сохраняет все
-найденные варианты картинки каждого специалиста в
-`UserData\MelperScout\sprites`, чтобы выбрать ту, где только лицо.
+(портреты у аватарок).
 
 ## Сборка и установка
 
@@ -47,6 +45,5 @@ dotnet build tools\scout-mod -c Release -p:Deploy=true
 команду:
 `[MelperScout] round N team T (you): value=... hp=... units=[id x отрядов(Lуровень,машин)] specialists=[id:иконка]`.
 Если какой-то портрет не нашёлся, будет строка `no sprite named '...'`.
-Для специалистов при `DumpSprites=true` — строки `sprite <вариант>: ...`.
 
 Удалить: стереть `MelperScout.dll` из `<игра>\Mods`.
