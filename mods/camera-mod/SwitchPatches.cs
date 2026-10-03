@@ -25,10 +25,10 @@ static class SwitchPatches
     {
         float max = Math.Max(0f, CameraSwitchSettings.MaxSwitchSeconds);
 
-        // Both getters return copies of the native structs; the setters write them back.
+        // The getters return copies of the native structs, only for reading; NativeBlend writes the time in place.
         var def = brain.m_DefaultBlend;
-        if (Cap(def, max, "default"))
-            brain.m_DefaultBlend = def;
+        if (NeedsCap(def, max, "default"))
+            NativeBlend.SetDefault(brain, def.m_Style, max);
 
         var blends = brain.m_CustomBlends?.m_CustomBlends;
         if (blends == null)
@@ -36,21 +36,17 @@ static class SwitchPatches
         for (int i = 0; i < blends.Length; i++)
         {
             var entry = blends[i];
-            var blend = entry.m_Blend;
-            if (!Cap(blend, max, $"{entry.m_From} -> {entry.m_To}"))
-                continue;
-            entry.m_Blend = blend;
-            blends[i] = entry;
+            if (NeedsCap(entry.m_Blend, max, $"{entry.m_From} -> {entry.m_To}"))
+                NativeBlend.SetCustomTime(blends, i, max);
         }
     }
 
-    static bool Cap(CinemachineBlendDefinition blend, float max, string name)
+    static bool NeedsCap(CinemachineBlendDefinition blend, float max, string name)
     {
         if (blend.m_Style == CinemachineBlendDefinition.Style.Cut || blend.m_Time <= max)
             return false;
         if (Logged.Add(name))
             MelperCameraMod.Log.Msg($"switch blend {name}: {blend.m_Style} {blend.m_Time}s -> {max}s");
-        blend.m_Time = max;
         return true;
     }
 

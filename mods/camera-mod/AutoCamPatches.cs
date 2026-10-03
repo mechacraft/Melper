@@ -42,7 +42,10 @@ static class AutoCamPatches
 
     // Blend shortening for the switch into this camera.
     static CinemachineBrain? _brain;
-    static CinemachineBlendDefinition? _savedDefaultBlend;
+    // The game's default blend, kept as plain values (see NativeBlend for why not as a struct).
+    static bool _hasSavedBlend;
+    static CinemachineBlendDefinition.Style _savedStyle;
+    static float _savedTime;
     static CinemachineBlenderSettings? _savedCustomBlends;
     static int _activatedFrame = -1;
     static float _activatedAt;
@@ -71,13 +74,17 @@ static class AutoCamPatches
                 // Capped first, so the blends given back after the switch are the capped ones.
                 SwitchPatches.CapBlends(brain);
                 _brain = brain;
-                _savedDefaultBlend = brain.m_DefaultBlend;
+                var saved = brain.m_DefaultBlend;
+                _savedStyle = saved.m_Style;
+                _savedTime = saved.m_Time;
+                _hasSavedBlend = true;
+                // A reference field: its generated setter does use the GC write barrier.
                 _savedCustomBlends = brain.m_CustomBlends;
                 var style = AutoCamSettings.SwitchBlendSeconds > 0f ? CinemachineBlendDefinition.Style.EaseOut : CinemachineBlendDefinition.Style.Cut;
-                brain.m_DefaultBlend = new CinemachineBlendDefinition(style, AutoCamSettings.SwitchBlendSeconds);
+                NativeBlend.SetDefault(brain, style, AutoCamSettings.SwitchBlendSeconds);
                 brain.m_CustomBlends = null;
                 LogOnce("blend",
-                    $"auto cam switch blend: {_savedDefaultBlend.m_Style} {_savedDefaultBlend.m_Time}s " +
+                    $"auto cam switch blend: {_savedStyle} {_savedTime}s " +
                     $"(custom blends {(_savedCustomBlends != null ? "present" : "none")}) -> {style} {AutoCamSettings.SwitchBlendSeconds}s");
             }
             catch (Exception e)
@@ -107,7 +114,7 @@ static class AutoCamPatches
                 Cams[__instance.Pointer] = __instance;
 
                 // The brain reads the blend definition in LateUpdate of the activation frame; give it back after.
-                if (_savedDefaultBlend != null && Time.frameCount > _activatedFrame + 1)
+                if (_hasSavedBlend && Time.frameCount > _activatedFrame + 1)
                     RestoreBlend();
 
                 if (!_enabled)
@@ -423,12 +430,12 @@ static class AutoCamPatches
 
     static void RestoreBlend()
     {
-        if (_brain != null && _savedDefaultBlend != null)
+        if (_brain != null && _hasSavedBlend)
         {
-            _brain.m_DefaultBlend = _savedDefaultBlend;
+            NativeBlend.SetDefault(_brain, _savedStyle, _savedTime);
             _brain.m_CustomBlends = _savedCustomBlends;
         }
-        _savedDefaultBlend = null;
+        _hasSavedBlend = false;
         _savedCustomBlends = null;
     }
 }
