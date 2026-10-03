@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using HarmonyLib;
+using BattleStatisticManager = Il2CppGameRiver.BattleStatisticManager;
+using RoundStatisticData = Il2CppGameRiver.RoundStatisticData;
 using Il2CppGameRiver.Client;
 using MelonLoader;
 using UnityEngine;
@@ -10,9 +12,10 @@ using UnityEngine;
 
 namespace MelperScout;
 
-// Shows both armies as they were when the last fight started, plus both teams' specialists.
+// Shows both armies as they were when the last fight started, what each unit did in that fight,
+// plus both teams' specialists.
 // Read-only: armies are snapshotted only at fight start, when everything is on the field anyway,
-// and shown during the next deployment. The opponent's purchases and moves are never read while they deploy.
+// damage only when the fight ends, and both are shown during the next deployment. The opponent's purchases and moves are never read while they deploy.
 // Specialists are public in the game's own UI, so they are read live and drawn next to each player's avatar.
 public sealed class MelperScoutMod : MelonMod
 {
@@ -47,6 +50,8 @@ public sealed class MelperScoutMod : MelonMod
         }
     }
 
+    static void SnapshotChanged() => _snapshotVersion++;
+
     internal static bool InDeployment;
     static float _nextSpecialistRefresh;
     static bool _drawFaulted;
@@ -56,7 +61,7 @@ public sealed class MelperScoutMod : MelonMod
     {
         Log = LoggerInstance;
         _prefs = MelonPreferences.CreateCategory("MelperScout");
-        _showOverlay = _prefs.CreateEntry("ShowOverlay", true, description: "Show the panel during deployment. F6 in game toggles it.");
+        _showOverlay = _prefs.CreateEntry("ShowOverlay", true, description: "Show the panel during deployment. F9 in game toggles it.");
         _showOwnTeam = _prefs.CreateEntry("ShowOwnTeam", true, description: "Show your own army next to the opponent's.");
         _scale = _prefs.CreateEntry("Scale", 1f, description: "Panel size (0.5..3).");
         _offsetRight = _prefs.CreateEntry("OffsetRight", 24f, description: "Distance from the right edge of the screen, in pixels.");
@@ -81,7 +86,7 @@ public sealed class MelperScoutMod : MelonMod
             RefreshSpecialists();
         }
 
-        if (Input.GetKeyDown(KeyCode.F6))
+        if (Input.GetKeyDown(KeyCode.F9))
         {
             _showOverlay.Value = !_showOverlay.Value;
             _prefs.SaveToFile(false);
@@ -138,6 +143,46 @@ public sealed class MelperScoutMod : MelonMod
         }
     }
 
+    // Runs before the game files the round's statistics away, while they are still the current round's.
+    internal static void OnFightEnd(BattleStatisticManager manager)
+    {
+        var snapshot = Snapshot;
+        if (snapshot == null || snapshot.HasDamage || !SameFight(snapshot))
+            return;
+        ReadDamage(snapshot, manager.GetCurrentRoundStatisticData(), "fight end");
+    }
+
+    static void ReadDamage(MatchSnapshot snapshot, RoundStatisticData? data, string when)
+    {
+        try
+        {
+            if (!FightDamageReader.Fill(snapshot, data))
+            {
+                Log.Msg($"{when}: no damage statistics to read");
+                return;
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Warning($"{when}: damage read failed: {e.Message}");
+            return;
+        }
+        snapshot.HasDamage = true;
+        SnapshotChanged();
+        foreach (var team in snapshot.Teams)
+        {
+            string rows = string.Join(", ", team.Damage.Select(d => $"{d.MechTypeId}:{d.Damage}/k{d.Kills}/t{d.Taken}"));
+            Log.Msg($"round {snapshot.Round} team {team.TeamIndex}{(team.IsLocal ? " (you)" : "")} damage ({when}): " +
+                    $"total={team.Damage.Sum(d => d.Damage)} [{rows}]");
+        }
+    }
+
+    static bool SameFight(MatchSnapshot snapshot)
+    {
+        var match = ArmySnapshotReader.CurrentMatch();
+        return match != null && match.Pointer == snapshot.Match && match.RoundCount == snapshot.Round;
+    }
+
     internal static void OnEnterDeployment()
     {
         InDeployment = true;
@@ -148,6 +193,9 @@ public sealed class MelperScoutMod : MelonMod
             var match = ArmySnapshotReader.CurrentMatch();
             if (Snapshot != null && (match == null || match.Pointer != Snapshot.Match || match.RoundCount < Snapshot.Round))
                 Snapshot = null;
+            // If the fight-end hook missed, the finished round is by now the game's last one.
+            if (Snapshot is { HasArmy: true, HasDamage: false } && FightDamageReader.CurrentManager() is { } manager)
+                ReadDamage(Snapshot, manager.GetLastRoundStatisticData(), "deployment");
         }
         catch (Exception e)
         {
@@ -197,6 +245,12 @@ public sealed class MelperScoutMod : MelonMod
 static class FightStartPatch
 {
     static void Postfix() => MelperScoutMod.Guard(MelperScoutMod.OnFightStart);
+}
+
+[HarmonyPatch(typeof(BattleStatisticManager), nameof(BattleStatisticManager.OnFightEnd))]
+static class StatisticFightEndPatch
+{
+    static void Prefix(BattleStatisticManager __instance) => MelperScoutMod.Guard(() => MelperScoutMod.OnFightEnd(__instance));
 }
 
 [HarmonyPatch(typeof(BattleSystem), nameof(BattleSystem.OnEnterDeploymentAfter))]

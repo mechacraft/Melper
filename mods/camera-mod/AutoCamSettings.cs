@@ -5,7 +5,7 @@ using Il2CppCinemachine;
 namespace MelperCamera;
 
 // Settings for the Auto ("Aerial") battle camera, GROverAllAutoCam / OverAll_Auto_Cam.
-// F7 in game opens a panel to change them live; changes are saved to UserData\MelonPreferences.cfg,
+// F6 in game opens a panel to change them live; changes are saved to UserData\MelonPreferences.cfg,
 // section [MelperCameraAuto], and that file wins over the defaults below. The panel's "Сбросить" button
 // goes back to these defaults. Ctrl+Shift+A switches all of them off and back on, to compare with the game.
 // The game's own values are printed once per launch in MelonLoader\Latest.log as "auto cam defaults: ...".
@@ -44,7 +44,7 @@ static class AutoCamSettings
             : Step < 1f ? $"{Value:0.0#}" : $"{Value:0}";
     }
 
-    // ---- Defaults. Edit here, or live with F7 in game. ----
+    // ---- Defaults. Edit here, or live with F6 in game. ----
 
     // How the camera fits the units into the frame. Game: "наезд, потом зум" (it "breathes" with zoom).
     internal static readonly Setting Adjustment = new("AdjustmentMode", "Подгонка кадра",

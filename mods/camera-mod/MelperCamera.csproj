@@ -26,9 +26,17 @@
     <Reference Include="$(Il2CppDir)\UnityEngine.TextRenderingModule.dll" Private="false" />
   </ItemGroup>
 
-  <!-- dotnet build -p:Deploy=true copies the DLL into the game's Mods folder. -->
+  <!-- dotnet build -p:Deploy=true copies the DLL into the game's Mods folder.
+       A running game locks the DLL against overwriting but not against renaming,
+       so the old copy is moved aside to .old first; the new one loads on the next start. -->
   <Target Name="DeployToGame" AfterTargets="Build" Condition="'$(Deploy)' == 'true'">
+    <PropertyGroup>
+      <DeployedDll>$(GameRoot)\Mods\$(TargetFileName)</DeployedDll>
+    </PropertyGroup>
+    <Delete Files="$(DeployedDll).old" ContinueOnError="true" />
+    <Move SourceFiles="$(DeployedDll)" DestinationFiles="$(DeployedDll).old" Condition="Exists('$(DeployedDll)') And !Exists('$(DeployedDll).old')" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GameRoot)\Mods" />
+    <Message Importance="high" Text="Deployed $(TargetFileName); restart the game to load it." />
   </Target>
 
 </Project>

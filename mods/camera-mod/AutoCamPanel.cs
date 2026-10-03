@@ -7,7 +7,7 @@ using Object = UnityEngine.Object;
 
 namespace MelperCamera;
 
-// F7: a panel sliding in from the right edge to change AutoCamSettings live.
+// F6: a panel sliding in from the right edge to change AutoCamSettings live.
 // Built with uGUI like MelperScout's panel (IMGUI texture drawing breaks under Il2CppInterop). Buttons are
 // hit-tested here by hand, so no Il2Cpp delegates are needed; the panel's raycast-target background makes
 // the game's UI treat the mouse as over UI, so clicks on it don't reach the battlefield.
@@ -205,7 +205,7 @@ static class AutoCamPanel
         background.raycastTarget = true;
 
         float y = Pad;
-        AddText(_panel, "Auto-камера   (F7 — закрыть, Shift — шаг ×5)", 14, new Color(1f, 0.85f, 0.45f), TextAnchor.MiddleLeft, Pad, y, Width - Pad * 2, RowHeight, bold: true);
+        AddText(_panel, "Auto-камера   (F6 — закрыть, Shift — шаг ×5)", 14, new Color(1f, 0.85f, 0.45f), TextAnchor.MiddleLeft, Pad, y, Width - Pad * 2, RowHeight, bold: true);
         y += RowHeight;
 
         foreach (var setting in settings)

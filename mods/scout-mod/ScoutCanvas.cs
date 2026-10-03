@@ -11,6 +11,7 @@ using Object = UnityEngine.Object;
 namespace MelperScout;
 
 // uGUI panel in the top right corner with both armies: one column per team, opponent on the right.
+// Under each army, what its unit types did in that fight, once the fight is over.
 // Specialists are drawn by SpecialistBadges next to the players' avatars instead.
 // Built with the game's own UI system (like BattleSuite) rather than IMGUI, whose texture drawing
 // throws ObjectCollectedException under Il2CppInterop.
@@ -24,6 +25,9 @@ static class ScoutCanvas
     const float UnitCell = 46f;
     const float UnitLabelHeight = 16f;
     const int UnitsPerRow = 5;
+    const float DamageRowHeight = 24f;
+    const float DamageIconSize = 22f;
+    const int MaxDamageRows = 7;
 
     static readonly Dictionary<string, Sprite?> Sprites = new(StringComparer.Ordinal);
     static readonly HashSet<string> ReportedMissing = new(StringComparer.Ordinal);
@@ -104,7 +108,7 @@ static class ScoutCanvas
         }
 
         float width = ColumnWidth * teams.Count + Padding * (teams.Count + 1);
-        float height = Padding * 2 + LineHeight + teams.Max(ColumnHeight);
+        float height = Padding * 2 + LineHeight + teams.Max(t => ColumnHeight(t, snapshot.HasDamage));
 
         _panel = NewObject("Panel", _rootRect);
         var panelRect = _panel.GetComponent<RectTransform>();
@@ -116,24 +120,97 @@ static class ScoutCanvas
         background.color = new Color(0f, 0f, 0f, 0.72f);
         background.raycastTarget = false;
 
-        string title = $"Армии на начало боя {snapshot.Round} раунда   (F6 — скрыть)";
+        string title = $"Раунд {snapshot.Round}: армии на начало боя{(snapshot.HasDamage ? " и урон" : "")}   (F9 — скрыть)";
         AddText(panelRect, title, 13, Color.white, TextAnchor.MiddleLeft, Padding, Padding * 0.5f, width - Padding * 2, LineHeight);
 
+        // One scale for both columns, so the bars compare across teams too.
+        long maxDamage = snapshot.HasDamage ? teams.SelectMany(t => t.Damage).Select(d => d.Damage).DefaultIfEmpty(0).Max() : 0;
         float x = Padding;
         foreach (var team in teams)
         {
-            BuildTeam(panelRect, team, x, Padding + LineHeight);
+            float y = BuildTeam(panelRect, team, x, Padding + LineHeight);
+            if (snapshot.HasDamage)
+                BuildDamage(panelRect, team, x, y, maxDamage);
             x += ColumnWidth + Padding;
         }
     }
 
-    static float ColumnHeight(TeamSnapshot team)
+    static float ColumnHeight(TeamSnapshot team, bool withDamage)
     {
         int unitRows = Math.Max(1, (team.Units.Count + UnitsPerRow - 1) / UnitsPerRow);
-        return HeaderHeight + LineHeight * 2 + unitRows * (UnitSize + UnitLabelHeight);
+        float height = HeaderHeight + LineHeight * 2 + unitRows * (UnitSize + UnitLabelHeight);
+        if (withDamage)
+            height += Padding + LineHeight + Math.Max(1, DamageRows(team).Count) * DamageRowHeight;
+        return height;
     }
 
-    static void BuildTeam(RectTransform parent, TeamSnapshot team, float x, float y)
+    // The top unit types; whatever does not fit is summed into the last row.
+    static List<UnitDamageInfo> DamageRows(TeamSnapshot team)
+    {
+        if (team.Damage.Count <= MaxDamageRows)
+            return team.Damage;
+        var rest = team.Damage.Skip(MaxDamageRows - 1).ToList();
+        var rows = team.Damage.Take(MaxDamageRows - 1).ToList();
+        rows.Add(new UnitDamageInfo
+        {
+            Name = $"ещё {rest.Count}",
+            Damage = rest.Sum(d => d.Damage),
+            Kills = rest.Sum(d => d.Kills),
+            Taken = rest.Sum(d => d.Taken),
+        });
+        return rows;
+    }
+
+    static void BuildDamage(RectTransform parent, TeamSnapshot team, float x, float y, long maxDamage)
+    {
+        y += Padding;
+        long total = team.Damage.Sum(d => d.Damage);
+        AddText(parent, $"Урон в бою: {total:N0}", 13, new Color(1f, 0.85f, 0.45f), TextAnchor.MiddleLeft, x, y, ColumnWidth, LineHeight);
+        y += LineHeight;
+
+        var rows = DamageRows(team);
+        if (rows.Count == 0)
+        {
+            AddText(parent, "нет данных", 12, Color.gray, TextAnchor.MiddleLeft, x, y, ColumnWidth, DamageRowHeight);
+            return;
+        }
+
+        float barX = x + DamageIconSize + 6f;
+        float barWidth = ColumnWidth - DamageIconSize - 6f;
+        var barColor = team.IsLocal ? new Color(0.3f, 0.6f, 1f, 0.55f) : new Color(1f, 0.35f, 0.3f, 0.55f);
+        foreach (var row in rows)
+        {
+            float iy = y + (DamageRowHeight - DamageIconSize) * 0.5f;
+            var icon = row.IconCandidates.Length > 0
+                ? AddIcon(parent, row.IconCandidates, row.Name, x, iy, DamageIconSize)
+                : AddText(parent, "", 11, Color.white, TextAnchor.MiddleCenter, x, iy, DamageIconSize, DamageIconSize);
+
+            float fill = maxDamage > 0 ? barWidth * row.Damage / maxDamage : 0f;
+            if (fill >= 1f)
+                AddBar(parent, barX, y + 3f, fill, DamageRowHeight - 6f, barColor);
+            string label = row.Kills > 0 ? $"{row.Damage:N0}  ·  {row.Kills} уб." : row.Damage.ToString("N0");
+            if (row.IconCandidates.Length == 0)
+                label = $"{row.Name}: {label}";
+            var text = AddText(parent, label, 12, Color.white, TextAnchor.MiddleLeft, barX + 4f, y, barWidth - 4f, DamageRowHeight);
+
+            string hover = $"{row.Name}: урон {row.Damage:N0}, убито {row.Kills}, получено урона {row.Taken:N0}";
+            HoverTargets.Add((icon, hover));
+            HoverTargets.Add((text, hover));
+            y += DamageRowHeight;
+        }
+    }
+
+    static void AddBar(RectTransform parent, float x, float y, float width, float height, Color color)
+    {
+        var go = NewObject("Bar", parent);
+        Place(go.GetComponent<RectTransform>(), x, y, width, height);
+        var image = go.AddComponent<Image>();
+        image.color = color;
+        image.raycastTarget = false;
+    }
+
+    // Returns where the column's army part ends.
+    static float BuildTeam(RectTransform parent, TeamSnapshot team, float x, float y)
     {
         string who = team.IsLocal ? "Вы" : "Соперник";
         AddText(parent, $"{who} (команда {team.TeamIndex + 1})", 15, new Color(1f, 0.85f, 0.45f), TextAnchor.MiddleLeft, x, y, ColumnWidth, HeaderHeight, bold: true);
@@ -154,6 +231,8 @@ static class ScoutCanvas
             AddText(parent, $"×{unit.Cards} ур.{unit.MaxLevel}", 11, Color.white, TextAnchor.MiddleCenter, ux - 4f, uy + UnitSize, UnitCell, UnitLabelHeight);
             HoverTargets.Add((rect, $"{unit.Name}: {unit.Cards} отр., {unit.Mechs} шт., макс. уровень {unit.MaxLevel}"));
         }
+        int unitRows = Math.Max(1, (team.Units.Count + UnitsPerRow - 1) / UnitsPerRow);
+        return y + unitRows * (UnitSize + UnitLabelHeight);
     }
 
     // An icon, or the name as text when the game has no sprite for it.

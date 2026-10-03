@@ -326,7 +326,7 @@ static class AutoCamPatches
         knob.Set = set;
         if (current == knob.Ours)
         {
-            // Still ours; the setting may have changed since (F7 panel).
+            // Still ours; the setting may have changed since (F6 panel).
             float wanted = target(knob.Game);
             if (wanted != knob.Ours)
             {
@@ -379,7 +379,7 @@ static class AutoCamPatches
     // Diagnostics: how much the camera's view angle and distance actually wander, summed up every 10 s.
     internal static class ViewProbe
     {
-        // Latest sample, shown live in the F7 panel.
+        // Latest sample, shown live in the F6 panel.
         internal static float LastPitch, LastHeading, LastDistance, LastAt = -1f;
 
         const float Window = 10f;

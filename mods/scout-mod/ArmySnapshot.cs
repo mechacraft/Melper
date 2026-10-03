@@ -38,6 +38,8 @@ sealed class TeamSnapshot
     public long MaxHealth;
     public List<SpecialistInfo> Specialists = new();
     public List<UnitTypeInfo> Units = new();
+    // What each unit type did in the fight, read when it ended; empty until then.
+    public List<UnitDamageInfo> Damage = new();
 }
 
 sealed class MatchSnapshot
@@ -46,6 +48,8 @@ sealed class MatchSnapshot
     public int Round;
     // False when no fight has been seen in this match yet, so only the specialists are known.
     public bool HasArmy;
+    // True once the fight that started with this snapshot has ended and its damage was read.
+    public bool HasDamage;
     public List<TeamSnapshot> Teams = new();
 }
 

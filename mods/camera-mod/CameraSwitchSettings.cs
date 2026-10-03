@@ -2,7 +2,7 @@ namespace MelperCamera;
 
 // Settings for switching between camera modes (manual, auto, zoom, free fly, shoulder).
 // Change a value, close the game, then rebuild and deploy:
-//   dotnet build tools\camera-mod -c Release -p:Deploy=true
+//   dotnet build mods\camera-mod -c Release -p:Deploy=true
 // What the game had and what the mod changed is printed once in MelonLoader\Latest.log as "switch blend ...".
 static class CameraSwitchSettings
 {

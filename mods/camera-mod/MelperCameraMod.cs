@@ -49,7 +49,7 @@ public sealed class MelperCameraMod : MelonMod
 
     public override void OnUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.F7))
+        if (Input.GetKeyDown(KeyCode.F6))
             AutoCamPanel.Toggle();
         AutoCamPanel.Update();
 

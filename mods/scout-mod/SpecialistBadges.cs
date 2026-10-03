@@ -18,6 +18,8 @@ static class SpecialistBadges
     const string BadgeName = "MelperScout.Specialists";
     const float SizeOfAvatar = 0.42f;
     const float Gap = 2f;
+    // Clearance from the avatar and from the name plate, as a share of a portrait's size.
+    const float Clearance = 1f / 3f;
 
     // Avatar image pointer -> the badge row we attached to it and the specialists it shows.
     static readonly Dictionary<IntPtr, (GameObject Row, string Key)> Rows = new();
@@ -95,8 +97,10 @@ static class SpecialistBadges
         var rowRect = row.GetComponent<RectTransform>();
         rowRect.anchorMin = rowRect.anchorMax = rowRect.pivot = new Vector2(toRight ? 0f : 1f, 1f);
         rowRect.sizeDelta = new Vector2(specialists.Count * (size + Gap) - Gap, size);
-        // Anchored to the avatar's pivot-relative coordinates via localPosition, so top lands exactly on the bar.
-        rowRect.localPosition = new Vector3(toRight ? box.xMax : box.xMin, top, 0f);
+        // Anchored to the avatar's pivot-relative coordinates via localPosition, then pushed out from the
+        // avatar and down from the name plate by a third of a portrait.
+        float clearance = size * Clearance;
+        rowRect.localPosition = new Vector3(toRight ? box.xMax + clearance : box.xMin - clearance, top - clearance, 0f);
 
         for (int i = 0; i < specialists.Count; i++)
         {

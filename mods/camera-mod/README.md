@@ -25,7 +25,7 @@ MelonLoader-мод, который меняет только камеру на �
 
 Настройки первых трёх пунктов лежат в `<игра>\UserData\MelonPreferences.cfg`,
 раздел `[MelperCamera]`. Auto-камеру удобнее всего крутить прямо в игре:
-`F7` выдвигает справа панель, где каждую настройку меняют кнопками `−`/`+`
+`F6` выдвигает справа панель, где каждую настройку меняют кнопками `−`/`+`
 (`Shift` — шаг ×5, зажатая кнопка повторяет). Там же видно текущий
 наклон, курс и дистанцию камеры. Изменения сохраняются в тот же файл,
 раздел `[MelperCameraAuto]`; значения по умолчанию заданы в
@@ -41,7 +41,7 @@ MelonLoader-мод, который меняет только камеру на �
 `MelonLoader\Il2CppAssemblies`, на которые ссылается проект).
 
 ```powershell
-dotnet build tools\camera-mod -c Release -p:Deploy=true
+dotnet build mods\camera-mod -c Release -p:Deploy=true
 ```
 
 `Deploy=true` копирует `MelperCamera.dll` в `<игра>\Mods`; игру перед этим
