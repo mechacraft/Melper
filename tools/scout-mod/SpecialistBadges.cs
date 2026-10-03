@@ -11,7 +11,7 @@ using Object = UnityEngine.Object;
 namespace MelperScout;
 
 // Small specialist portraits beside each player's avatar in the game's own top panel: on the side where
-// the name and HP bar are, top edge right under the HP bar, side edge against the avatar.
+// the name and HP bar are, top edge right under the name plate, side edge against the avatar.
 // The game itself shows each player's specialist count there, so this is public information.
 static class SpecialistBadges
 {
@@ -39,7 +39,8 @@ static class SpecialistBadges
             seen.Add(image!.Pointer);
             byTeam.TryGetValue(controller!.GetTeamIndex(), out var team);
             var slider = Alive(panel.lifeSlider) ? panel.lifeSlider.GetComponent<RectTransform>() : null;
-            Attach(image, slider, team?.Specialists ?? new List<SpecialistInfo>());
+            var name = Alive(panel.nameText) ? panel.nameText.rectTransform : null;
+            Attach(image, slider, name, team?.Specialists ?? new List<SpecialistInfo>());
         }
 
         foreach (var key in Rows.Keys.Where(k => !seen.Contains(k)).ToList())
@@ -58,7 +59,7 @@ static class SpecialistBadges
         Rows.Clear();
     }
 
-    static void Attach(GRImage avatar, RectTransform? hpBar, List<SpecialistInfo> specialists)
+    static void Attach(GRImage avatar, RectTransform? hpBar, RectTransform? nameText, List<SpecialistInfo> specialists)
     {
         string key = string.Join(",", specialists.Select(s => s.Id));
         if (Rows.TryGetValue(avatar.Pointer, out var existing) && Alive(existing.Row))
@@ -73,24 +74,18 @@ static class SpecialistBadges
 
         var avatarRect = avatar.rectTransform;
         var box = avatarRect.rect;
-        // The HP bar in the avatar's own coordinates: which side it is on, and where its bottom edge is.
+        // In the avatar's own coordinates: the HP bar says which side to use, and the row starts
+        // below whichever is lower, the HP bar or the name plate under it.
         bool toRight = true;
         float top = box.yMax;
         if (hpBar != null)
         {
-            var corners = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<Vector3>(4);
-            hpBar.GetWorldCorners(corners);
-            float minX = float.MaxValue, maxX = float.MinValue, minY = float.MaxValue;
-            for (int c = 0; c < 4; c++)
-            {
-                var local = avatarRect.InverseTransformPoint(corners[c]);
-                minX = Math.Min(minX, local.x);
-                maxX = Math.Max(maxX, local.x);
-                minY = Math.Min(minY, local.y);
-            }
+            var (minX, maxX, minY) = Bounds(avatarRect, hpBar);
             toRight = (minX + maxX) / 2f >= box.center.x;
             top = minY;
         }
+        if (nameText != null)
+            top = Math.Min(top, Bounds(avatarRect, nameText).MinY);
         float room = top - box.yMin;
         float size = Math.Max(16f, Math.Min(box.height * SizeOfAvatar, room > 16f ? room : float.MaxValue));
         MelperScoutMod.Log.Msg($"specialists by avatar: {(toRight ? "right" : "left")} side, top {top - box.yMax:F0} from avatar top, size {size:F0}");
@@ -122,6 +117,21 @@ static class SpecialistBadges
             img.raycastTarget = false;
         }
         Rows[avatar.Pointer] = (row, key);
+    }
+
+    static (float MinX, float MaxX, float MinY) Bounds(RectTransform space, RectTransform target)
+    {
+        var corners = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<Vector3>(4);
+        target.GetWorldCorners(corners);
+        float minX = float.MaxValue, maxX = float.MinValue, minY = float.MaxValue;
+        for (int c = 0; c < 4; c++)
+        {
+            var local = space.InverseTransformPoint(corners[c]);
+            minX = Math.Min(minX, local.x);
+            maxX = Math.Max(maxX, local.x);
+            minY = Math.Min(minY, local.y);
+        }
+        return (minX, maxX, minY);
     }
 
     static Sprite? FaceSprite(SpecialistInfo specialist)
